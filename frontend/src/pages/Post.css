@@ -1,0 +1,734 @@
+/* ============================================================
+   POST PAGE
+   ============================================================ */
+
+.post-page {
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.post-header {
+    background: white;
+    padding: 45px;
+    border-radius: 18px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.post-category {
+    display: inline-block;
+
+    padding: 7px 14px;
+
+    border-radius: 20px;
+
+    background: #eee7ff;
+    color: #6c3fd5;
+
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.post-header h1 {
+    margin: 18px 0 12px;
+
+    font-size: 42px;
+    line-height: 1.2;
+}
+
+.post-description {
+    max-width: 850px;
+
+    margin: 0;
+
+    font-size: 18px;
+    line-height: 1.7;
+
+    color: #666;
+}
+
+.post-meta {
+    display: flex;
+
+    gap: 25px;
+
+    margin-top: 25px;
+
+    color: #666;
+
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   MAIN 70% + SIDEBAR 30%
+   ============================================================ */
+
+.post-layout {
+    display: grid;
+
+    /*
+       Main Story = 70%
+       Sidebar    = 30%
+    */
+    grid-template-columns: 7fr 3fr;
+
+    gap: 25px;
+
+    align-items: start;
+}
+
+
+/* ============================================================
+   MAIN STORY - 70%
+   ============================================================ */
+
+.main-story {
+    width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    background: white;
+
+    padding: 40px;
+
+    border-radius: 18px;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+}
+
+.main-story-label {
+    display: inline-block;
+
+    margin-bottom: 25px;
+
+    padding: 7px 13px;
+
+    border-radius: 20px;
+
+    background: #e9f4ff;
+    color: #2774c7;
+
+    font-size: 13px;
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.5px;
+}
+
+.main-story-content {
+    min-width: 0;
+
+    font-size: 18px;
+
+    line-height: 1.9;
+
+    color: #333;
+
+    overflow-wrap: break-word;
+}
+
+.main-story-content > p {
+    margin: 0;
+
+    line-height: 1.9;
+}
+
+
+/* ============================================================
+   SIDEBAR - 30%
+   ============================================================ */
+
+.post-sidebar {
+    width: 100%;
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+
+    /*
+       Keep sidebar visible while
+       reading a long story.
+    */
+    position: sticky;
+
+    top: 20px;
+}
+
+
+/* ============================================================
+   SIDEBAR CARDS
+   ============================================================ */
+
+.side-card {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    background: white;
+
+    padding: 22px;
+
+    border-radius: 15px;
+
+    border-left: 4px solid #6c3fd5;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+
+    overflow: hidden;
+}
+
+.side-card h3 {
+    margin: 0 0 10px;
+
+    font-size: 17px;
+}
+
+.side-card p {
+    margin: 0;
+
+    color: #555;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+
+    overflow-wrap: break-word;
+}
+
+
+/* ============================================================
+   LESSONS SIDEBAR
+   ============================================================ */
+
+.lessons-card {
+    background: #fff8e8;
+
+    border-left-color: #e2a526;
+}
+
+.sidebar-lessons {
+    color: #555;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+
+    overflow-wrap: break-word;
+
+    word-break: normal;
+}
+
+.sidebar-lessons p {
+    margin-bottom: 8px;
+}
+
+.sidebar-lessons h2,
+.sidebar-lessons h3 {
+    margin-top: 10px;
+
+    margin-bottom: 8px;
+}
+
+.sidebar-lessons ul,
+.sidebar-lessons ol {
+    padding-left: 20px;
+
+    margin-top: 8px;
+}
+
+
+/* ============================================================
+   SIDEBAR IMAGES
+   ============================================================ */
+
+/*
+   Images inside the Lessons sidebar
+   must never become huge.
+*/
+
+.sidebar-lessons img {
+    display: block;
+
+    width: 100%;
+
+    max-width: 100%;
+
+    height: auto;
+
+    max-height: 220px;
+
+    margin: 15px auto;
+
+    border-radius: 8px;
+
+    object-fit: contain;
+}
+
+
+/* ============================================================
+   CONTACT STORYTELLER
+   ============================================================ */
+
+.storyteller-contact {
+    margin-top: 15px;
+}
+
+.contact-storyteller-btn {
+    display: inline-block;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 10px 15px;
+
+    background: #6c3fd5;
+
+    color: white;
+
+    text-align: center;
+
+    text-decoration: none;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    transition: 0.2s ease;
+}
+
+.contact-storyteller-btn:hover {
+    opacity: 0.85;
+
+    transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   TAGS
+   ============================================================ */
+
+.post-tags {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+}
+
+.post-tag {
+    padding: 6px 10px;
+
+    border-radius: 15px;
+
+    background: #f0f3ff;
+
+    color: #4c63c9;
+
+    font-size: 12px;
+}
+
+
+/* ============================================================
+   RICH TEXT
+   ============================================================ */
+
+/*
+   This class is kept for rich-text content if
+   you use it elsewhere in the post page.
+*/
+
+.rich-text-content {
+    max-width: 100%;
+
+    font-size: 18px;
+
+    line-height: 1.9;
+
+    overflow-wrap: break-word;
+}
+
+.rich-text-content p {
+    margin-bottom: 15px;
+}
+
+.rich-text-content h2 {
+    margin-top: 30px;
+
+    margin-bottom: 12px;
+
+    font-size: 27px;
+}
+
+.rich-text-content h3 {
+    margin-top: 25px;
+
+    margin-bottom: 10px;
+
+    font-size: 22px;
+}
+
+.rich-text-content strong {
+    font-weight: bold;
+}
+
+.rich-text-content em {
+    font-style: italic;
+}
+
+.rich-text-content ul,
+.rich-text-content ol {
+    margin-bottom: 15px;
+
+    padding-left: 25px;
+}
+
+.rich-text-content li {
+    margin-bottom: 7px;
+}
+
+
+/* ============================================================
+   RICH TEXT IMAGES
+   ============================================================ */
+
+/*
+   Safety size for any rich-text image.
+
+   The image can never become wider than
+   the available content area and will not
+   become extremely tall.
+*/
+
+.rich-text-content img {
+    display: block;
+
+    width: 100%;
+
+    max-width: 650px;
+
+    height: auto;
+
+    max-height: 350px;
+
+    margin: 30px auto;
+
+    border-radius: 10px;
+
+    object-fit: contain;
+}
+
+
+/* ============================================================
+   ADDITIONAL STORIES
+   ============================================================ */
+
+.additional-stories {
+    margin-top: 0;
+}
+
+.additional-story {
+    padding: 15px 0;
+
+    margin-bottom: 10px;
+
+    border-bottom: 1px solid #eee;
+}
+
+.additional-story:last-child {
+    border-bottom: none;
+
+    margin-bottom: 0;
+}
+
+.additional-story h4 {
+    margin: 0 0 8px;
+
+    font-size: 15px;
+}
+
+.additional-story p {
+    margin: 0;
+
+    color: #555;
+
+    line-height: 1.7;
+}
+
+
+/* ============================================================
+   ACTION BUTTONS
+   ============================================================ */
+
+.post-actions {
+    display: flex;
+
+    gap: 10px;
+}
+
+.post-actions button {
+    flex: 1;
+
+    border: none;
+
+    padding: 10px 14px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    background: #f2f2f2;
+
+    font-size: 14px;
+
+    transition: 0.2s ease;
+}
+
+.post-actions button:hover {
+    background: #e8e8e8;
+
+    transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   COMMENTS
+   ============================================================ */
+
+.comments-section {
+    margin-top: 30px;
+
+    background: white;
+
+    padding: 35px;
+
+    border-radius: 18px;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+}
+
+.comments-section h2 {
+    margin-top: 0;
+
+    margin-bottom: 25px;
+}
+
+.comment-form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+    margin-bottom: 30px;
+}
+
+.comment-form input,
+.comment-form textarea {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 13px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 10px;
+
+    font-family: inherit;
+
+    font-size: 14px;
+}
+
+.comment-form textarea {
+    min-height: 120px;
+
+    resize: vertical;
+}
+
+.comment-form button {
+    align-self: flex-start;
+
+    border: none;
+
+    padding: 12px 20px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    background: #6c3fd5;
+
+    color: white;
+
+    font-weight: bold;
+}
+
+.comment-form button:hover {
+    opacity: 0.9;
+}
+
+.comment-card {
+    padding: 18px;
+
+    margin-bottom: 12px;
+
+    background: #f7f7f7;
+
+    border-radius: 12px;
+}
+
+.comment-card strong {
+    display: block;
+
+    margin-bottom: 5px;
+}
+
+.comment-card p {
+    margin-top: 8px;
+
+    line-height: 1.6;
+}
+
+.empty-comments {
+    color: #777;
+}
+
+
+/* ============================================================
+   STATUS / ERROR
+   ============================================================ */
+
+.post-status,
+.post-error {
+    text-align: center;
+
+    padding: 50px;
+
+    font-size: 18px;
+}
+
+.post-error {
+    color: #c0392b;
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 800px) {
+
+    .post-page {
+        width: 94%;
+
+        margin: 25px auto;
+    }
+
+
+    /* Header */
+
+    .post-header {
+        padding: 28px;
+    }
+
+    .post-header h1 {
+        font-size: 30px;
+    }
+
+    .post-description {
+        font-size: 16px;
+    }
+
+    .post-meta {
+        flex-wrap: wrap;
+
+        gap: 12px;
+    }
+
+
+    /* Main story + sidebar stack */
+
+    .post-layout {
+        grid-template-columns: 1fr;
+
+        gap: 20px;
+    }
+
+
+    /* Sidebar is no longer sticky */
+
+    .post-sidebar {
+        position: static;
+    }
+
+
+    /* Main story */
+
+    .main-story {
+        padding: 25px;
+    }
+
+    .main-story-content {
+        font-size: 16px;
+    }
+
+
+    /* Rich text */
+
+    .rich-text-content {
+        font-size: 16px;
+    }
+
+
+    /*
+       Mobile images stay controlled.
+       They use the available width but
+       cannot become excessively tall.
+    */
+
+    .sidebar-lessons img {
+        width: 100%;
+
+        max-width: 100%;
+
+        height: auto;
+
+        max-height: 300px;
+    }
+
+    .rich-text-content img {
+        width: 100%;
+
+        max-width: 100%;
+
+        height: auto;
+
+        max-height: 300px;
+    }
+
+
+    /* Comments */
+
+    .comments-section {
+        padding: 25px;
+    }
+
+    .comment-form button {
+        width: 100%;
+    }
+}

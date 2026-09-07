@@ -1,0 +1,385 @@
+/* ============================================================
+   CREATE STORY PAGE
+   ============================================================ */
+
+.create-story-page {
+    min-height: calc(100vh - 70px);
+    background: #f5f7fb;
+    padding: 40px 20px 60px;
+    box-sizing: border-box;
+}
+
+
+/* ============================================================
+   MAIN CONTAINER
+   ============================================================ */
+
+.create-story-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 35px;
+    box-sizing: border-box;
+
+    background: #ffffff;
+    border-radius: 16px;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+
+.create-story-container h1 {
+    margin: 0 0 30px;
+
+    text-align: center;
+
+    font-size: 32px;
+    color: #1f2937;
+}
+
+
+/* ============================================================
+   MESSAGES
+   ============================================================ */
+
+.success-message {
+    margin-bottom: 20px;
+    padding: 12px 15px;
+
+    border-radius: 8px;
+
+    background: #ecfdf5;
+    color: #047857;
+
+    font-size: 14px;
+}
+
+
+.error-message {
+    margin-bottom: 20px;
+    padding: 12px 15px;
+
+    border-radius: 8px;
+
+    background: #fef2f2;
+    color: #b91c1c;
+
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #374151;
+}
+
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 12px 14px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    font-family: inherit;
+    font-size: 15px;
+
+    outline: none;
+}
+
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #6c3fd5;
+}
+
+
+.form-group textarea {
+    min-height: 120px;
+
+    resize: vertical;
+
+    line-height: 1.6;
+}
+
+
+/* ============================================================
+   EDITOR
+   ============================================================ */
+
+.editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-bottom: 10px;
+}
+
+
+.editor-button {
+    padding: 8px 12px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #374151;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.editor-button:hover {
+    background: #f3f4f6;
+}
+
+
+.editor-button.active {
+    background: #6c3fd5;
+    color: #ffffff;
+
+    border-color: #6c3fd5;
+}
+
+
+.rich-text-editor {
+    min-height: 280px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    background: #ffffff;
+}
+
+
+.rich-text-editor .ProseMirror {
+    min-height: 280px;
+
+    padding: 15px;
+
+    box-sizing: border-box;
+
+    outline: none;
+
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+
+.rich-text-editor img {
+    display: block;
+
+    width: auto;
+    max-width: 100%;
+
+    max-height: 350px;
+
+    margin: 20px auto;
+
+    border-radius: 8px;
+
+    object-fit: contain;
+}
+
+
+/* ============================================================
+   IMAGE UPLOAD
+   ============================================================ */
+
+.upload-image-button {
+    margin-top: 10px;
+
+    padding: 10px 16px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #374151;
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.upload-image-button:hover {
+    background: #1f2937;
+}
+
+
+.upload-image-button:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+/* ============================================================
+   UPLOADED IMAGE PREVIEW
+   ============================================================ */
+
+.uploaded-image-preview {
+    margin-top: 20px;
+    padding: 15px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    background: #f9fafb;
+
+    overflow: hidden;
+}
+
+
+.uploaded-image-preview p {
+    margin: 0 0 12px;
+
+    font-size: 13px;
+    color: #4b5563;
+}
+
+
+/*
+   This controls ONLY the preview image.
+   It prevents the uploaded image from
+   taking over the entire page.
+*/
+
+.uploaded-image-preview img {
+    display: block;
+
+    width: auto;
+    max-width: 100%;
+
+    height: auto;
+    max-height: 300px;
+
+    margin: 0 auto;
+
+    border-radius: 8px;
+
+    object-fit: contain;
+}
+
+
+/* Prevent a long image URL from
+   creating horizontal scrolling. */
+
+.image-url {
+    margin-top: 12px !important;
+
+    overflow-wrap: anywhere;
+
+    word-break: break-word;
+
+    font-size: 12px !important;
+    color: #6b7280 !important;
+}
+
+
+/* ============================================================
+   CREATE BUTTON
+   ============================================================ */
+
+.create-story-button {
+    display: block;
+
+    width: 100%;
+
+    padding: 13px 20px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #6c3fd5;
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.create-story-button:hover {
+    background: #5930b7;
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+    .create-story-page {
+        padding: 20px 12px 40px;
+    }
+
+
+    .create-story-container {
+        padding: 22px 18px;
+        border-radius: 12px;
+    }
+
+
+    .create-story-container h1 {
+        font-size: 27px;
+    }
+
+
+    .editor-toolbar {
+        gap: 6px;
+    }
+
+
+    .editor-button {
+        padding: 7px 9px;
+
+        font-size: 12px;
+    }
+
+
+    .rich-text-editor .ProseMirror {
+        min-height: 240px;
+    }
+
+
+    .rich-text-editor img {
+        max-height: 250px;
+    }
+
+
+    .uploaded-image-preview img {
+        max-height: 220px;
+    }
+
+}

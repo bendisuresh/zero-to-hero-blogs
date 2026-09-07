@@ -1,0 +1,94 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 30px;
+    background-color: #222;
+}
+
+.navbar-logo a {
+    color: white;
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.navbar-links {
+    display: flex;
+    gap: 20px;
+}
+
+.navbar-links a,
+.navbar-admin a {
+    color: white;
+    text-decoration: none;
+}
+
+.navbar-links a:hover,
+.navbar-admin a:hover {
+    text-decoration: underline;
+}
+
+/* Hide mobile menu button on desktop */
+.menu-button {
+    display: none;
+}
+
+/* Hide mobile-only admin link on desktop */
+.mobile-admin {
+    display: none;
+}
+
+
+/* =========================
+   Mobile
+   ========================= */
+
+@media (max-width: 768px) {
+    .navbar {
+        position: relative;
+        flex-wrap: wrap;
+        padding: 15px 20px;
+    }
+
+    .menu-button {
+        display: block;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+    }
+
+    /* Hide desktop admin link */
+    .navbar-admin {
+        display: none;
+    }
+
+    /* Hide navigation links by default */
+    .navbar-links {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        gap: 0;
+        margin-top: 15px;
+    }
+
+    /* Show navigation when hamburger is clicked */
+    .navbar-links-open {
+        display: flex;
+    }
+
+    .navbar-links a {
+        padding: 12px 0;
+    }
+
+    /* Show Admin Login inside mobile menu */
+    .mobile-admin {
+        display: block;
+    }
+
+    .mobile-admin a {
+        display: block;
+    }
+}

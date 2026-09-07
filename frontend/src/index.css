@@ -1,0 +1,29 @@
+/* Remove the browser's default spacing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Basic page settings */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #222;
+}
+/* Main content area */
+main {
+  padding: 60px 40px;
+  text-align: center;
+}
+
+main h1 {
+  margin-bottom: 15px;
+  font-size: 40px;
+}
+
+main p {
+  font-size: 18px;
+  line-height: 1.6;
+}

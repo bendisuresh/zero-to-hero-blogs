@@ -1,0 +1,260 @@
+/* Main Home page */
+.home-page {
+  width: 100%;
+}
+
+/* Hero section */
+.home-hero {
+  padding: 100px 40px;
+  text-align: center;
+  background-color: #e5e7eb;
+}
+
+.home-hero h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.home-hero p {
+  max-width: 700px;
+  margin: 0 auto 30px;
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+.home-hero button {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 6px;
+  background-color: #111827;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.home-hero button:hover {
+  opacity: 0.8;
+}
+
+/* Categories */
+.home-categories {
+  padding: 70px 40px;
+  text-align: center;
+}
+
+.home-categories h2,
+.home-journey h2 {
+  font-size: 32px;
+  margin-bottom: 35px;
+}
+
+.category-container {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  flex-wrap: wrap;
+}
+
+.category-card {
+  width: 240px;
+  padding: 25px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background-color: white;
+}
+
+.category-card h3 {
+  margin-bottom: 12px;
+  font-size: 22px;
+}
+
+.category-card p {
+  line-height: 1.5;
+}
+
+/* Journey section */
+.home-journey {
+  padding: 70px 40px;
+  text-align: center;
+  background-color: #f3f4f6;
+}
+
+.home-journey > p {
+  max-width: 700px;
+  margin: 0 auto 40px;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.journey-steps {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  flex-wrap: wrap;
+}
+
+.journey-steps div {
+  width: 200px;
+  padding: 25px;
+  background-color: white;
+  border-radius: 10px;
+}
+
+.journey-steps span {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.journey-steps h3 {
+  margin: 10px 0;
+}
+
+.journey-steps p {
+  line-height: 1.5;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .home-hero {
+    padding: 70px 20px;
+  }
+
+  .home-hero h1 {
+    font-size: 36px;
+  }
+
+  .home-hero p {
+    font-size: 17px;
+  }
+
+  .home-categories,
+  .home-journey {
+    padding: 50px 20px;
+  }
+}
+
+/* =========================
+   HOME EXPLORE LINKS
+   ========================= */
+
+.category-card {
+    display: block;
+
+    text-decoration: none;
+    color: inherit;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   LATEST STORIES
+   ========================= */
+
+.home-latest-stories {
+    max-width: 1200px;
+
+    margin: 0 auto;
+    padding: 60px 28px;
+}
+
+.home-latest-stories h2 {
+    margin: 0 0 10px;
+
+    text-align: center;
+
+    font-size: 28px;
+    color: #1f2937;
+}
+
+.home-section-description {
+    margin: 0 auto 30px;
+
+    text-align: center;
+
+    color: #6b7280;
+    font-size: 15px;
+}
+
+.home-posts {
+    display: grid;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 24px;
+}
+
+.home-message {
+    margin: 30px 0;
+
+    text-align: center;
+
+    color: #4b5563;
+}
+
+.home-error {
+    color: #b91c1c;
+}
+
+
+/* =========================
+   EXPLORE BUTTON
+   ========================= */
+
+.home-explore-button {
+    display: inline-block;
+
+    margin-top: 10px;
+    padding: 11px 20px;
+
+    border-radius: 7px;
+
+    background: #1f2937;
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.home-explore-button:hover {
+    background: #374151;
+}
+
+
+/* =========================
+   TABLET
+   ========================= */
+
+@media (max-width: 900px) {
+
+    .home-posts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .home-latest-stories {
+        padding: 50px 20px;
+    }
+}
+
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 600px) {
+
+    .home-latest-stories {
+        padding: 40px 12px;
+    }
+
+    .home-latest-stories h2 {
+        font-size: 24px;
+    }
+
+    .home-posts {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+}
