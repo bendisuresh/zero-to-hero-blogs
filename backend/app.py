@@ -1197,7 +1197,7 @@ def uploaded_file(filename):
 # ============================================================
 
 @app.route(
-    "/rss.xml",
+    "/api/rss",
     methods=["GET"]
 )
 def rss_feed():
