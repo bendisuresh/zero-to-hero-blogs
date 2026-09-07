@@ -3,6 +3,7 @@ from database import db
 
 class Post(db.Model):
     __tablename__ = "posts"
+    __table_args__ = {"schema": "public"}
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -11,6 +12,7 @@ class Post(db.Model):
     category = db.Column(db.String(50), nullable=False)
     storyteller = db.Column(db.String(100), nullable=False)
     storyteller_email = db.Column(db.String(255))
+
     starting_point = db.Column(db.Text, nullable=False)
     how_started = db.Column(db.Text, nullable=False)
     financial_info = db.Column(db.Text, nullable=False)
@@ -24,7 +26,6 @@ class Post(db.Model):
     dislikes = db.Column(db.Integer, default=0)
     tags = db.Column(db.String(300), default="")
 
-    # Stores when the story was created
     created_at = db.Column(
         db.DateTime,
         server_default=db.func.now(),
@@ -34,6 +35,7 @@ class Post(db.Model):
 
 class Admin(db.Model):
     __tablename__ = "admins"
+    __table_args__ = {"schema": "public"}
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -51,12 +53,13 @@ class Admin(db.Model):
 
 class AdditionalStory(db.Model):
     __tablename__ = "additional_stories"
+    __table_args__ = {"schema": "public"}
 
     id = db.Column(db.Integer, primary_key=True)
 
     post_id = db.Column(
         db.Integer,
-        db.ForeignKey("posts.id"),
+        db.ForeignKey("public.posts.id"),
         nullable=False
     )
 
@@ -78,12 +81,13 @@ class AdditionalStory(db.Model):
 
 class Comment(db.Model):
     __tablename__ = "comments"
+    __table_args__ = {"schema": "public"}
 
     id = db.Column(db.Integer, primary_key=True)
 
     post_id = db.Column(
         db.Integer,
-        db.ForeignKey("posts.id"),
+        db.ForeignKey("public.posts.id"),
         nullable=False
     )
 

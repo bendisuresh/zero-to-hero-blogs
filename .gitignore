@@ -10,6 +10,7 @@ frontend/.env
 backend/venv/
 backend/.env
 backend/uploads/
+backend/neon_data.sql
 
 
 # Python
