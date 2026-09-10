@@ -1,6 +1,7 @@
 import os
 import uuid
 from datetime import datetime
+from functools import wraps
 
 import bleach
 from dotenv import load_dotenv
@@ -10,7 +11,8 @@ from flask_jwt_extended import (
     JWTManager,
     create_access_token,
     jwt_required,
-    get_jwt_identity
+    get_jwt_identity,
+    get_jwt
 )
 from werkzeug.security import (
     check_password_hash,
@@ -116,6 +118,25 @@ app.config["JWT_SECRET_KEY"] = os.getenv(
 db.init_app(app)
 
 jwt = JWTManager(app)
+
+
+def admin_required():
+    def decorator(fn):
+        @wraps(fn)
+        @jwt_required()
+        def wrapper(*args, **kwargs):
+            claims = get_jwt()
+
+            if claims.get("role") != "admin":
+                return jsonify({
+                    "message": "Admin access required"
+                }), 403
+
+            return fn(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 
 # ============================================================
@@ -386,72 +407,6 @@ def get_post(post_id):
 # CREATE POST
 # ============================================================
 
-@app.route(
-    "/api/posts",
-    methods=["POST"]
-)
-def create_post():
-
-    data = request.get_json()
-
-    # Validate data
-    validation_error = validate_post_data(data)
-
-    if validation_error:
-
-        return {
-            "message": validation_error
-        }, 400
-
-    storyteller_email = data.get(
-        "storyteller_email",
-        ""
-    ).strip()
-
-    post = Post(
-
-        title=data["title"].strip(),
-
-        description=data["description"].strip(),
-
-        category=data["category"].strip(),
-
-        storyteller=data["storyteller"].strip(),
-
-        storyteller_email=storyteller_email,
-
-        starting_point=data["starting_point"].strip(),
-
-        how_started=data["how_started"].strip(),
-
-        financial_info=data["financial_info"].strip(),
-
-        approach=data["approach"].strip(),
-
-        life_changed=data["life_changed"].strip(),
-
-        failures=data["failures"].strip(),
-
-        lessons=sanitize_rich_text(
-            data["lessons"]
-        ),
-
-        tags=data.get(
-            "tags",
-            ""
-        ).strip()
-    )
-
-    db.session.add(post)
-
-    db.session.commit()
-
-    return {
-        "message": "Post created successfully",
-        "post_id": post.id
-    }, 201
-
-
 # ============================================================
 # ADMIN LOGIN
 # ============================================================
@@ -500,7 +455,10 @@ def admin_login():
         }, 401
 
     access_token = create_access_token(
-        identity=admin.email
+        identity=admin.email,
+        additional_claims={
+            "role": "admin"
+        }
     )
 
     return {
@@ -517,7 +475,7 @@ def admin_login():
     "/api/admin/dashboard",
     methods=["GET"]
 )
-@jwt_required()
+@admin_required()
 def admin_dashboard():
 
     current_admin = get_jwt_identity()
@@ -536,7 +494,7 @@ def admin_dashboard():
     "/api/admin/posts",
     methods=["POST"]
 )
-@jwt_required()
+@admin_required()
 def admin_create_post():
 
     data = request.get_json()
@@ -608,7 +566,7 @@ def admin_create_post():
     "/api/admin/posts/<int:post_id>/additional-stories",
     methods=["POST"]
 )
-@jwt_required()
+@admin_required()
 def add_additional_story(post_id):
 
     data = request.get_json()
@@ -713,7 +671,7 @@ def get_additional_stories(post_id):
     "/api/admin/posts/<int:post_id>",
     methods=["DELETE"]
 )
-@jwt_required()
+@admin_required()
 def delete_post(post_id):
 
     post = db.session.get(
@@ -785,7 +743,7 @@ def delete_post(post_id):
     "/api/admin/posts/<int:post_id>",
     methods=["PUT"]
 )
-@jwt_required()
+@admin_required()
 def update_post(post_id):
 
     post = db.session.get(
@@ -970,7 +928,7 @@ def get_comments(post_id):
     "/api/admin/comments/<int:comment_id>",
     methods=["DELETE"]
 )
-@jwt_required()
+@admin_required()
 def delete_comment(comment_id):
 
     comment = db.session.get(
@@ -1106,7 +1064,7 @@ def view_post(post_id):
     "/api/admin/upload",
     methods=["POST"]
 )
-@jwt_required()
+@admin_required()
 def upload_image():
 
     # Check whether request contains an image
