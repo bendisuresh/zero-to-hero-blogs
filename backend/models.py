@@ -1,9 +1,13 @@
+import os
+
 from database import db
 
 
+TESTING = os.getenv("TESTING") == "1"
+
 class Post(db.Model):
     __tablename__ = "posts"
-    __table_args__ = {"schema": "public"}
+    __table_args__ = {} if TESTING else {"schema": "public"}
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -35,7 +39,7 @@ class Post(db.Model):
 
 class Admin(db.Model):
     __tablename__ = "admins"
-    __table_args__ = {"schema": "public"}
+    __table_args__ = {} if TESTING else {"schema": "public"}
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -53,13 +57,13 @@ class Admin(db.Model):
 
 class AdditionalStory(db.Model):
     __tablename__ = "additional_stories"
-    __table_args__ = {"schema": "public"}
+    __table_args__ = {} if TESTING else {"schema": "public"}
 
     id = db.Column(db.Integer, primary_key=True)
 
     post_id = db.Column(
         db.Integer,
-        db.ForeignKey("public.posts.id"),
+        db.ForeignKey("posts.id" if TESTING else "public.posts.id"),
         nullable=False
     )
 
@@ -81,13 +85,13 @@ class AdditionalStory(db.Model):
 
 class Comment(db.Model):
     __tablename__ = "comments"
-    __table_args__ = {"schema": "public"}
+    __table_args__ = {} if TESTING else {"schema": "public"}
 
     id = db.Column(db.Integer, primary_key=True)
 
     post_id = db.Column(
         db.Integer,
-        db.ForeignKey("public.posts.id"),
+        db.ForeignKey("posts.id" if TESTING else "public.posts.id"),
         nullable=False
     )
 
