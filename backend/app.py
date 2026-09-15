@@ -1,10 +1,10 @@
 import os
-from datetime import datetime
+
 from functools import wraps
 
 import bleach
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request, Response
+from flask import Flask
 from flask_cors import CORS
 from routes.auth import auth_bp, admin_required
 from routes.posts import posts_bp
@@ -15,10 +15,7 @@ from routes.rss import rss_bp
 from routes.additional_stories import additional_stories_bp
 from flask_jwt_extended import (
     JWTManager,
-    create_access_token,
-    jwt_required,
-    get_jwt_identity,
-    get_jwt
+    get_jwt_identity
 )
 from werkzeug.security import (
     check_password_hash,
@@ -27,7 +24,7 @@ from werkzeug.security import (
 
 
 from database import db
-from models import Post, Admin,AdditionalStory , Comment
+
 
 
 # ============================================================
@@ -58,13 +55,7 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
 # Allowed image extensions
-ALLOWED_EXTENSIONS = {
-    "png",
-    "jpg",
-    "jpeg",
-    "gif",
-    "webp"
-}
+
 
 
 # Create uploads folder if it does not already exist
@@ -217,72 +208,6 @@ def admin_dashboard():
 # DELETE POST
 # ============================================================
 
-@app.route(
-    "/api/admin/posts/<int:post_id>",
-    methods=["DELETE"]
-)
-@admin_required()
-def delete_post(post_id):
-
-    post = db.session.get(
-        Post,
-        post_id
-    )
-
-    # Story does not exist
-    if not post:
-
-        return jsonify({
-            "message": "Story not found"
-        }), 404
-
-    # Check when the story was created
-    created_at = post.created_at
-
-    # Current time
-    current_time = datetime.utcnow()
-
-    # Calculate how old the story is
-    age = current_time - created_at
-
-    # Delete is allowed only within 24 hours
-    if age.total_seconds() > 24 * 60 * 60:
-
-        return jsonify({
-            "message": (
-                "Stories can only be deleted "
-                "within 24 hours of creation."
-            )
-        }), 403
-
-    try:
-
-        # Delete related additional stories first
-        AdditionalStory.query.filter_by(
-            post_id=post.id
-        ).delete()
-
-        # Delete related comments
-        Comment.query.filter_by(
-            post_id=post.id
-        ).delete()
-
-        # Delete the main post
-        db.session.delete(post)
-
-        db.session.commit()
-
-        return jsonify({
-            "message": "Story deleted successfully"
-        }), 200
-
-    except Exception:
-
-        db.session.rollback()
-
-        return jsonify({
-            "message": "Failed to delete story"
-        }), 500
 
 
 # ============================================================
