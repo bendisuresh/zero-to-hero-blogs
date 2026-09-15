@@ -7,6 +7,7 @@ import bleach
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, send_from_directory, Response
 from flask_cors import CORS
+from routes.auth import auth_bp
 from flask_jwt_extended import (
     JWTManager,
     create_access_token,
@@ -118,7 +119,7 @@ app.config["JWT_SECRET_KEY"] = os.getenv(
 db.init_app(app)
 
 jwt = JWTManager(app)
-
+app.register_blueprint(auth_bp)
 
 def admin_required():
     def decorator(fn):
@@ -410,62 +411,6 @@ def get_post(post_id):
 # ============================================================
 # ADMIN LOGIN
 # ============================================================
-
-@app.route(
-    "/api/admin/login",
-    methods=["POST"]
-)
-def admin_login():
-
-    data = request.get_json()
-
-    if not data:
-
-        return {
-            "message": "Request body is required"
-        }, 400
-
-    email = data.get("email")
-
-    password = data.get("password")
-
-    if not email or not password:
-
-        return {
-            "message": "Email and password are required"
-        }, 400
-
-    admin = Admin.query.filter_by(
-        email=email
-    ).first()
-
-    if not admin:
-
-        return {
-            "message": "Invalid email or password"
-        }, 401
-
-    if not check_password_hash(
-        admin.password_hash,
-        password
-    ):
-
-        return {
-            "message": "Invalid email or password"
-        }, 401
-
-    access_token = create_access_token(
-        identity=admin.email,
-        additional_claims={
-            "role": "admin"
-        }
-    )
-
-    return {
-        "message": "Login successful",
-        "access_token": access_token
-    }, 200
-
 
 # ============================================================
 # ADMIN DASHBOARD
