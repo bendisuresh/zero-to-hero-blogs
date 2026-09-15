@@ -1,11 +1,32 @@
 from flask import Blueprint, request
-from flask_jwt_extended import create_access_token
+from functools import wraps
+from flask_jwt_extended import (
+    create_access_token,
+    jwt_required,
+    get_jwt
+)
 from werkzeug.security import check_password_hash
 
 from models import Admin
 
-
 auth_bp = Blueprint("auth", __name__)
+def admin_required():
+    def decorator(fn):
+        @wraps(fn)
+        @jwt_required()
+        def wrapper(*args, **kwargs):
+            claims = get_jwt()
+
+            if claims.get("role") != "admin":
+                return {
+                    "message": "Admin access required"
+                }, 403
+
+            return fn(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 
 @auth_bp.route("/api/admin/login", methods=["POST"])

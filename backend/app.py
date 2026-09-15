@@ -7,7 +7,8 @@ import bleach
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, send_from_directory, Response
 from flask_cors import CORS
-from routes.auth import auth_bp
+from routes.auth import auth_bp, admin_required
+from routes.posts import posts_bp
 from flask_jwt_extended import (
     JWTManager,
     create_access_token,
@@ -120,25 +121,7 @@ db.init_app(app)
 
 jwt = JWTManager(app)
 app.register_blueprint(auth_bp)
-
-def admin_required():
-    def decorator(fn):
-        @wraps(fn)
-        @jwt_required()
-        def wrapper(*args, **kwargs):
-            claims = get_jwt()
-
-            if claims.get("role") != "admin":
-                return jsonify({
-                    "message": "Admin access required"
-                }), 403
-
-            return fn(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
-
+app.register_blueprint(posts_bp)
 
 # ============================================================
 # CREATE DATABASE TABLES
@@ -151,141 +134,6 @@ with app.app_context():
 # ============================================================
 # RICH TEXT SANITIZATION
 # ============================================================
-
-def sanitize_rich_text(html):
-    """
-    Allow only the HTML formatting used by our Tiptap editor.
-
-    Dangerous HTML such as <script> is removed.
-    """
-
-    allowed_tags = [
-        "p",
-        "h2",
-        "h3",
-        "strong",
-        "em",
-        "ul",
-        "ol",
-        "li",
-        "a",
-        "img"
-    ]
-
-    allowed_attributes = {
-        "a": [
-            "href",
-            "target",
-            "rel"
-        ],
-        "img": [
-            "src",
-            "alt",
-            "title"
-        ]
-    }
-
-    return bleach.clean(
-        html,
-        tags=allowed_tags,
-        attributes=allowed_attributes,
-        protocols=[
-            "http",
-            "https"
-        ],
-        strip=True
-    )
-
-
-# ============================================================
-# POST VALIDATION
-# ============================================================
-
-def validate_post_data(data):
-    """
-    Validate the basic fields required for a blog post.
-
-    Returns:
-        None if valid
-        Error message if invalid
-    """
-
-    # Make sure request body exists
-    if not data:
-        return "Request body is required"
-
-    allowed_categories = {
-        "Business",
-        "Job",
-        "Investment",
-        "Other"
-    }
-
-    # Check category
-    if data.get("category") not in allowed_categories:
-        return "Invalid category"
-
-    required_fields = [
-        "title",
-        "description",
-        "category",
-        "storyteller",
-        "starting_point",
-        "how_started",
-        "financial_info",
-        "approach",
-        "life_changed",
-        "failures",
-        "lessons"
-    ]
-
-    # Check required fields
-    for field in required_fields:
-
-        value = data.get(field)
-
-        if not isinstance(value, str):
-            return f"{field} is required"
-
-        if not value.strip():
-            return f"{field} is required"
-
-    # Storyteller email is optional
-    storyteller_email = data.get(
-        "storyteller_email",
-        ""
-    )
-
-    # Prevent None from causing .strip() error
-    if storyteller_email is None:
-        storyteller_email = ""
-
-    if not isinstance(storyteller_email, str):
-        return "Storyteller email must be text"
-
-    storyteller_email = storyteller_email.strip()
-
-    if len(storyteller_email) > 255:
-        return "Storyteller email must be 255 characters or less"
-
-    # Check field lengths
-    if len(data["title"].strip()) > 200:
-        return "Title must be 200 characters or less"
-
-    if len(data["category"].strip()) > 50:
-        return "Category must be 50 characters or less"
-
-    if len(data["storyteller"].strip()) > 100:
-        return "Storyteller must be 100 characters or less"
-
-    if len(data["financial_info"].strip()) > 1000:
-        return "Financial info must be 1000 characters or less"
-
-    if len(data.get("tags", "").strip()) > 300:
-        return "Tags must be 300 characters or less"
-
-    return None
-
 
 # ============================================================
 # IMAGE FILE VALIDATION
@@ -319,89 +167,12 @@ def home():
 # GET ALL POSTS
 # ============================================================
 
-@app.route(
-    "/api/posts",
-    methods=["GET"]
-)
-def get_posts():
-
-    # Read optional category from query string
-    category = request.args.get("category")
-
-    query = Post.query
-
-    # Filter posts by category if provided
-    if category:
-        query = query.filter_by(
-            category=category
-        )
-
-    posts = (
-        query
-        .order_by(Post.created_at.desc())
-        .all()
-    )
-
-    posts_data = []
-
-    for post in posts:
-
-        posts_data.append({
-            "id": post.id,
-            "title": post.title,
-            "description": post.description,
-            "category": post.category,
-            "storyteller": post.storyteller,
-            "storyteller_email": post.storyteller_email,
-            "views": post.views or 0,
-            "likes": post.likes or 0,
-            "dislikes": post.dislikes or 0,
-            "tags": post.tags
-        })
-
-    return posts_data, 200
 
 
 # ============================================================
 # GET ONE POST
 # ============================================================
 
-@app.route(
-    "/api/posts/<int:post_id>",
-    methods=["GET"]
-)
-def get_post(post_id):
-
-    post = db.session.get(
-        Post,
-        post_id
-    )
-
-    if post is None:
-
-        return {
-            "message": "Post not found"
-        }, 404
-
-    return {
-        "id": post.id,
-        "title": post.title,
-        "description": post.description,
-        "category": post.category,
-        "storyteller": post.storyteller,
-        "storyteller_email": post.storyteller_email,
-        "starting_point": post.starting_point,
-        "how_started": post.how_started,
-        "financial_info": post.financial_info,
-        "approach": post.approach,
-        "life_changed": post.life_changed,
-        "failures": post.failures,
-        "lessons": post.lessons,
-        "views": post.views or 0,
-        "likes": post.likes or 0,
-        "dislikes": post.dislikes or 0,
-        "tags": post.tags
-    }, 200
 
 
 # ============================================================
@@ -435,72 +206,6 @@ def admin_dashboard():
 # ADMIN CREATE POST
 # ============================================================
 
-@app.route(
-    "/api/admin/posts",
-    methods=["POST"]
-)
-@admin_required()
-def admin_create_post():
-
-    data = request.get_json()
-
-    # Validate post data
-    validation_error = validate_post_data(data)
-
-    if validation_error:
-
-        return {
-            "message": validation_error
-        }, 400
-
-    storyteller_email = data.get(
-        "storyteller_email",
-        ""
-    ).strip()
-
-    post = Post(
-
-        title=data["title"].strip(),
-
-        description=data["description"].strip(),
-
-        category=data["category"].strip(),
-
-        storyteller=data["storyteller"].strip(),
-
-        storyteller_email=storyteller_email,
-
-        starting_point=data["starting_point"].strip(),
-
-        how_started=data["how_started"].strip(),
-
-        financial_info=data["financial_info"].strip(),
-
-        approach=data["approach"].strip(),
-
-        life_changed=data["life_changed"].strip(),
-
-        failures=data["failures"].strip(),
-
-        # Sanitize Tiptap HTML before storing it
-        lessons=sanitize_rich_text(
-            data["lessons"]
-        ),
-
-        tags=data.get(
-            "tags",
-            ""
-        ).strip()
-    )
-
-    db.session.add(post)
-
-    db.session.commit()
-
-    return {
-        "message": "Story created successfully",
-        "post_id": post.id
-    }, 201
 
 
 # ============================================================
@@ -684,77 +389,6 @@ def delete_post(post_id):
 # UPDATE POST
 # ============================================================
 
-@app.route(
-    "/api/admin/posts/<int:post_id>",
-    methods=["PUT"]
-)
-@admin_required()
-def update_post(post_id):
-
-    post = db.session.get(
-        Post,
-        post_id
-    )
-
-    if not post:
-
-        return {
-            "message": "Post not found"
-        }, 404
-
-    data = request.get_json()
-
-    # Validate data
-    validation_error = validate_post_data(data)
-
-    if validation_error:
-
-        return {
-            "message": validation_error
-        }, 400
-
-    storyteller_email = data.get(
-        "storyteller_email",
-        ""
-    ).strip()
-
-    post.title = data["title"].strip()
-
-    post.description = data["description"].strip()
-
-    post.category = data["category"].strip()
-
-    post.storyteller = data["storyteller"].strip()
-
-    post.storyteller_email = storyteller_email
-
-    post.starting_point = data["starting_point"].strip()
-
-    post.how_started = data["how_started"].strip()
-
-    post.financial_info = data["financial_info"].strip()
-
-    post.approach = data["approach"].strip()
-
-    post.life_changed = data["life_changed"].strip()
-
-    post.failures = data["failures"].strip()
-
-    # Sanitize rich text before saving
-    post.lessons = sanitize_rich_text(
-        data["lessons"]
-    )
-
-    if "tags" in data:
-
-        post.tags = data["tags"].strip()
-
-    db.session.commit()
-
-    return {
-        "message": "Story updated successfully",
-        "post_id": post.id
-    }, 200
 
 
 # ============================================================
