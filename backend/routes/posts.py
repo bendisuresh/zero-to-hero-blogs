@@ -7,11 +7,14 @@ from models import (
     AdditionalStory,
     Comment
 )
+
+from services.post_service import create_post
 from routes.auth import admin_required
 from utils.validators import (
     validate_post_data,
     sanitize_rich_text,
 )
+
 
 posts_bp = Blueprint("posts", __name__)
 
@@ -52,6 +55,8 @@ def get_posts():
         })
 
     return posts_data, 200
+
+
 @posts_bp.route(
     "/api/posts/<int:post_id>",
     methods=["GET"]
@@ -86,6 +91,8 @@ def get_post(post_id):
         "dislikes": post.dislikes or 0,
         "tags": post.tags
     }, 200
+
+
 @posts_bp.route(
     "/api/admin/posts",
     methods=["POST"]
@@ -102,42 +109,18 @@ def admin_create_post():
             "message": validation_error
         }, 400
 
-    storyteller_email = data.get(
-        "storyteller_email",
-        ""
-    ).strip()
-
-    post = Post(
-        title=data["title"].strip(),
-        description=data["description"].strip(),
-        category=data["category"].strip(),
-        storyteller=data["storyteller"].strip(),
-        storyteller_email=storyteller_email,
-        starting_point=data["starting_point"].strip(),
-        how_started=data["how_started"].strip(),
-        financial_info=data["financial_info"].strip(),
-        approach=data["approach"].strip(),
-        life_changed=data["life_changed"].strip(),
-        failures=data["failures"].strip(),
-
-        # Sanitize Tiptap HTML before storing it
-        lessons=sanitize_rich_text(
-            data["lessons"]
-        ),
-
-        tags=data.get(
-            "tags",
-            ""
-        ).strip()
+    # Sanitize Tiptap HTML before storing it
+    data["lessons"] = sanitize_rich_text(
+        data["lessons"]
     )
 
-    db.session.add(post)
-    db.session.commit()
+    post = create_post(data)
 
     return {
         "message": "Story created successfully",
         "post_id": post.id
     }, 201
+
 
 @posts_bp.route(
     "/api/admin/posts/<int:post_id>",
@@ -197,13 +180,13 @@ def update_post(post_id):
         "post_id": post.id
     }, 200
 
+
 @posts_bp.route(
     "/api/admin/posts/<int:post_id>",
     methods=["DELETE"]
 )
 @admin_required()
 def delete_post(post_id):
-
     post = db.session.get(
         Post,
         post_id
@@ -234,7 +217,6 @@ def delete_post(post_id):
         }), 403
 
     try:
-
         # Delete related additional stories first
         AdditionalStory.query.filter_by(
             post_id=post.id
@@ -255,13 +237,9 @@ def delete_post(post_id):
         }), 200
 
     except Exception:
-
         db.session.rollback()
 
         return jsonify({
             "message": "Failed to delete story"
         }), 500
-
-
-
-
+    
