@@ -11,6 +11,7 @@ from routes.posts import posts_bp
 from routes.comments import comments_bp
 from routes.reactions import reactions_bp
 from routes.uploads import uploads_bp
+from routes.rss import rss_bp
 from routes.additional_stories import additional_stories_bp
 from flask_jwt_extended import (
     JWTManager,
@@ -129,6 +130,7 @@ app.register_blueprint(additional_stories_bp)
 app.register_blueprint(comments_bp)
 app.register_blueprint(reactions_bp)
 app.register_blueprint(uploads_bp)
+app.register_blueprint(rss_bp)
 
 # ============================================================
 # CREATE DATABASE TABLES
@@ -311,93 +313,6 @@ def delete_post(post_id):
 # RSS FEED
 # ============================================================
 
-@app.route(
-    "/api/rss",
-    methods=["GET"]
-)
-def rss_feed():
-
-    # Get latest 20 posts
-    posts = (
-        Post.query
-        .order_by(
-            Post.created_at.desc()
-        )
-        .limit(20)
-        .all()
-    )
-
-    # Frontend URL comes from environment
-    frontend_url = os.getenv(
-        "FRONTEND_URL",
-        "http://127.0.0.1:5173"
-    )
-
-    rss_items = []
-
-    for post in posts:
-
-        # Create one RSS item for every blog post
-        rss_items.append(
-            f"""
-            <item>
-                <title><![CDATA[{post.title}]]></title>
-
-                <description><![CDATA[
-                    {post.description}
-                ]]></description>
-
-                <link>
-                    {frontend_url}/post/{post.id}
-                </link>
-
-                <guid>
-                    {frontend_url}/post/{post.id}
-                </guid>
-
-                <category><![CDATA[
-                    {post.category}
-                ]]></category>
-
-                <pubDate>
-                    {post.created_at.strftime(
-                        "%a, %d %b %Y %H:%M:%S GMT"
-                    )}
-                </pubDate>
-            </item>
-            """
-        )
-
-    # Create complete RSS document
-    rss_content = f"""<?xml version="1.0" encoding="UTF-8"?>
-
-<rss version="2.0">
-
-    <channel>
-
-        <title>Zero to Hero Blogs</title>
-
-        <description>
-            Real stories of journeys from zero to success.
-        </description>
-
-        <link>
-            {frontend_url}/
-        </link>
-
-        <language>en</language>
-
-        {"".join(rss_items)}
-
-    </channel>
-
-</rss>
-"""
-
-    return Response(
-        rss_content,
-        mimetype="application/rss+xml"
-    )
 
 
 # ============================================================
