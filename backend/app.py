@@ -1,16 +1,16 @@
 import os
-import uuid
 from datetime import datetime
 from functools import wraps
 
 import bleach
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request, send_from_directory, Response
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 from routes.auth import auth_bp, admin_required
 from routes.posts import posts_bp
 from routes.comments import comments_bp
 from routes.reactions import reactions_bp
+from routes.uploads import uploads_bp
 from routes.additional_stories import additional_stories_bp
 from flask_jwt_extended import (
     JWTManager,
@@ -23,7 +23,7 @@ from werkzeug.security import (
     check_password_hash,
     generate_password_hash
 )
-from werkzeug.utils import secure_filename
+
 
 from database import db
 from models import Post, Admin,AdditionalStory , Comment
@@ -128,6 +128,7 @@ app.register_blueprint(posts_bp)
 app.register_blueprint(additional_stories_bp)
 app.register_blueprint(comments_bp)
 app.register_blueprint(reactions_bp)
+app.register_blueprint(uploads_bp)
 
 # ============================================================
 # CREATE DATABASE TABLES
@@ -145,16 +146,7 @@ with app.app_context():
 # IMAGE FILE VALIDATION
 # ============================================================
 
-def allowed_file(filename):
-    """
-    Check whether the uploaded file has an allowed extension.
-    """
 
-    return (
-        "." in filename
-        and filename.rsplit(".", 1)[1].lower()
-        in ALLOWED_EXTENSIONS
-    )
 
 
 # ============================================================
@@ -313,94 +305,6 @@ def delete_post(post_id):
 # IMAGE UPLOAD
 # ============================================================
 
-@app.route(
-    "/api/admin/upload",
-    methods=["POST"]
-)
-@admin_required()
-def upload_image():
-
-    # Check whether request contains an image
-    if "image" not in request.files:
-
-        return {
-            "message": "No image file provided"
-        }, 400
-
-    image = request.files["image"]
-
-    # Check whether a file was selected
-    if image.filename == "":
-
-        return {
-            "message": "No image selected"
-        }, 400
-
-    # Check file extension
-    if not allowed_file(image.filename):
-
-        return {
-            "message": (
-                "Invalid image type. "
-                "Allowed: png, jpg, jpeg, gif, webp"
-            )
-        }, 400
-
-    # Make original filename safe
-    original_filename = secure_filename(
-        image.filename
-    )
-
-    # Extract extension
-    file_extension = os.path.splitext(
-        original_filename
-    )[1].lower()
-
-    # Generate unique filename
-    filename = (
-        f"{uuid.uuid4().hex}"
-        f"{file_extension}"
-    )
-
-    # Create complete file path
-    image_path = os.path.join(
-        app.config["UPLOAD_FOLDER"],
-        filename
-    )
-
-    # Save image
-    image.save(image_path)
-
-    # Backend URL comes from environment
-    backend_url = os.getenv(
-        "BACKEND_URL",
-        "http://127.0.0.1:5000"
-    )
-
-    # Create URL for frontend
-    image_url = (
-        f"{backend_url}/uploads/{filename}"
-    )
-
-    return {
-        "message": "Image uploaded successfully",
-        "image_url": image_url
-    }, 201
-
-
-# ============================================================
-# SERVE UPLOADED IMAGES
-# ============================================================
-
-@app.route(
-    "/uploads/<path:filename>"
-)
-def uploaded_file(filename):
-
-    return send_from_directory(
-        app.config["UPLOAD_FOLDER"],
-        filename
-    )
 
 
 # ============================================================
