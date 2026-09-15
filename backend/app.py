@@ -1,8 +1,4 @@
 import os
-
-from functools import wraps
-
-import bleach
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
@@ -16,10 +12,6 @@ from routes.additional_stories import additional_stories_bp
 from flask_jwt_extended import (
     JWTManager,
     get_jwt_identity
-)
-from werkzeug.security import (
-    check_password_hash,
-    generate_password_hash
 )
 
 
