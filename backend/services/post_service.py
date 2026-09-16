@@ -106,3 +106,54 @@ def delete_post(post):
     except Exception:
         db.session.rollback()
         raise
+
+def get_posts(
+    category=None,
+    search="",
+    sort="latest",
+    page=1,
+    limit=10
+):
+    query = Post.query
+
+    if category:
+        query = query.filter_by(
+            category=category
+        )
+
+    if search:
+        search_pattern = f"%{search}%"
+
+        query = query.filter(
+            db.or_(
+                Post.title.ilike(search_pattern),
+                Post.description.ilike(search_pattern),
+                Post.storyteller.ilike(search_pattern),
+                Post.category.ilike(search_pattern),
+                Post.tags.ilike(search_pattern)
+            )
+        )
+
+    if sort == "popular":
+        query = query.order_by(
+            (
+                db.func.coalesce(Post.views, 0)
+                + db.func.coalesce(Post.likes, 0)
+                - db.func.coalesce(Post.dislikes, 0)
+            ).desc()
+        )
+    else:
+        query = query.order_by(
+            Post.created_at.desc()
+        )
+
+    pagination = (
+        query
+        .paginate(
+            page=page,
+            per_page=limit,
+            error_out=False
+        )
+    )
+
+    return pagination

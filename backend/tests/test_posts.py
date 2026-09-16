@@ -559,3 +559,45 @@ def test_get_posts_search_supports_category_and_pagination(
         assert data["total_pages"] == 2
         assert len(data["posts"]) == 1
         assert "Python" in data["posts"][0]["title"]
+
+def test_admin_posts_requires_authentication(client):
+    response = client.get(
+        "/api/admin/posts"
+    )
+
+    assert response.status_code == 401
+
+
+def test_admin_posts_rejects_non_admin(client):
+    user_token = create_access_token(
+        identity="user@test.com",
+        additional_claims={
+            "role": "user"
+        }
+    )
+
+    response = client.get(
+        "/api/admin/posts",
+        headers={
+            "Authorization": f"Bearer {user_token}"
+        }
+    )
+
+    assert response.status_code == 403
+
+
+def test_admin_posts_allows_admin(client, admin_token):
+    response = client.get(
+        "/api/admin/posts",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        }
+    )
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert "posts" in data
+    assert "page" in data
+    assert "total_pages" in data

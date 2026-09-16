@@ -10,6 +10,11 @@ function AdminDashboard() {
     const [posts, setPosts] = useState([]);
     const [comments, setComments] = useState([]);
 
+    const [searchTerm, setSearchTerm] = useState("");
+    const [category, setCategory] = useState("");
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -45,22 +50,47 @@ function AdminDashboard() {
                 setMessage(dashboardData.message);
                 setAdmin(dashboardData.admin);
 
-                // Get all stories
+                // Get admin stories with search,
+                // category filtering and pagination
+                const params = new URLSearchParams({
+                    page: page,
+                    limit: 10,
+                });
+
+                if (searchTerm) {
+                    params.set("search", searchTerm);
+                }
+
+                if (category) {
+                    params.set("category", category);
+                }
+
                 const postsResponse = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/posts`
+                    `${import.meta.env.VITE_API_URL}/api/admin/posts?${params.toString()}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
                 );
 
                 const postsData =
                     await postsResponse.json();
 
                 if (!postsResponse.ok) {
-                    setError("Unable to load stories");
+                    setError(
+                        postsData.message ||
+                        "Unable to load stories"
+                    );
                     return;
                 }
 
-                const posts = postsData.posts;
+                const posts = postsData.posts || [];
 
                 setPosts(posts);
+                setTotalPages(
+                    postsData.total_pages || 1
+                );
 
                 // Get comments from every story
                 const allComments = [];
@@ -97,7 +127,7 @@ function AdminDashboard() {
         };
 
         getDashboard();
-    }, [navigate]);
+    }, [navigate, page, searchTerm, category]);
 
     const handleLogout = () => {
         localStorage.removeItem("admin_token");
@@ -281,13 +311,58 @@ function AdminDashboard() {
                     </span>
                 </div>
 
+                {/* Search and category filters */}
+                <div className="admin-filters">
+                    <input
+                        type="text"
+                        placeholder="Search stories..."
+                        value={searchTerm}
+                        onChange={(event) => {
+                            setSearchTerm(
+                                event.target.value
+                            );
+                            setPage(1);
+                        }}
+                    />
+
+                    <select
+                        value={category}
+                        onChange={(event) => {
+                            setCategory(
+                                event.target.value
+                            );
+                            setPage(1);
+                        }}
+                    >
+                        <option value="">
+                            All Categories
+                        </option>
+
+                        <option value="Business">
+                            Business
+                        </option>
+
+                        <option value="Job">
+                            Job
+                        </option>
+
+                        <option value="Investment">
+                            Investment
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+                    </select>
+                </div>
+
                 {posts.length === 0 ? (
                     <div className="admin-empty">
                         <h3>No stories found</h3>
 
                         <p>
-                            Create your first story to
-                            see it here.
+                            Try changing your search or
+                            category filter.
                         </p>
                     </div>
                 ) : (
@@ -340,15 +415,16 @@ function AdminDashboard() {
                                     >
                                         Add Story
                                     </button>
+
                                     <button
-    onClick={() =>
-        navigate(
-            `/admin/posts/${post.id}/edit`
-        )
-    }
->
-    Edit Story
-</button>
+                                        onClick={() =>
+                                            navigate(
+                                                `/admin/posts/${post.id}/edit`
+                                            )
+                                        }
+                                    >
+                                        Edit Story
+                                    </button>
 
                                     <button
                                         className="admin-delete-button"
@@ -365,6 +441,40 @@ function AdminDashboard() {
                         ))}
                     </div>
                 )}
+
+                {/* Story pagination */}
+                {!loading &&
+                    !error &&
+                    totalPages > 1 && (
+                        <div className="admin-pagination">
+                            <button
+                                type="button"
+                                disabled={page === 1}
+                                onClick={() =>
+                                    setPage(page - 1)
+                                }
+                            >
+                                Previous
+                            </button>
+
+                            <span>
+                                Page {page} of{" "}
+                                {totalPages}
+                            </span>
+
+                            <button
+                                type="button"
+                                disabled={
+                                    page === totalPages
+                                }
+                                onClick={() =>
+                                    setPage(page + 1)
+                                }
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
             </section>
 
             {/* Comment moderation section */}

@@ -7,6 +7,7 @@ from models import (
 
 from services.post_service import (
     create_post,
+    get_posts as get_posts_service,
     update_post as update_post_service,
     delete_post as delete_post_service
 )
@@ -25,7 +26,7 @@ def get_posts():
     search = request.args.get(
         "search",
         default=""
-        ).strip()
+    ).strip()
     sort = request.args.get(
         "sort",
         default="latest"
@@ -36,7 +37,6 @@ def get_posts():
         default=1,
         type=int
     )
-
     limit = request.args.get(
         "limit",
         default=10,
@@ -49,46 +49,12 @@ def get_posts():
     if limit < 1:
         limit = 10
 
-    query = Post.query
-
-    if category:
-        query = query.filter_by(
-            category=category
-        )
-
-    if search:
-        search_pattern = f"%{search}%"
-
-        query = query.filter(
-            db.or_(
-                Post.title.ilike(search_pattern),
-                Post.description.ilike(search_pattern),
-                Post.storyteller.ilike(search_pattern),
-                Post.category.ilike(search_pattern),
-                Post.tags.ilike(search_pattern)
-            )
-        )
-
-    if sort == "popular":
-        query = query.order_by(
-            (
-                db.func.coalesce(Post.views, 0)
-                + db.func.coalesce(Post.likes, 0)
-                - db.func.coalesce(Post.dislikes, 0)
-            ).desc()
-        )
-    else:
-        query = query.order_by(
-            Post.created_at.desc()
-        )
-
-    pagination = (
-        query
-        .paginate(
-            page=page,
-            per_page=limit,
-            error_out=False
-        )
+    pagination = get_posts_service(
+        category=category,
+        search=search,
+        sort=sort,
+        page=page,
+        limit=limit
     )
 
     posts_data = []
@@ -112,7 +78,6 @@ def get_posts():
         "page": pagination.page,
         "total_pages": pagination.pages
     }, 200
-
 
 @posts_bp.route(
     "/api/posts/<int:post_id>",
@@ -148,7 +113,65 @@ def get_post(post_id):
         "dislikes": post.dislikes or 0,
         "tags": post.tags
     }, 200
+@posts_bp.route("/api/admin/posts", methods=["GET"])
+@admin_required()
+def get_admin_posts():
+    category = request.args.get("category")
+    search = request.args.get(
+        "search",
+        default=""
+    ).strip()
+    sort = request.args.get(
+        "sort",
+        default="latest"
+    ).lower()
 
+    page = request.args.get(
+        "page",
+        default=1,
+        type=int
+    )
+    limit = request.args.get(
+        "limit",
+        default=10,
+        type=int
+    )
+
+    if page < 1:
+        page = 1
+
+    if limit < 1:
+        limit = 10
+
+    pagination = get_posts_service(
+        category=category,
+        search=search,
+        sort=sort,
+        page=page,
+        limit=limit
+    )
+
+    posts_data = []
+
+    for post in pagination.items:
+        posts_data.append({
+            "id": post.id,
+            "title": post.title,
+            "description": post.description,
+            "category": post.category,
+            "storyteller": post.storyteller,
+            "storyteller_email": post.storyteller_email,
+            "views": post.views or 0,
+            "likes": post.likes or 0,
+            "dislikes": post.dislikes or 0,
+            "tags": post.tags
+        })
+
+    return {
+        "posts": posts_data,
+        "page": pagination.page,
+        "total_pages": pagination.pages
+    }, 200
 
 @posts_bp.route(
     "/api/admin/posts",
