@@ -3,6 +3,10 @@ from flask import Blueprint, request
 from database import db
 from models import Post, Comment
 from routes.auth import admin_required
+from services.comment_service import (
+    create_comment as create_comment_service,
+    delete_comment as delete_comment_service
+)
 
 
 comments_bp = Blueprint(
@@ -51,15 +55,11 @@ def create_comment(post_id):
             "message": "Post not found"
         }, 404
 
-    comment = Comment(
-        post_id=post_id,
-        name=name.strip(),
-        content=content.strip()
-    )
-
-    db.session.add(comment)
-
-    db.session.commit()
+    comment = create_comment_service(
+    post_id,
+    name,
+    content
+)
 
     return {
         "message": "Comment added successfully",
@@ -130,9 +130,7 @@ def delete_comment(comment_id):
             "message": "Comment not found"
         }, 404
 
-    db.session.delete(comment)
-
-    db.session.commit()
+    delete_comment_service(comment)
 
     return {
         "message": "Comment deleted successfully"
