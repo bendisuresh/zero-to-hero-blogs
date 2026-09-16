@@ -2,6 +2,11 @@ from flask import Blueprint
 
 from database import db
 from models import Post
+from services.reaction_service import (
+    like_post as like_post_service,
+    dislike_post as dislike_post_service,
+    record_view
+)
 
 
 reactions_bp = Blueprint(
@@ -31,16 +36,11 @@ def like_post(post_id):
         }, 404
 
     # Protect against old NULL database values
-    if post.likes is None:
-        post.likes = 0
-
-    post.likes += 1
-
-    db.session.commit()
+    likes = like_post_service(post)
 
     return {
         "message": "Post liked successfully",
-        "likes": post.likes
+        "likes": likes
     }, 200
 
 
@@ -65,16 +65,11 @@ def dislike_post(post_id):
         }, 404
 
     # Protect against old NULL database values
-    if post.dislikes is None:
-        post.dislikes = 0
-
-    post.dislikes += 1
-
-    db.session.commit()
+    dislikes = dislike_post_service(post)
 
     return {
         "message": "Post disliked successfully",
-        "dislikes": post.dislikes
+        "dislikes": dislikes
     }, 200
 
 
@@ -99,14 +94,9 @@ def view_post(post_id):
         }, 404
 
     # Protect against old NULL database values
-    if post.views is None:
-        post.views = 0
-
-    post.views += 1
-
-    db.session.commit()
+    views = record_view(post)
 
     return {
         "message": "Post view recorded successfully",
-        "views": post.views
-    }, 200
+        "views": views
+    }, 200 
