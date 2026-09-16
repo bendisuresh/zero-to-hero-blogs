@@ -7,7 +7,17 @@ TESTING = os.getenv("TESTING") == "1"
 
 class Post(db.Model):
     __tablename__ = "posts"
-    __table_args__ = {} if TESTING else {"schema": "public"}
+    __table_args__ = (
+        db.Index(
+            "ix_posts_category",
+            "category"
+        ),
+        db.Index(
+            "ix_posts_created_at",
+            "created_at"
+        ),
+        {} if TESTING else {"schema": "public"}
+    )
 
     id = db.Column(db.Integer, primary_key=True)
 

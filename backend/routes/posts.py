@@ -22,6 +22,10 @@ posts_bp = Blueprint("posts", __name__)
 @posts_bp.route("/api/posts", methods=["GET"])
 def get_posts():
     category = request.args.get("category")
+    sort = request.args.get(
+        "sort",
+        default="latest"
+    ).lower()
 
     page = request.args.get(
         "page",
@@ -48,9 +52,21 @@ def get_posts():
             category=category
         )
 
+    if sort == "popular":
+        query = query.order_by(
+            (
+                db.func.coalesce(Post.views, 0)
+                + db.func.coalesce(Post.likes, 0)
+                - db.func.coalesce(Post.dislikes, 0)
+            ).desc()
+        )
+    else:
+        query = query.order_by(
+            Post.created_at.desc()
+        )
+
     pagination = (
         query
-        .order_by(Post.created_at.desc())
         .paginate(
             page=page,
             per_page=limit,

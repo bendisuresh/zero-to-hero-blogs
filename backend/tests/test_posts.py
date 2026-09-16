@@ -363,3 +363,89 @@ def test_get_posts_supports_category_with_pagination(
 
     for post in data["posts"]:
         assert post["category"] == "Business"
+def test_get_posts_supports_latest_sort(
+    client,
+    admin_token
+):
+    for index in range(3):
+        data = post_payload()
+        data["title"] = f"Latest Test Post {index}"
+
+        response = client.post(
+            "/api/admin/posts",
+            headers={
+                "Authorization": f"Bearer {admin_token}"
+            },
+            json=data
+        )
+
+        assert response.status_code == 201
+
+    response = client.get(
+        "/api/posts?sort=latest"
+    )
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert data["posts"][0]["title"] == "Latest Test Post 2"
+    assert data["posts"][1]["title"] == "Latest Test Post 1"
+    assert data["posts"][2]["title"] == "Latest Test Post 0"
+
+
+def test_get_posts_supports_popular_sort(
+    client,
+    admin_token,
+    app
+):
+    post_ids = []
+
+    for index in range(3):
+        data = post_payload()
+        data["title"] = f"Popular Test Post {index}"
+
+        response = client.post(
+            "/api/admin/posts",
+            headers={
+                "Authorization": f"Bearer {admin_token}"
+            },
+            json=data
+        )
+
+        assert response.status_code == 201
+        post_ids.append(response.get_json()["post_id"])
+
+    with app.app_context():
+        from models import Post
+        from database import db
+
+        post_1 = db.session.get(Post, post_ids[0])
+        post_2 = db.session.get(Post, post_ids[1])
+        post_3 = db.session.get(Post, post_ids[2])
+
+        post_1.views = 10
+        post_1.likes = 2
+        post_1.dislikes = 0
+
+        post_2.views = 30
+        post_2.likes = 5
+        post_2.dislikes = 1
+
+        post_3.views = 20
+        post_3.likes = 1
+        post_3.dislikes = 0
+
+        db.session.commit()
+
+    response = client.get(
+        "/api/posts?sort=popular"
+    )
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert data["posts"][0]["title"] == "Popular Test Post 1"
+    assert data["posts"][1]["title"] == "Popular Test Post 2"
+    assert data["posts"][2]["title"] == "Popular Test Post 0"

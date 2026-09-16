@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, get_jwt_identity
-
+from flask_migrate import Migrate
 from database import db
 from routes.auth import auth_bp, admin_required
 from routes.posts import posts_bp
@@ -69,7 +69,9 @@ app.config["JWT_SECRET_KEY"] = os.getenv(
 
 
 db.init_app(app)
+migrate=Migrate(app,db)
 jwt = JWTManager(app)
+
 
 
 # Register application routes
@@ -82,9 +84,9 @@ app.register_blueprint(uploads_bp)
 app.register_blueprint(rss_bp)
 
 
-with app.app_context():
-    db.create_all()
-
+if os.getenv("TESTING") == "1":
+    with app.app_context():
+        db.create_all()
 
 @app.route("/")
 def home():
