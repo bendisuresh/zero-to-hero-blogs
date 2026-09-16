@@ -21,7 +21,7 @@ function Home() {
 
                 const data = await response.json();
 
-                setPosts(data);
+                setPosts(data.posts);
             } catch {
                 setError("Unable to load latest stories.");
             } finally {

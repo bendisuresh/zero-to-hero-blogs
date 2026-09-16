@@ -7,6 +7,9 @@ function CategoryPage({ category, title, description }) {
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -14,8 +17,15 @@ function CategoryPage({ category, title, description }) {
                 setLoading(true);
                 setError("");
 
+                const params = new URLSearchParams({
+                    category: category,
+                    search: searchTerm,
+                    page: page,
+                    limit: 10
+                });
+
                 const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/posts?category=${encodeURIComponent(category)}`
+                    `${import.meta.env.VITE_API_URL}/api/posts?${params.toString()}`
                 );
 
                 if (!response.ok) {
@@ -24,7 +34,8 @@ function CategoryPage({ category, title, description }) {
 
                 const data = await response.json();
 
-                setPosts(data);
+                setPosts(data.posts);
+                setTotalPages(data.total_pages);
             } catch {
                 setError("Unable to load stories.");
             } finally {
@@ -33,17 +44,10 @@ function CategoryPage({ category, title, description }) {
         };
 
         fetchPosts();
-    }, [category]);
+    }, [category, searchTerm, page]);
 
     // Search by title or description
-    const filteredPosts = posts.filter((post) => {
-        const search = searchTerm.toLowerCase();
 
-        return (
-            post.title.toLowerCase().includes(search) ||
-            post.description.toLowerCase().includes(search)
-        );
-    });
 
     return (
         <main className="category-page">
@@ -66,9 +70,10 @@ function CategoryPage({ category, title, description }) {
                     className="category-search"
                     placeholder={`Search ${category.toLowerCase()} stories...`}
                     value={searchTerm}
-                    onChange={(event) =>
-                        setSearchTerm(event.target.value)
-                    }
+                    onChange={(event) => {
+                        setSearchTerm(event.target.value);
+                        setPage(1);
+                    }}
                 />
 
                 {/* Loading */}
@@ -89,8 +94,8 @@ function CategoryPage({ category, title, description }) {
                 {!loading && !error && (
                     <div className="category-posts">
 
-                        {filteredPosts.length > 0 ? (
-                            filteredPosts.map((post) => (
+                        {posts.length > 0 ? (
+                            posts.map((post) => (
                                 <PostCard
                                     key={post.id}
                                     post={post}
@@ -104,6 +109,33 @@ function CategoryPage({ category, title, description }) {
 
                     </div>
                 )}
+                {/* Pagination */}
+                {!loading && !error && totalPages > 1 && (
+                    <div className="category-pagination">
+
+                        <button
+                            type="button"
+                            disabled={page === 1}
+                            onClick={() => setPage(page - 1)}
+                        >
+                            Previous
+                        </button>
+
+                        <span>
+                            Page {page} of {totalPages}
+                        </span>
+
+                        <button
+                            type="button"
+                            disabled={page === totalPages}
+                            onClick={() => setPage(page + 1)}
+                        >
+                            Next
+                        </button>
+
+                    </div>
+                )}
+
 
             </section>
 
