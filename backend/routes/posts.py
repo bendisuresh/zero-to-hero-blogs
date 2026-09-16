@@ -22,6 +22,10 @@ posts_bp = Blueprint("posts", __name__)
 @posts_bp.route("/api/posts", methods=["GET"])
 def get_posts():
     category = request.args.get("category")
+    search = request.args.get(
+        "search",
+        default=""
+        ).strip()
     sort = request.args.get(
         "sort",
         default="latest"
@@ -50,6 +54,19 @@ def get_posts():
     if category:
         query = query.filter_by(
             category=category
+        )
+
+    if search:
+        search_pattern = f"%{search}%"
+
+        query = query.filter(
+            db.or_(
+                Post.title.ilike(search_pattern),
+                Post.description.ilike(search_pattern),
+                Post.storyteller.ilike(search_pattern),
+                Post.category.ilike(search_pattern),
+                Post.tags.ilike(search_pattern)
+            )
         )
 
     if sort == "popular":

@@ -449,3 +449,113 @@ def test_get_posts_supports_popular_sort(
     assert data["posts"][0]["title"] == "Popular Test Post 1"
     assert data["posts"][1]["title"] == "Popular Test Post 2"
     assert data["posts"][2]["title"] == "Popular Test Post 0"
+
+
+def test_get_posts_supports_search(
+    client,
+    admin_token):
+        posts = [
+        ("Python Career Journey", "python"),
+        ("Learning SQL for Data Analysis", "sql"),
+        ("Starting a Small Business", "business")
+    ]
+
+        for title, tags in posts:
+            data = post_payload()
+            data["title"] = title
+            data["tags"] = tags
+
+            response = client.post(
+                "/api/admin/posts",
+                headers={
+                    "Authorization": f"Bearer {admin_token}"
+                },
+                json=data
+            )
+
+            assert response.status_code == 201
+
+        response = client.get(
+            "/api/posts?search=python"
+        )
+
+        assert response.status_code == 200
+
+        data = response.get_json()
+
+        assert len(data["posts"]) == 1
+        assert data["posts"][0]["title"] == "Python Career Journey"
+
+
+def test_get_posts_search_is_case_insensitive(
+        client,
+        admin_token
+    ):
+        data = post_payload()
+        data["title"] = "Python Programming Journey"
+        data["description"] = "A journey into backend development"
+
+        response = client.post(
+            "/api/admin/posts",
+            headers={
+                "Authorization": f"Bearer {admin_token}"
+            },
+            json=data
+        )
+
+        assert response.status_code == 201
+
+        response = client.get(
+            "/api/posts?search=PYTHON"
+        )
+
+        assert response.status_code == 200
+
+        data = response.get_json()
+
+        assert len(data["posts"]) == 1
+        assert data["posts"][0]["title"] == "Python Programming Journey"
+
+
+def test_get_posts_search_supports_category_and_pagination(
+        client,
+        admin_token
+    ):
+        posts = [
+            ("Python Business Journey", "Business"),
+            ("Python Business Growth", "Business"),
+            ("Python Job Journey", "Job"),
+            ("Investment Journey", "Investment")
+        ]
+
+        for title, category in posts:
+            data = post_payload()
+            data["title"] = title
+            data["category"] = category
+
+            response = client.post(
+                "/api/admin/posts",
+                headers={
+                    "Authorization": f"Bearer {admin_token}"
+                },
+                json=data
+            )
+
+            assert response.status_code == 201
+
+        response = client.get(
+            "/api/posts"
+            "?category=Business"
+            "&search=python"
+            "&page=1"
+            "&limit=1"
+        )
+
+        assert response.status_code == 200
+
+        data = response.get_json()
+
+        assert data["page"] == 1
+        assert data["total_pages"] == 2
+        assert len(data["posts"]) == 1
+        assert "Python" in data["posts"][0]["title"]
