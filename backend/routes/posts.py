@@ -1,14 +1,16 @@
 from flask import Blueprint, jsonify, request
 from database import db
-from datetime import datetime
 
 from models import (
-    Post,
-    AdditionalStory,
-    Comment
+    Post
 )
 
-from services.post_service import create_post
+from services.post_service import (
+    create_post,
+    update_post as update_post_service,
+    delete_post as delete_post_service
+)
+
 from routes.auth import admin_required
 from utils.validators import (
     validate_post_data,
@@ -140,7 +142,7 @@ def update_post(post_id):
 
     data = request.get_json()
 
-    # Validate data
+    # Validate post data
     validation_error = validate_post_data(data)
 
     if validation_error:
@@ -148,32 +150,15 @@ def update_post(post_id):
             "message": validation_error
         }, 400
 
-    storyteller_email = data.get(
-        "storyteller_email",
-        ""
-    ).strip()
-
-    post.title = data["title"].strip()
-    post.description = data["description"].strip()
-    post.category = data["category"].strip()
-    post.storyteller = data["storyteller"].strip()
-    post.storyteller_email = storyteller_email
-    post.starting_point = data["starting_point"].strip()
-    post.how_started = data["how_started"].strip()
-    post.financial_info = data["financial_info"].strip()
-    post.approach = data["approach"].strip()
-    post.life_changed = data["life_changed"].strip()
-    post.failures = data["failures"].strip()
-
     # Sanitize rich text before saving
-    post.lessons = sanitize_rich_text(
+    data["lessons"] = sanitize_rich_text(
         data["lessons"]
     )
 
-    if "tags" in data:
-        post.tags = data["tags"].strip()
-
-    db.session.commit()
+    post = update_post_service(
+        post,
+        data
+    )
 
     return {
         "message": "Story updated successfully",
@@ -192,23 +177,14 @@ def delete_post(post_id):
         post_id
     )
 
-    # Story does not exist
     if not post:
         return jsonify({
             "message": "Story not found"
         }), 404
 
-    # Check when the story was created
-    created_at = post.created_at
+    deleted = delete_post_service(post)
 
-    # Current time
-    current_time = datetime.utcnow()
-
-    # Calculate how old the story is
-    age = current_time - created_at
-
-    # Delete is allowed only within 24 hours
-    if age.total_seconds() > 24 * 60 * 60:
+    if not deleted:
         return jsonify({
             "message": (
                 "Stories can only be deleted "
@@ -216,30 +192,6 @@ def delete_post(post_id):
             )
         }), 403
 
-    try:
-        # Delete related additional stories first
-        AdditionalStory.query.filter_by(
-            post_id=post.id
-        ).delete()
-
-        # Delete related comments
-        Comment.query.filter_by(
-            post_id=post.id
-        ).delete()
-
-        # Delete the main post
-        db.session.delete(post)
-
-        db.session.commit()
-
-        return jsonify({
-            "message": "Story deleted successfully"
-        }), 200
-
-    except Exception:
-        db.session.rollback()
-
-        return jsonify({
-            "message": "Failed to delete story"
-        }), 500
-    
+    return jsonify({
+        "message": "Story deleted successfully"
+    }), 200

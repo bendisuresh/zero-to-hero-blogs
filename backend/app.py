@@ -1,7 +1,11 @@
 import os
+
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager, get_jwt_identity
+
+from database import db
 from routes.auth import auth_bp, admin_required
 from routes.posts import posts_bp
 from routes.comments import comments_bp
@@ -9,35 +13,14 @@ from routes.reactions import reactions_bp
 from routes.uploads import uploads_bp
 from routes.rss import rss_bp
 from routes.additional_stories import additional_stories_bp
-from flask_jwt_extended import (
-    JWTManager,
-    get_jwt_identity
-)
 
-
-from database import db
-
-
-
-# ============================================================
-# LOAD ENVIRONMENT VARIABLES
-# ============================================================
 
 load_dotenv()
-
-
-# ============================================================
-# CREATE FLASK APPLICATION
-# ============================================================
 
 app = Flask(__name__)
 
 
-# ============================================================
-# IMAGE UPLOAD CONFIGURATION
-# ============================================================
-
-# Folder where uploaded images will be stored
+# Upload configuration
 UPLOAD_FOLDER = os.path.join(
     app.root_path,
     "uploads"
@@ -45,24 +28,13 @@ UPLOAD_FOLDER = os.path.join(
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-
-# Allowed image extensions
-
-
-
-# Create uploads folder if it does not already exist
 os.makedirs(
     app.config["UPLOAD_FOLDER"],
     exist_ok=True
 )
 
 
-# ============================================================
-# CORS
-# ============================================================
-
-# Local frontend URLs
-# Production frontend URL comes from .env
+# CORS configuration
 frontend_url = os.getenv("FRONTEND_URL")
 
 allowed_origins = [
@@ -79,34 +51,28 @@ CORS(
 )
 
 
-# ============================================================
-# DATABASE CONFIGURATION
-# ============================================================
+# Database configuration
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
+    "DATABASE_URL"
+)
 
-# Database URL comes from .env
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 if os.getenv("TESTING") == "1":
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
 
 
-# ============================================================
-# JWT CONFIGURATION
-# ============================================================
-
+# JWT configuration
 app.config["JWT_SECRET_KEY"] = os.getenv(
     "JWT_SECRET_KEY"
 )
 
 
-# ============================================================
-# INITIALIZE EXTENSIONS
-# ============================================================
-
 db.init_app(app)
-
 jwt = JWTManager(app)
+
+
+# Register application routes
 app.register_blueprint(auth_bp)
 app.register_blueprint(posts_bp)
 app.register_blueprint(additional_stories_bp)
@@ -115,60 +81,17 @@ app.register_blueprint(reactions_bp)
 app.register_blueprint(uploads_bp)
 app.register_blueprint(rss_bp)
 
-# ============================================================
-# CREATE DATABASE TABLES
-# ============================================================
 
 with app.app_context():
     db.create_all()
 
 
-# ============================================================
-# RICH TEXT SANITIZATION
-# ============================================================
-
-# ============================================================
-# IMAGE FILE VALIDATION
-# ============================================================
-
-
-
-
-# ============================================================
-# HOME
-# ============================================================
-
 @app.route("/")
 def home():
-
     return {
         "message": "Zero to Hero Blogs API is running!"
     }
 
-
-# ============================================================
-# GET ALL POSTS
-# ============================================================
-
-
-
-# ============================================================
-# GET ONE POST
-# ============================================================
-
-
-
-# ============================================================
-# CREATE POST
-# ============================================================
-
-# ============================================================
-# ADMIN LOGIN
-# ============================================================
-
-# ============================================================
-# ADMIN DASHBOARD
-# ============================================================
 
 @app.route(
     "/api/admin/dashboard",
@@ -176,7 +99,6 @@ def home():
 )
 @admin_required()
 def admin_dashboard():
-
     current_admin = get_jwt_identity()
 
     return {
@@ -185,59 +107,7 @@ def admin_dashboard():
     }, 200
 
 
-# ============================================================
-# ADMIN CREATE POST
-# ============================================================
-
-
-
-# ============================================================
-# ADDITIONAL STORY
-# ============================================================
-
-
-# ============================================================
-# DELETE POST
-# ============================================================
-
-
-
-# ============================================================
-# UPDATE POST
-# ============================================================
-
-
-
-# ============================================================
-# CREATE COMMENT
-# ============================================================
-
-
-
-# ============================================================
-# LIKE POST
-# ============================================================
-
-
-
-# ============================================================
-# IMAGE UPLOAD
-# ============================================================
-
-
-
-# ============================================================
-# RSS FEED
-# ============================================================
-
-
-
-# ============================================================
-# START FLASK SERVER
-# ============================================================
-
 if __name__ == "__main__":
-
     app.run(
         debug=True
     )
