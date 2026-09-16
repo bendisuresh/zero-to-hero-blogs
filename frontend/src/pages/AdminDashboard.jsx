@@ -58,12 +58,14 @@ function AdminDashboard() {
                     return;
                 }
 
-                setPosts(postsData);
+                const posts = postsData.posts;
+
+                setPosts(posts);
 
                 // Get comments from every story
                 const allComments = [];
 
-                for (const post of postsData) {
+                for (const post of posts) {
                     const commentsResponse = await fetch(
                         `${import.meta.env.VITE_API_URL}/api/posts/${post.id}/comments`
                     );
