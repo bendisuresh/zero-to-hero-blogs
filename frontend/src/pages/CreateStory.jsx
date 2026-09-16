@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image";
 
+import RichTextEditor from "../components/RichTextEditor";
 import "./CreateStory.css";
 
 
@@ -52,30 +49,7 @@ function CreateStory() {
     // RICH TEXT EDITOR
     // ============================================================
 
-    const editor = useEditor({
-
-        extensions: [
-            StarterKit,
-
-            Link.configure({
-                openOnClick: false,
-            }),
-
-            Image,
-        ],
-
-        content: "",
-
-        onUpdate: ({ editor }) => {
-
-            setFormData((currentData) => ({
-                ...currentData,
-                lessons: editor.getHTML(),
-            }));
-
-        },
-
-    });
+    const [editor, setEditor] = useState(null);
 
 
     // ============================================================
@@ -866,9 +840,15 @@ function CreateStory() {
                         </div>
 
 
-                        <EditorContent
-                            editor={editor}
-                            className="rich-text-editor"
+                        <RichTextEditor
+                            value={formData.lessons}
+                            onChange={(value) => {
+                                setFormData((currentData) => ({
+                                    ...currentData,
+                                    lessons: value,
+                                }));
+                            }}
+                            onEditorReady={setEditor}
                         />
 
                     </div>

@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image";
+import RichTextEditor from "../components/RichTextEditor";
 
 import "./CreateStory.css";
 
@@ -47,30 +44,7 @@ function EditStory() {
     // RICH TEXT EDITOR
     // ============================================================
 
-    const editor = useEditor({
-
-        extensions: [
-            StarterKit,
-
-            Link.configure({
-                openOnClick: false,
-            }),
-
-            Image,
-        ],
-
-        content: "",
-
-        onUpdate: ({ editor }) => {
-
-            setFormData((currentData) => ({
-                ...currentData,
-                lessons: editor.getHTML(),
-            }));
-
-        },
-
-    });
+    const [editor, setEditor] = useState(null);
 
 
     // ============================================================
@@ -156,16 +130,6 @@ function EditStory() {
 
                 });
 
-
-                // Put existing lessons into Tiptap.
-                if (editor) {
-
-                    editor.commands.setContent(
-                        data.lessons || ""
-                    );
-
-                }
-
             } catch {
 
                 setError(
@@ -183,7 +147,7 @@ function EditStory() {
 
         getPost();
 
-    }, [id, navigate, editor]);
+    }, [id, navigate]);
 
 
     // ============================================================
@@ -848,9 +812,15 @@ function EditStory() {
                         </div>
 
 
-                        <EditorContent
-                            editor={editor}
-                            className="rich-text-editor"
+                        <RichTextEditor
+                            value={formData.lessons}
+                            onChange={(value) => {
+                                setFormData((currentData) => ({
+                                    ...currentData,
+                                    lessons: value,
+                                }));
+                            }}
+                            onEditorReady={setEditor}
                         />
 
                     </div>
