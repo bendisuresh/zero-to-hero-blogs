@@ -12,10 +12,8 @@ from services.post_service import (
 )
 
 from routes.auth import admin_required
-from utils.validators import (
-    validate_post_data,
-    sanitize_rich_text,
-)
+from schemas.post_schema import validate_post
+from utils.validators import sanitize_rich_text
 
 
 posts_bp = Blueprint("posts", __name__)
@@ -104,7 +102,7 @@ def admin_create_post():
     data = request.get_json()
 
     # Validate post data
-    validation_error = validate_post_data(data)
+    validation_error = validate_post(data)
 
     if validation_error:
         return {
@@ -143,7 +141,7 @@ def update_post(post_id):
     data = request.get_json()
 
     # Validate post data
-    validation_error = validate_post_data(data)
+    validation_error = validate_post(data)
 
     if validation_error:
         return {
