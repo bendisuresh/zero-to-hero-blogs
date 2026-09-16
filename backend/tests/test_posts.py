@@ -146,6 +146,7 @@ def test_non_admin_cannot_delete_post(client, app):
 
     assert response.status_code == 403
 
+
 def test_admin_cannot_create_post_with_invalid_category(
     client,
     admin_token
@@ -213,3 +214,152 @@ def test_admin_cannot_update_post_with_invalid_category(
     data = response.get_json()
 
     assert data["message"] == "Invalid category"
+
+
+def test_get_posts_returns_paginated_response(
+    client,
+    admin_token
+):
+    for index in range(15):
+        data = post_payload()
+        data["title"] = f"Test Post {index}"
+
+        response = client.post(
+            "/api/admin/posts",
+            headers={
+                "Authorization": (
+                    f"Bearer {admin_token}"
+                )
+            },
+            json=data
+        )
+
+        assert response.status_code == 201
+
+    response = client.get(
+        "/api/posts?page=1&limit=10"
+    )
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert "posts" in data
+    assert "page" in data
+    assert "total_pages" in data
+
+    assert data["page"] == 1
+    assert data["total_pages"] == 2
+    assert len(data["posts"]) == 10
+
+
+def test_get_posts_returns_second_page(
+    client,
+    admin_token
+):
+    for index in range(15):
+        data = post_payload()
+        data["title"] = f"Test Post {index}"
+
+        response = client.post(
+            "/api/admin/posts",
+            headers={
+                "Authorization": (
+                    f"Bearer {admin_token}"
+                )
+            },
+            json=data
+        )
+
+        assert response.status_code == 201
+
+    response = client.get(
+        "/api/posts?page=2&limit=10"
+    )
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert data["page"] == 2
+    assert data["total_pages"] == 2
+    assert len(data["posts"]) == 5
+
+
+def test_get_posts_handles_invalid_pagination_values(
+    client,
+    admin_token
+):
+    for index in range(3):
+        data = post_payload()
+        data["title"] = f"Test Post {index}"
+
+        response = client.post(
+            "/api/admin/posts",
+            headers={
+                "Authorization": (
+                    f"Bearer {admin_token}"
+                )
+            },
+            json=data
+        )
+
+        assert response.status_code == 201
+
+    response = client.get(
+        "/api/posts?page=0&limit=0"
+    )
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert data["page"] == 1
+    assert data["total_pages"] == 1
+    assert len(data["posts"]) == 3
+
+
+def test_get_posts_supports_category_with_pagination(
+    client,
+    admin_token
+):
+    categories = [
+        "Business",
+        "Business",
+        "Business",
+        "Job",
+        "Job"
+    ]
+
+    for index, category in enumerate(categories):
+        data = post_payload()
+        data["title"] = f"Category Test Post {index}"
+        data["category"] = category
+
+        response = client.post(
+            "/api/admin/posts",
+            headers={
+                "Authorization": (
+                    f"Bearer {admin_token}"
+                )
+            },
+            json=data
+        )
+
+        assert response.status_code == 201
+
+    response = client.get(
+        "/api/posts"
+        "?category=Business&page=1&limit=2"
+    )
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert data["page"] == 1
+    assert data["total_pages"] == 2
+    assert len(data["posts"]) == 2
+
+    for post in data["posts"]:
+        assert post["category"] == "Business"

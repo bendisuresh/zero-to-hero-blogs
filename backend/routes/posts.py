@@ -21,26 +21,46 @@ posts_bp = Blueprint("posts", __name__)
 
 @posts_bp.route("/api/posts", methods=["GET"])
 def get_posts():
-    # Read optional category from query string
     category = request.args.get("category")
+
+    page = request.args.get(
+        "page",
+        default=1,
+        type=int
+    )
+
+    limit = request.args.get(
+        "limit",
+        default=10,
+        type=int
+    )
+
+    if page < 1:
+        page = 1
+
+    if limit < 1:
+        limit = 10
 
     query = Post.query
 
-    # Filter posts by category if provided
     if category:
         query = query.filter_by(
             category=category
         )
 
-    posts = (
+    pagination = (
         query
         .order_by(Post.created_at.desc())
-        .all()
+        .paginate(
+            page=page,
+            per_page=limit,
+            error_out=False
+        )
     )
 
     posts_data = []
 
-    for post in posts:
+    for post in pagination.items:
         posts_data.append({
             "id": post.id,
             "title": post.title,
@@ -54,7 +74,11 @@ def get_posts():
             "tags": post.tags
         })
 
-    return posts_data, 200
+    return {
+        "posts": posts_data,
+        "page": pagination.page,
+        "total_pages": pagination.pages
+    }, 200
 
 
 @posts_bp.route(
