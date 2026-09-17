@@ -1,182 +1,160 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+    lazy,
+    Suspense,
+} from "react";
+import {
+    BrowserRouter,
+    Routes,
+    Route,
+} from "react-router-dom";
 
 import Navbar from "./components/Navbar";
-
-import Home from "./pages/Home";
-import CategoryPage from "./pages/CategoryPage";
-
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
-import CreateStory from "./pages/CreateStory";
-import AddAdditionalStory from "./pages/AddAdditionalStory";
-import EditStory from "./pages/EditStory";
-
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import Post from "./pages/Post";
-import NotFound from "./pages/NotFound";
+const Home = lazy(() => import("./pages/Home"));
+const CategoryPage = lazy(() => import("./pages/CategoryPage"));
+const Post = lazy(() => import("./pages/Post"));
 
+const AdminLogin = lazy(() => import("./pages/AdminLogin"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const CreateStory = lazy(() => import("./pages/CreateStory"));
+const AddAdditionalStory = lazy(
+    () => import("./pages/AddAdditionalStory")
+);
+const EditStory = lazy(() => import("./pages/EditStory"));
+
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+function RouteLoading() {
+    return (
+        <main className="route-loading">
+            <div className="route-loading-content">
+                <span className="route-loading-spinner"></span>
+                <p>Loading...</p>
+            </div>
+        </main>
+    );
+}
 
 function App() {
     return (
         <BrowserRouter>
-
-            {/* Navbar is displayed on all pages */}
             <Navbar />
 
-            {/* Define all website routes */}
-            <Routes>
+            <Suspense fallback={<RouteLoading />}>
+                <Routes>
+                    <Route
+                        path="/"
+                        element={<Home />}
+                    />
 
-                {/* Home page */}
-                <Route
-                    path="/"
-                    element={<Home />}
-                />
+                    <Route
+                        path="/business"
+                        element={
+                            <CategoryPage
+                                category="Business"
+                                title="Business Stories"
+                                description="Learn from entrepreneurs, companies, leadership journeys, failures, and business lessons."
+                            />
+                        }
+                    />
 
+                    <Route
+                        path="/job"
+                        element={
+                            <CategoryPage
+                                category="Job"
+                                title="Career Stories"
+                                description="Learn from successful careers, career changes, challenges, and professional growth."
+                            />
+                        }
+                    />
 
-                {/* =========================
-                    PUBLIC CATEGORY PAGES
-                   ========================= */}
+                    <Route
+                        path="/investment"
+                        element={
+                            <CategoryPage
+                                category="Investment"
+                                title="Investment Stories"
+                                description="Learn from investment journeys, strategies, mistakes, failures, and lessons."
+                            />
+                        }
+                    />
 
-                {/* Business */}
-                <Route
-                    path="/business"
-                    element={
-                        <CategoryPage
-                            category="Business"
-                            title="Business Stories"
-                            description="Learn from entrepreneurs, companies, leadership journeys, failures, and business lessons."
-                        />
-                    }
-                />
+                    <Route
+                        path="/other"
+                        element={
+                            <CategoryPage
+                                category="Other"
+                                title="Other Journeys"
+                                description="Explore inspiring journeys from sports, entertainment, and other fields."
+                            />
+                        }
+                    />
 
-                {/* Job */}
-                <Route
-                    path="/job"
-                    element={
-                        <CategoryPage
-                            category="Job"
-                            title="Career Stories"
-                            description="Learn from successful careers, career changes, challenges, and professional growth."
-                        />
-                    }
-                />
+                    <Route
+                        path="/stories"
+                        element={
+                            <CategoryPage
+                                category=""
+                                title="All Stories"
+                                description="Explore stories, journeys, lessons, and experiences from across Zero to Hero."
+                            />
+                        }
+                    />
 
-                {/* Investment */}
-                <Route
-                    path="/investment"
-                    element={
-                        <CategoryPage
-                            category="Investment"
-                            title="Investment Stories"
-                            description="Learn from investment journeys, strategies, mistakes, failures, and lessons."
-                        />
-                    }
-                />
+                    <Route
+                        path="/post/:id"
+                        element={<Post />}
+                    />
 
-                {/* Other */}
-                <Route
-                    path="/other"
-                    element={
-                        <CategoryPage
-                            category="Other"
-                            title="Other Journeys"
-                            description="Explore inspiring journeys from sports, entertainment, and other fields."
-                        />
-                    }
-                />
-                {/* =========================
-    PUBLIC ALL STORIES PAGE
-   ========================= */}
+                    <Route
+                        path="/admin/login"
+                        element={<AdminLogin />}
+                    />
 
-                <Route
-                    path="/stories"
-                    element={
-                        <CategoryPage
-                            category=""
-                            title="All Stories"
-                            description="Explore stories, journeys, lessons, and experiences from across Zero to Hero."
-                        />
-                    }
-                />
+                    <Route
+                        path="/admin/dashboard"
+                        element={
+                            <ProtectedRoute>
+                                <AdminDashboard />
+                            </ProtectedRoute>
+                        }
+                    />
 
+                    <Route
+                        path="/admin/create-story"
+                        element={
+                            <ProtectedRoute>
+                                <CreateStory />
+                            </ProtectedRoute>
+                        }
+                    />
 
-                {/* =========================
-                    PUBLIC STORY PAGE
-                   ========================= */}
+                    <Route
+                        path="/admin/posts/:id/edit"
+                        element={
+                            <ProtectedRoute>
+                                <EditStory />
+                            </ProtectedRoute>
+                        }
+                    />
 
-                <Route
-                    path="/post/:id"
-                    element={<Post />}
-                />
+                    <Route
+                        path="/admin/posts/:id/additional-story"
+                        element={
+                            <ProtectedRoute>
+                                <AddAdditionalStory />
+                            </ProtectedRoute>
+                        }
+                    />
 
-
-                {/* =========================
-                    ADMIN LOGIN
-                   ========================= */}
-
-                <Route
-                    path="/admin/login"
-                    element={<AdminLogin />}
-                />
-
-
-                {/* =========================
-                    PROTECTED ADMIN PAGES
-                   ========================= */}
-
-                {/* Admin Dashboard */}
-                <Route
-                    path="/admin/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <AdminDashboard />
-                        </ProtectedRoute>
-                    }
-                />
-
-                {/* Create Story */}
-                <Route
-                    path="/admin/create-story"
-                    element={
-                        <ProtectedRoute>
-                            <CreateStory />
-                        </ProtectedRoute>
-                    }
-                />
-
-                {/* Edit Story */}
-                <Route
-                    path="/admin/posts/:id/edit"
-                    element={
-                        <ProtectedRoute>
-                            <EditStory />
-                        </ProtectedRoute>
-                    }
-                />
-
-                {/* Add Additional Story */}
-                <Route
-                    path="/admin/posts/:id/additional-story"
-                    element={
-                        <ProtectedRoute>
-                            <AddAdditionalStory />
-                        </ProtectedRoute>
-                    }
-                />
-
-
-                {/* =========================
-                    404 PAGE
-                   ========================= */}
-
-                <Route
-                    path="*"
-                    element={<NotFound />}
-                />
-
-            </Routes>
-
+                    <Route
+                        path="*"
+                        element={<NotFound />}
+                    />
+                </Routes>
+            </Suspense>
         </BrowserRouter>
     );
 }
