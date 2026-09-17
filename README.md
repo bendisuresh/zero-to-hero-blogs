@@ -164,3 +164,33 @@ Install the following before running the project:
 ```bash
 git clone https://github.com/bendisuresh/zero-to-hero-blogs.git
 cd zero-to-hero-blogs
+
+## API Documentation
+
+The backend exposes REST APIs for public blog content and protected administrator operations.
+
+### Public Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/` | API health/status |
+| GET | `/api/posts` | Get published stories |
+| GET | `/api/posts/:id` | Get a story by ID |
+| GET | `/api/posts/:id/comments` | Get comments for a story |
+| POST | `/api/posts/:id/comments` | Submit a comment |
+| GET | `/api/posts/:id/additional-stories` | Get additional stories |
+| POST | `/api/posts/:id/view` | Record a story view |
+| POST | `/api/posts/:id/like` | Like a story |
+| POST | `/api/posts/:id/dislike` | Dislike a story |
+| GET | `/api/rss` | RSS feed |
+
+### Admin Authentication
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/admin/login` | Authenticate an administrator |
+
+A successful login returns a JWT access token. Protected administrator requests send the token using the `Authorization` header:
+
+```text
+Authorization: Bearer <access_token>
