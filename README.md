@@ -146,3 +146,21 @@ flowchart TD
     F --> F1[Business Logic]
     F --> F2[Validation]
     F --> F3[Data Processing]
+
+
+## Local Development Setup
+
+### Prerequisites
+
+Install the following before running the project:
+
+- Python 3.x
+- Node.js and npm
+- PostgreSQL
+- Git
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/bendisuresh/zero-to-hero-blogs.git
+cd zero-to-hero-blogs
