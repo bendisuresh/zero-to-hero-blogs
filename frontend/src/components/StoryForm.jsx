@@ -1,4 +1,6 @@
 import RichTextEditor from "./RichTextEditor";
+import TagInput from "./TagInput";
+import ImageUploader from "./ImageUploader";
 
 function StoryForm({
     formData,
@@ -8,6 +10,11 @@ function StoryForm({
     handleAddLink,
     handleEditLink,
     handleRemoveLink,
+    selectedImage,
+    imageUrl,
+    uploadingImage,
+    onImageChange,
+    onImageUpload,
 }) {
     return (
         <>
@@ -31,7 +38,6 @@ function StoryForm({
                 />
             </div>
 
-
             {/* ============================================================
                 DESCRIPTION
             ============================================================ */}
@@ -50,7 +56,6 @@ function StoryForm({
                     required
                 />
             </div>
-
 
             {/* ============================================================
                 CATEGORY
@@ -85,7 +90,6 @@ function StoryForm({
                 </select>
             </div>
 
-
             {/* ============================================================
                 STORYTELLER
             ============================================================ */}
@@ -106,7 +110,6 @@ function StoryForm({
                 />
             </div>
 
-
             {/* ============================================================
                 STORYTELLER EMAIL
             ============================================================ */}
@@ -125,7 +128,6 @@ function StoryForm({
                     onChange={handleChange}
                 />
             </div>
-
 
             {/* ============================================================
                 STARTING POINT
@@ -146,7 +148,6 @@ function StoryForm({
                 />
             </div>
 
-
             {/* ============================================================
                 HOW THEY STARTED
             ============================================================ */}
@@ -165,7 +166,6 @@ function StoryForm({
                     required
                 />
             </div>
-
 
             {/* ============================================================
                 FINANCIAL INFORMATION
@@ -186,7 +186,6 @@ function StoryForm({
                 />
             </div>
 
-
             {/* ============================================================
                 APPROACH
             ============================================================ */}
@@ -205,7 +204,6 @@ function StoryForm({
                     required
                 />
             </div>
-
 
             {/* ============================================================
                 LIFE CHANGED
@@ -226,7 +224,6 @@ function StoryForm({
                 />
             </div>
 
-
             {/* ============================================================
                 FAILURES
             ============================================================ */}
@@ -246,26 +243,28 @@ function StoryForm({
                 />
             </div>
 
-
             {/* ============================================================
                 TAGS
             ============================================================ */}
 
-            <div className="form-group">
-                <label htmlFor="tags">
-                    Tags
-                </label>
+            <TagInput
+                value={formData.tags}
+                onChange={handleChange}
+            />
 
-                <input
-                    id="tags"
-                    type="text"
-                    name="tags"
-                    placeholder="business, startup, success"
-                    value={formData.tags}
-                    onChange={handleChange}
+            {/* ============================================================
+                IMAGE UPLOAD
+            ============================================================ */}
+
+            {onImageChange && onImageUpload && (
+                <ImageUploader
+                    selectedImage={selectedImage}
+                    imageUrl={imageUrl}
+                    uploadingImage={uploadingImage}
+                    onImageChange={onImageChange}
+                    onImageUpload={onImageUpload}
                 />
-            </div>
-
+            )}
 
             {/* ============================================================
                 LESSONS / RICH TEXT EDITOR
@@ -275,7 +274,6 @@ function StoryForm({
                 <label>
                     Lessons Learned
                 </label>
-
 
                 {/* Editor toolbar */}
 
@@ -301,7 +299,6 @@ function StoryForm({
                         Bold
                     </button>
 
-
                     {/* Italic */}
 
                     <button
@@ -322,7 +319,6 @@ function StoryForm({
                         Italic
                     </button>
 
-
                     {/* Add link */}
 
                     <button
@@ -337,7 +333,6 @@ function StoryForm({
                         Link
                     </button>
 
-
                     {/* Edit link */}
 
                     <button
@@ -348,7 +343,6 @@ function StoryForm({
                         Edit Link
                     </button>
 
-
                     {/* Remove link */}
 
                     <button
@@ -358,7 +352,6 @@ function StoryForm({
                     >
                         Remove Link
                     </button>
-
 
                     {/* H2 */}
 
@@ -384,7 +377,6 @@ function StoryForm({
                         H2
                     </button>
 
-
                     {/* Bullet list */}
 
                     <button
@@ -404,7 +396,6 @@ function StoryForm({
                     >
                         Bullet List
                     </button>
-
 
                     {/* Numbered list */}
 
@@ -427,9 +418,6 @@ function StoryForm({
                     </button>
 
                 </div>
-
-
-                {/* Reusable editor */}
 
                 <RichTextEditor
                     value={formData.lessons}

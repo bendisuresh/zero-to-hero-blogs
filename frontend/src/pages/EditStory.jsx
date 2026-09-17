@@ -216,8 +216,6 @@ function EditStory() {
             return;
         }
 
-        // Financial information validation.
-
         if (!formData.financial_info.trim()) {
             setError(
                 "Financial Information is required"
@@ -225,8 +223,6 @@ function EditStory() {
 
             return;
         }
-
-        // Lessons validation.
 
         if (!editor || editor.isEmpty) {
             setError(
@@ -301,25 +297,18 @@ function EditStory() {
 
     return (
         <main className="create-story-page">
+
             <section className="create-story-container">
 
                 <h1>
                     Edit Story
                 </h1>
 
-                {/* ====================================================
-                    SUCCESS MESSAGE
-                ==================================================== */}
-
                 {message && (
                     <p className="success-message">
                         {message}
                     </p>
                 )}
-
-                {/* ====================================================
-                    ERROR MESSAGE
-                ==================================================== */}
 
                 {error && (
                     <p className="error-message">
@@ -328,10 +317,6 @@ function EditStory() {
                 )}
 
                 <form onSubmit={handleSubmit}>
-
-                    {/* ====================================================
-                        REUSABLE STORY FORM
-                    ==================================================== */}
 
                     <StoryForm
                         formData={formData}
@@ -342,10 +327,6 @@ function EditStory() {
                         handleEditLink={handleEditLink}
                         handleRemoveLink={handleRemoveLink}
                     />
-
-                    {/* ====================================================
-                        SAVE / CANCEL
-                    ==================================================== */}
 
                     <div className="form-group edit-story-actions">
 
@@ -377,6 +358,7 @@ function EditStory() {
                 </form>
 
             </section>
+
         </main>
     );
 }

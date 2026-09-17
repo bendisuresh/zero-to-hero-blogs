@@ -7,7 +7,6 @@ import "./CreateStory.css";
 function CreateStory() {
     const navigate = useNavigate();
 
-
     // ============================================================
     // FORM DATA
     // ============================================================
@@ -28,10 +27,8 @@ function CreateStory() {
         tags: "",
     });
 
-
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
-
 
     // ============================================================
     // IMAGE STATE
@@ -41,13 +38,11 @@ function CreateStory() {
     const [imageUrl, setImageUrl] = useState("");
     const [uploadingImage, setUploadingImage] = useState(false);
 
-
     // ============================================================
     // RICH TEXT EDITOR
     // ============================================================
 
     const [editor, setEditor] = useState(null);
-
 
     // ============================================================
     // HANDLE NORMAL INPUT CHANGES
@@ -61,7 +56,6 @@ function CreateStory() {
             [name]: value,
         }));
     };
-
 
     // ============================================================
     // SELECT IMAGE
@@ -78,7 +72,6 @@ function CreateStory() {
         setImageUrl("");
         setError("");
     };
-
 
     // ============================================================
     // UPLOAD IMAGE
@@ -151,7 +144,6 @@ function CreateStory() {
         }
     };
 
-
     // ============================================================
     // URL VALIDATION
     // ============================================================
@@ -168,7 +160,6 @@ function CreateStory() {
             return false;
         }
     };
-
 
     // ============================================================
     // ADD LINK
@@ -199,7 +190,6 @@ function CreateStory() {
             })
             .run();
     };
-
 
     // ============================================================
     // EDIT LINK
@@ -238,7 +228,6 @@ function CreateStory() {
             .run();
     };
 
-
     // ============================================================
     // REMOVE LINK
     // ============================================================
@@ -250,7 +239,6 @@ function CreateStory() {
             .unsetLink()
             .run();
     };
-
 
     // ============================================================
     // CREATE STORY
@@ -269,7 +257,6 @@ function CreateStory() {
             return;
         }
 
-        // Make sure the editor contains content.
         if (!editor || editor.isEmpty) {
             setError("Lessons field is required");
             return;
@@ -303,7 +290,6 @@ function CreateStory() {
                 "Story created successfully!"
             );
 
-
             // ========================================================
             // CLEAR FORM
             // ========================================================
@@ -324,12 +310,8 @@ function CreateStory() {
                 tags: "",
             });
 
-
-            // Clear editor.
             editor.commands.clearContent();
 
-
-            // Clear image state.
             setSelectedImage(null);
             setImageUrl("");
 
@@ -339,7 +321,6 @@ function CreateStory() {
             );
         }
     };
-
 
     // ============================================================
     // UI
@@ -354,17 +335,11 @@ function CreateStory() {
                     Create Story
                 </h1>
 
-
-                {/* Success message */}
-
                 {message && (
                     <p className="success-message">
                         {message}
                     </p>
                 )}
-
-
-                {/* Error message */}
 
                 {error && (
                     <p className="error-message">
@@ -372,12 +347,7 @@ function CreateStory() {
                     </p>
                 )}
 
-
                 <form onSubmit={handleSubmit}>
-
-                    {/* ====================================================
-                        REUSABLE STORY FORM
-                    ==================================================== */}
 
                     <StoryForm
                         formData={formData}
@@ -387,70 +357,12 @@ function CreateStory() {
                         handleAddLink={handleAddLink}
                         handleEditLink={handleEditLink}
                         handleRemoveLink={handleRemoveLink}
+                        selectedImage={selectedImage}
+                        imageUrl={imageUrl}
+                        uploadingImage={uploadingImage}
+                        onImageChange={handleImageChange}
+                        onImageUpload={handleImageUpload}
                     />
-
-
-                    {/* ====================================================
-                        IMAGE UPLOAD
-                    ==================================================== */}
-
-                    <div className="form-group">
-
-                        <label htmlFor="story-image">
-                            Story Image
-                        </label>
-
-
-                        <input
-                            id="story-image"
-                            type="file"
-                            accept="image/png,image/jpeg,image/gif,image/webp"
-                            onChange={handleImageChange}
-                        />
-
-
-                        <button
-                            type="button"
-                            onClick={handleImageUpload}
-                            disabled={
-                                !selectedImage ||
-                                uploadingImage
-                            }
-                            className="upload-image-button"
-                        >
-                            {uploadingImage
-                                ? "Uploading..."
-                                : "Upload Image"}
-                        </button>
-
-
-                        {imageUrl && (
-                            <div className="uploaded-image-preview">
-
-                                <p>
-                                    Image uploaded successfully:
-                                </p>
-
-
-                                <img
-                                    src={imageUrl}
-                                    alt="Uploaded story"
-                                />
-
-
-                                <p className="image-url">
-                                    {imageUrl}
-                                </p>
-
-                            </div>
-                        )}
-
-                    </div>
-
-
-                    {/* ====================================================
-                        SUBMIT
-                    ==================================================== */}
 
                     <button
                         type="submit"
