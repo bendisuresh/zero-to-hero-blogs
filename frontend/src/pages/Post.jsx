@@ -1,8 +1,25 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-
+import { Link, useParams } from "react-router-dom";
 import Toast from "../components/Toast";
+import getStoryImage from "../utils/storyImage";
 import "./Post.css";
+
+
+function StorySection({ title, children }) {
+    if (!children) {
+        return null;
+    }
+
+    return (
+        <section className="story-section">
+            <h2>{title}</h2>
+
+            <div className="story-section-content">
+                <p>{children}</p>
+            </div>
+        </section>
+    );
+}
 
 
 function Post() {
@@ -23,17 +40,8 @@ function Post() {
         message: ""
     });
 
-
-    // ============================================================
-    // API BASE URL
-    // ============================================================
-
     const API_URL = import.meta.env.VITE_API_URL;
 
-
-    // ============================================================
-    // TOAST
-    // ============================================================
 
     const showToast = (message) => {
         setToast({
@@ -50,21 +58,16 @@ function Post() {
     };
 
 
-    // ============================================================
-    // LOAD POST DATA
-    // ============================================================
+    /*
+    ============================================================
+    LOAD STORY
+    ============================================================
+    */
 
     useEffect(() => {
-
         const loadPost = async () => {
-
             setLoading(true);
             setError("");
-
-
-            // ----------------------------------------------------
-            // FETCH POST
-            // ----------------------------------------------------
 
             try {
                 const response = await fetch(
@@ -75,7 +78,8 @@ function Post() {
 
                 if (!response.ok) {
                     setError(
-                        data.message || "Failed to load story"
+                        data.message ||
+                        "Failed to load story"
                     );
                 } else {
                     setPost(data);
@@ -88,9 +92,11 @@ function Post() {
             }
 
 
-            // ----------------------------------------------------
-            // FETCH ADDITIONAL STORIES
-            // ----------------------------------------------------
+            /*
+            ----------------------------------------------------
+            ADDITIONAL STORIES
+            ----------------------------------------------------
+            */
 
             try {
                 const response = await fetch(
@@ -111,9 +117,11 @@ function Post() {
             }
 
 
-            // ----------------------------------------------------
-            // FETCH COMMENTS
-            // ----------------------------------------------------
+            /*
+            ----------------------------------------------------
+            COMMENTS
+            ----------------------------------------------------
+            */
 
             try {
                 const response = await fetch(
@@ -134,9 +142,11 @@ function Post() {
             }
 
 
-            // ----------------------------------------------------
-            // RECORD VIEW
-            // ----------------------------------------------------
+            /*
+            ----------------------------------------------------
+            RECORD VIEW
+            ----------------------------------------------------
+            */
 
             try {
                 await fetch(
@@ -153,22 +163,21 @@ function Post() {
                 );
             }
 
-
             setLoading(false);
         };
-
 
         loadPost();
 
     }, [id, API_URL]);
 
 
-    // ============================================================
-    // LIKE
-    // ============================================================
+    /*
+    ============================================================
+    LIKE
+    ============================================================
+    */
 
     const handleLike = async () => {
-
         try {
             const response = await fetch(
                 `${API_URL}/api/posts/${id}/like`,
@@ -181,8 +190,10 @@ function Post() {
 
             if (!response.ok) {
                 showToast(
-                    data.message || "Unable to like story"
+                    data.message ||
+                    "Unable to like story"
                 );
+
                 return;
             }
 
@@ -201,12 +212,13 @@ function Post() {
     };
 
 
-    // ============================================================
-    // DISLIKE
-    // ============================================================
+    /*
+    ============================================================
+    DISLIKE
+    ============================================================
+    */
 
     const handleDislike = async () => {
-
         try {
             const response = await fetch(
                 `${API_URL}/api/posts/${id}/dislike`,
@@ -219,8 +231,10 @@ function Post() {
 
             if (!response.ok) {
                 showToast(
-                    data.message || "Unable to dislike story"
+                    data.message ||
+                    "Unable to dislike story"
                 );
+
                 return;
             }
 
@@ -239,18 +253,20 @@ function Post() {
     };
 
 
-    // ============================================================
-    // SUBMIT COMMENT
-    // ============================================================
+    /*
+    ============================================================
+    COMMENT SUBMISSION
+    ============================================================
+    */
 
     const handleCommentSubmit = async (event) => {
-
         event.preventDefault();
 
         if (!name.trim() || !comment.trim()) {
             showToast(
                 "Name and comment are required"
             );
+
             return;
         }
 
@@ -263,8 +279,8 @@ function Post() {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        name,
-                        content: comment
+                        name: name.trim(),
+                        content: comment.trim()
                     })
                 }
             );
@@ -273,8 +289,10 @@ function Post() {
 
             if (!response.ok) {
                 showToast(
-                    data.message || "Failed to add comment"
+                    data.message ||
+                    "Failed to add comment"
                 );
+
                 return;
             }
 
@@ -282,7 +300,12 @@ function Post() {
             setComment("");
 
 
-            // Refresh comments after submitting
+            /*
+            ----------------------------------------------------
+            REFRESH COMMENTS
+            ----------------------------------------------------
+            */
+
             try {
                 const commentsResponse = await fetch(
                     `${API_URL}/api/posts/${id}/comments`
@@ -302,7 +325,6 @@ function Post() {
                 );
             }
 
-
             showToast("Comment added!");
 
         } catch {
@@ -313,68 +335,173 @@ function Post() {
     };
 
 
-    // ============================================================
-    // LOADING
-    // ============================================================
+    /*
+    ============================================================
+    LOADING STATE
+    ============================================================
+    */
 
     if (loading) {
         return (
             <main className="post-page">
 
-                <p className="post-status">
-                    Loading story...
-                </p>
+                <div className="post-status-card">
+
+                    <span className="status-spinner"></span>
+
+                    <p>
+                        Loading story...
+                    </p>
+
+                </div>
 
             </main>
         );
     }
 
 
-    // ============================================================
-    // ERROR
-    // ============================================================
+    /*
+    ============================================================
+    ERROR STATE
+    ============================================================
+    */
 
     if (error) {
         return (
             <main className="post-page">
 
-                <p className="post-error">
-                    {error}
-                </p>
+                <div className="post-status-card post-error-card">
+
+                    <h2>
+                        Unable to load this story
+                    </h2>
+
+                    <p>
+                        {error}
+                    </p>
+
+                    <Link
+                        to="/"
+                        className="post-back-link"
+                    >
+                        ← Back to Home
+                    </Link>
+
+                </div>
 
             </main>
         );
     }
 
 
-    // ============================================================
-    // POST NOT FOUND
-    // ============================================================
+    /*
+    ============================================================
+    STORY NOT FOUND
+    ============================================================
+    */
 
     if (!post) {
         return (
             <main className="post-page">
 
-                <p className="post-status">
-                    Story not found.
-                </p>
+                <div className="post-status-card">
+
+                    <h2>
+                        Story not found
+                    </h2>
+
+                    <Link
+                        to="/"
+                        className="post-back-link"
+                    >
+                        ← Back to Home
+                    </Link>
+
+                </div>
 
             </main>
         );
     }
 
 
-    // ============================================================
-    // MAIN PAGE
-    // ============================================================
+    /*
+    ============================================================
+    STORY DATA
+    ============================================================
+    */
+
+    const imageUrl = getStoryImage(post);
+
+    const storyParts = [
+        post.description,
+        post.starting_point,
+        post.how_started,
+        post.financial_info,
+        post.approach,
+        post.life_changed,
+        post.failures,
+        post.lessons
+    ];
+
+
+    const totalWords = storyParts
+        .filter(Boolean)
+        .join(" ")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .length;
+
+
+    const readingTime = Math.max(
+        1,
+        Math.ceil(totalWords / 200)
+    );
+
+
+    const formattedDate = post.created_at
+        ? new Date(
+            post.created_at
+        ).toLocaleDateString(
+            "en-IN",
+            {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            }
+        )
+        : "";
+
+
+    /*
+    ============================================================
+    PAGE
+    ============================================================
+    */
 
     return (
         <main className="post-page">
 
 
-            {/* ====================================================
-                POST HEADER
-            ==================================================== */}
+            {/* =================================================
+                BACK NAVIGATION
+               ================================================= */}
+
+            <div className="post-navigation">
+
+                <Link
+                    to="/"
+                    className="post-back-link"
+                >
+                    ← Back to Stories
+                </Link>
+
+            </div>
+
+
+            {/* =================================================
+                ARTICLE HEADER
+               ================================================= */}
 
             <header className="post-header">
 
@@ -382,22 +509,42 @@ function Post() {
                     {post.category}
                 </span>
 
+
                 <h1>
                     {post.title}
                 </h1>
+
 
                 <p className="post-description">
                     {post.description}
                 </p>
 
+
                 <div className="post-meta">
 
                     <span>
-                        By {post.storyteller}
+                        By{" "}
+
+                        <strong>
+                            {post.storyteller}
+                        </strong>
                     </span>
 
+
+                    {formattedDate && (
+                        <span>
+                            {formattedDate}
+                        </span>
+                    )}
+
+
                     <span>
-                        👁 {post.views}
+                        {readingTime} min read
+                    </span>
+
+
+                    <span>
+                        {post.views || 0} views
                     </span>
 
                 </div>
@@ -405,315 +552,377 @@ function Post() {
             </header>
 
 
-            {/* ====================================================
-                70 / 30 CONTENT LAYOUT
-            ==================================================== */}
+            {/* =================================================
+                HERO IMAGE
+               ================================================= */}
 
-            <div className="post-layout">
+            <figure className="post-hero-image">
+
+                <img
+                    src={imageUrl}
+                    alt={post.title}
+                />
+
+            </figure>
+
+
+            {/* =================================================
+                ARTICLE + SIDEBAR
+               ================================================= */}
+
+            <div className="post-content-layout">
 
 
                 {/* =================================================
-                    MAIN STORY - 70%
-                    
-                    ONLY the main story is shown here.
-                ================================================= */}
+                    MAIN ARTICLE
+                   ================================================= */}
 
                 <article className="main-story">
 
-                    <div className="main-story-label">
-                        Main Story
-                    </div>
 
-                    <div className="main-story-content">
+                    <div className="story-introduction">
+
+                        <span>
+                            THE JOURNEY
+                        </span>
 
                         <p>
-                            {post.description}
+                            Every journey begins somewhere.
+                            This is the story behind the
+                            starting point, challenges,
+                            decisions and lessons that
+                            shaped this journey.
                         </p>
 
                     </div>
+
+
+                    <StorySection title="Starting Point">
+                        {post.starting_point}
+                    </StorySection>
+
+
+                    <StorySection title="How It Started">
+                        {post.how_started}
+                    </StorySection>
+
+
+                    <StorySection title="The Approach">
+                        {post.approach}
+                    </StorySection>
+
+
+                    <StorySection title="How Life Changed">
+                        {post.life_changed}
+                    </StorySection>
+
+
+                    <StorySection title="Challenges & Failures">
+                        {post.failures}
+                    </StorySection>
+
+
+                    <StorySection title="Financial Context">
+                        {post.financial_info}
+                    </StorySection>
+
+
+                    {/* =================================================
+                        LESSONS
+                       ================================================= */}
+
+                    {post.lessons && (
+
+                        <section className="lessons-section">
+
+                            <div className="lessons-heading">
+
+                                <span>
+                                    KEY TAKEAWAYS
+                                </span>
+
+                                <h2>
+                                    Lessons Learned
+                                </h2>
+
+                            </div>
+
+
+                            <div
+                                className="story-rich-content"
+                                dangerouslySetInnerHTML={{
+                                    __html: post.lessons
+                                }}
+                            />
+
+                        </section>
+
+                    )}
+
+
+                    {/* =================================================
+                        ADDITIONAL STORIES
+                       ================================================= */}
+
+                    {additionalStories.length > 0 && (
+
+                        <section className="additional-stories-section">
+
+                            <div className="section-heading">
+
+                                <span>
+                                    MORE FROM THIS STORY
+                                </span>
+
+                                <h2>
+                                    Additional Stories
+                                </h2>
+
+                            </div>
+
+
+                            <div className="additional-stories-list">
+
+                                {additionalStories.map(
+                                    (story) => (
+
+                                        <article
+                                            className="additional-story"
+                                            key={story.id}
+                                        >
+
+                                            <h3>
+                                                {story.title}
+                                            </h3>
+
+                                            <p>
+                                                {story.content}
+                                            </p>
+
+                                        </article>
+
+                                    )
+                                )}
+
+                            </div>
+
+                        </section>
+
+                    )}
 
                 </article>
 
 
                 {/* =================================================
-                    SIDEBAR - 30%
-
-                    All supporting/sub topics are here.
-                ================================================= */}
+                    SIDEBAR
+                   ================================================= */}
 
                 <aside className="post-sidebar">
 
 
-                    {/* ------------------------------------------------
+                    {/* =================================================
                         STORYTELLER
-                    ------------------------------------------------ */}
+                       ================================================= */}
 
-                    <div className="side-card">
+                    <section className="sidebar-section">
+
+                        <span className="sidebar-label">
+                            STORYTELLER
+                        </span>
 
                         <h3>
-                            👤 Storyteller
+                            {post.storyteller}
                         </h3>
 
-                        <p>
-                            {post.storyteller}
-                        </p>
-
-
-                        {/* Contact Storyteller */}
 
                         {post.storyteller_email && (
-                            <div className="storyteller-contact">
 
-                                <a
-                                    href={`mailto:${post.storyteller_email}`}
-                                    className="contact-storyteller-btn"
-                                >
-                                    📧 Contact Storyteller
-                                </a>
+                            <a
+                                href={`mailto:${post.storyteller_email}`}
+                                className="contact-storyteller-btn"
+                            >
+                                Contact Storyteller
+                            </a>
 
-                            </div>
                         )}
 
-                    </div>
+                    </section>
 
 
-                    {/* ------------------------------------------------
-                        STARTING POINT
-                    ------------------------------------------------ */}
+                    {/* =================================================
+                        STORY DETAILS
+                       ================================================= */}
 
-                    <div className="side-card">
+                    <section className="sidebar-section">
 
-                        <h3>
-                            🚀 Starting Point
-                        </h3>
-
-                        <p>
-                            {post.starting_point}
-                        </p>
-
-                    </div>
+                        <span className="sidebar-label">
+                            STORY DETAILS
+                        </span>
 
 
-                    {/* ------------------------------------------------
-                        HOW IT STARTED
-                    ------------------------------------------------ */}
+                        <div className="story-detail">
 
-                    <div className="side-card">
+                            <span>
+                                Category
+                            </span>
 
-                        <h3>
-                            💡 How It Started
-                        </h3>
-
-                        <p>
-                            {post.how_started}
-                        </p>
-
-                    </div>
-
-
-                    {/* ------------------------------------------------
-                        FINANCIAL INFORMATION
-                    ------------------------------------------------ */}
-
-                    <div className="side-card">
-
-                        <h3>
-                            💰 Income / Net Worth
-                        </h3>
-
-                        <p>
-                            {post.financial_info}
-                        </p>
-
-                    </div>
-
-
-                    {/* ------------------------------------------------
-                        APPROACH
-                    ------------------------------------------------ */}
-
-                    <div className="side-card">
-
-                        <h3>
-                            🎯 Approach
-                        </h3>
-
-                        <p>
-                            {post.approach}
-                        </p>
-
-                    </div>
-
-
-                    {/* ------------------------------------------------
-                        LIFE CHANGED
-                    ------------------------------------------------ */}
-
-                    <div className="side-card">
-
-                        <h3>
-                            🌱 How Life Changed
-                        </h3>
-
-                        <p>
-                            {post.life_changed}
-                        </p>
-
-                    </div>
-
-
-                    {/* ------------------------------------------------
-                        FAILURES
-                    ------------------------------------------------ */}
-
-                    <div className="side-card">
-
-                        <h3>
-                            ⚠️ Failures
-                        </h3>
-
-                        <p>
-                            {post.failures}
-                        </p>
-
-                    </div>
-
-
-                    {/* ------------------------------------------------
-                        LESSONS
-                    ------------------------------------------------ */}
-
-                    <div className="side-card lessons-card">
-
-                        <h3>
-                            🧠 Lessons
-                        </h3>
-
-                        <div
-                            className="sidebar-lessons"
-                            dangerouslySetInnerHTML={{
-                                __html: post.lessons
-                            }}
-                        />
-
-                    </div>
-
-
-                    {/* ------------------------------------------------
-                        ADDITIONAL STORIES
-                    ------------------------------------------------ */}
-
-                    {additionalStories.length > 0 && (
-
-                        <div className="side-card additional-stories">
-
-                            <h3>
-                                📖 Additional Stories
-                            </h3>
-
-                            {additionalStories.map(
-                                (story) => (
-
-                                    <article
-                                        className="additional-story"
-                                        key={story.id}
-                                    >
-
-                                        <h4>
-                                            {story.title}
-                                        </h4>
-
-                                        <p>
-                                            {story.content}
-                                        </p>
-
-                                    </article>
-
-                                )
-                            )}
+                            <strong>
+                                {post.category}
+                            </strong>
 
                         </div>
 
-                    )}
+
+                        <div className="story-detail">
+
+                            <span>
+                                Reading time
+                            </span>
+
+                            <strong>
+                                {readingTime} min
+                            </strong>
+
+                        </div>
 
 
-                    {/* ------------------------------------------------
-                        TAGS
-                    ------------------------------------------------ */}
+                        <div className="story-detail">
 
-                    {post.tags && (
+                            <span>
+                                Views
+                            </span>
 
-                        <div className="side-card">
+                            <strong>
+                                {post.views || 0}
+                            </strong>
 
-                            <h3>
-                                🏷 Tags
-                            </h3>
+                        </div>
 
-                            <div className="post-tags">
 
-                                {post.tags
-                                    .split(",")
-                                    .map((tag) => (
+                        {formattedDate && (
 
-                                        <span
-                                            key={tag}
-                                            className="post-tag"
-                                        >
-                                            #{tag.trim()}
-                                        </span>
+                            <div className="story-detail">
 
-                                    ))}
+                                <span>
+                                    Published
+                                </span>
+
+                                <strong>
+                                    {formattedDate}
+                                </strong>
 
                             </div>
 
-                        </div>
+                        )}
 
-                    )}
+                    </section>
 
 
-                    {/* ------------------------------------------------
-                        ENGAGEMENT
-                    ------------------------------------------------ */}
+                    {/* =================================================
+                        CLICKABLE TAGS
+                       ================================================= */}
 
-                    <div className="side-card">
+                    {post.tags && (
+    <section className="sidebar-section">
+        <span className="sidebar-label">
+            TOPICS
+        </span>
 
-                        <h3>
-                            Your Feedback
-                        </h3>
+        <div className="post-tags">
+            {post.tags
+                .split(",")
+                .map((tag) => {
+                    const cleanTag = tag.trim();
+
+                    return (
+                        <Link
+                            key={cleanTag}
+                            to={`/stories?tag=${encodeURIComponent(cleanTag)}`}
+                            className="post-tag"
+                        >
+                            #{cleanTag}
+                        </Link>
+                    );
+                })}
+        </div>
+    </section>
+)}
+
+
+                    {/* =================================================
+                        FEEDBACK
+                       ================================================= */}
+
+                    <section className="sidebar-section feedback-section">
+
+                        <span className="sidebar-label">
+                            YOUR FEEDBACK
+                        </span>
+
 
                         <div className="post-actions">
 
-                            <button
-                                onClick={handleLike}
-                            >
-                                ❤️ {post.likes}
-                            </button>
 
                             <button
-                                onClick={handleDislike}
+                                type="button"
+                                onClick={handleLike}
+                                aria-label="Like story"
                             >
-                                👎 {post.dislikes}
+
+                                <span>
+                                    👍
+                                </span>
+
+                                <strong>
+                                    {post.likes || 0}
+                                </strong>
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                onClick={handleDislike}
+                                aria-label="Dislike story"
+                            >
+
+                                <span>
+                                    👎
+                                </span>
+
+                                <strong>
+                                    {post.dislikes || 0}
+                                </strong>
+
                             </button>
 
                         </div>
 
-                    </div>
-
+                    </section>
 
                 </aside>
 
             </div>
 
 
-            {/* ====================================================
+            {/* =====================================================
                 COMMENTS
-            ==================================================== */}
+               ===================================================== */}
 
             <section className="comments-section">
 
-                <h2>
-                    Comments ({comments.length})
-                </h2>
+
+                <div className="comments-heading">
+
+                    <span>
+                        JOIN THE CONVERSATION
+                    </span>
+
+                    <h2>
+                        Comments ({comments.length})
+                    </h2>
+
+                </div>
 
 
                 <form
@@ -730,16 +939,18 @@ function Post() {
                         }
                     />
 
+
                     <textarea
-                        placeholder="Write a comment..."
+                        placeholder="Share your thoughts..."
                         value={comment}
                         onChange={(event) =>
                             setComment(event.target.value)
                         }
                     />
 
+
                     <button type="submit">
-                        Post Comment
+                        Post Comment →
                     </button>
 
                 </form>
@@ -749,9 +960,14 @@ function Post() {
 
                     {comments.length === 0 ? (
 
-                        <p className="empty-comments">
-                            Be the first to comment.
-                        </p>
+                        <div className="empty-comments">
+
+                            <p>
+                                Be the first to share your
+                                thoughts on this story.
+                            </p>
+
+                        </div>
 
                     ) : (
 
@@ -762,13 +978,26 @@ function Post() {
                                 key={item.id}
                             >
 
-                                <strong>
-                                    {item.name}
-                                </strong>
+                                <div className="comment-avatar">
 
-                                <p>
-                                    {item.content}
-                                </p>
+                                    {item.name
+                                        .charAt(0)
+                                        .toUpperCase()}
+
+                                </div>
+
+
+                                <div className="comment-content">
+
+                                    <strong>
+                                        {item.name}
+                                    </strong>
+
+                                    <p>
+                                        {item.content}
+                                    </p>
+
+                                </div>
 
                             </article>
 
@@ -780,10 +1009,6 @@ function Post() {
 
             </section>
 
-
-            {/* ====================================================
-                TOAST
-            ==================================================== */}
 
             <Toast
                 show={toast.show}

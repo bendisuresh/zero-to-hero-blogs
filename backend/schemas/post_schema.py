@@ -83,5 +83,21 @@ def validate_post(data):
 
     if len(data.get("tags", "").strip()) > 300:
         return "Tags must be 300 characters or less"
+    image_url = data.get(
+        "image_url",
+        ""
+    )
+
+    if image_url is None:
+        image_url = ""
+
+    if not isinstance(image_url, str):
+        return "Image URL must be text"
+
+    if len(image_url.strip()) > 500:
+        return (
+            "Image URL must be "
+            "500 characters or less"
+        )
 
     return None

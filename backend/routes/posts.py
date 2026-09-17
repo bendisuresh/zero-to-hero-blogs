@@ -23,6 +23,12 @@ posts_bp = Blueprint("posts", __name__)
 @posts_bp.route("/api/posts", methods=["GET"])
 def get_posts():
     category = request.args.get("category")
+
+    tag = request.args.get(
+        "tag",
+        default=""
+    ).strip()
+
     search = request.args.get(
         "search",
         default=""
@@ -52,6 +58,7 @@ def get_posts():
     pagination = get_posts_service(
         category=category,
         search=search,
+        tag=tag,
         sort=sort,
         page=page,
         limit=limit
@@ -67,6 +74,7 @@ def get_posts():
             "category": post.category,
             "storyteller": post.storyteller,
             "storyteller_email": post.storyteller_email,
+            "image_url": post.image_url,
             "views": post.views or 0,
             "likes": post.likes or 0,
             "dislikes": post.dislikes or 0,
@@ -101,6 +109,7 @@ def get_post(post_id):
         "category": post.category,
         "storyteller": post.storyteller,
         "storyteller_email": post.storyteller_email,
+        "image_url": post.image_url,
         "starting_point": post.starting_point,
         "how_started": post.how_started,
         "financial_info": post.financial_info,
@@ -164,7 +173,13 @@ def get_admin_posts():
             "views": post.views or 0,
             "likes": post.likes or 0,
             "dislikes": post.dislikes or 0,
-            "tags": post.tags
+            "tags": post.tags,
+            "image_url": post.image_url,
+            "created_at": (
+                post.created_at.isoformat()
+                if post.created_at
+                else None
+            )
         })
 
     return {

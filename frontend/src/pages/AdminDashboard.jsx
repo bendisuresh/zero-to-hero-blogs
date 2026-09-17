@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AdminDashboard.css";
 
+import AdminStoryList from "../components/AdminStoryList";
+import AdminCommentList from "../components/AdminCommentList";
+import Pagination from "../components/Pagination";
+import AdminStatCard from "../components/AdminStatCard";
+
+
 function AdminDashboard() {
     const navigate = useNavigate();
 
@@ -10,13 +16,22 @@ function AdminDashboard() {
     const [posts, setPosts] = useState([]);
     const [comments, setComments] = useState([]);
 
+    const [summary, setSummary] = useState({
+        total_stories: 0,
+        total_comments: 0,
+        total_views: 0,
+        total_likes: 0,
+    });
+
     const [searchTerm, setSearchTerm] = useState("");
     const [category, setCategory] = useState("");
+    const [sort, setSort] = useState("latest");
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
 
     useEffect(() => {
         const getDashboard = async () => {
@@ -50,11 +65,37 @@ function AdminDashboard() {
                 setMessage(dashboardData.message);
                 setAdmin(dashboardData.admin);
 
+
+                // Get dashboard summary
+                const summaryResponse = await fetch(
+                    `${import.meta.env.VITE_API_URL}/api/admin/summary`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                const summaryData =
+                    await summaryResponse.json();
+
+                if (!summaryResponse.ok) {
+                    setError(
+                        summaryData.message ||
+                        "Unable to load dashboard summary"
+                    );
+                    return;
+                }
+
+                setSummary(summaryData);
+
+
                 // Get admin stories with search,
-                // category filtering and pagination
+                // category filtering, sorting and pagination
                 const params = new URLSearchParams({
                     page: page,
                     limit: 10,
+                    sort: sort,
                 });
 
                 if (searchTerm) {
@@ -85,17 +126,20 @@ function AdminDashboard() {
                     return;
                 }
 
-                const posts = postsData.posts || [];
+                const fetchedPosts =
+                    postsData.posts || [];
 
-                setPosts(posts);
+                setPosts(fetchedPosts);
+
                 setTotalPages(
                     postsData.total_pages || 1
                 );
 
+
                 // Get comments from every story
                 const allComments = [];
 
-                for (const post of posts) {
+                for (const post of fetchedPosts) {
                     const commentsResponse = await fetch(
                         `${import.meta.env.VITE_API_URL}/api/posts/${post.id}/comments`
                     );
@@ -127,20 +171,42 @@ function AdminDashboard() {
         };
 
         getDashboard();
-    }, [navigate, page, searchTerm, category]);
+    }, [
+        navigate,
+        page,
+        searchTerm,
+        category,
+        sort,
+    ]);
+
 
     const handleLogout = () => {
         localStorage.removeItem("admin_token");
         navigate("/admin/login");
     };
 
+
     const handleCreateStory = () => {
         navigate("/admin/create-story");
     };
 
+
     const handleViewStory = (id) => {
         navigate(`/post/${id}`);
     };
+
+
+    const handleAddStory = (id) => {
+        navigate(
+            `/admin/posts/${id}/additional-story`
+        );
+    };
+
+
+    const handleEditStory = (id) => {
+        navigate(`/admin/posts/${id}/edit`);
+    };
+
 
     const handleDeleteStory = async (id) => {
         const confirmed = window.confirm(
@@ -186,12 +252,23 @@ function AdminDashboard() {
                     (post) => post.id !== id
                 )
             );
+
+            // Update summary count
+            setSummary((currentSummary) => ({
+                ...currentSummary,
+                total_stories:
+                    Math.max(
+                        0,
+                        currentSummary.total_stories - 1
+                    ),
+            }));
         } catch {
             setError(
                 "Unable to connect to the server"
             );
         }
     };
+
 
     const handleDeleteComment = async (commentId) => {
         const confirmed = window.confirm(
@@ -238,12 +315,23 @@ function AdminDashboard() {
                         comment.id !== commentId
                 )
             );
+
+            // Update summary count
+            setSummary((currentSummary) => ({
+                ...currentSummary,
+                total_comments:
+                    Math.max(
+                        0,
+                        currentSummary.total_comments - 1
+                    ),
+            }));
         } catch {
             setError(
                 "Unable to connect to the server"
             );
         }
     };
+
 
     if (loading) {
         return (
@@ -254,6 +342,7 @@ function AdminDashboard() {
             </main>
         );
     }
+
 
     if (error) {
         return (
@@ -266,8 +355,10 @@ function AdminDashboard() {
         );
     }
 
+
     return (
         <main className="admin-page">
+
             {/* Dashboard header */}
             <section className="admin-header">
                 <div>
@@ -283,6 +374,7 @@ function AdminDashboard() {
 
                 <div className="admin-header-actions">
                     <button
+                        type="button"
                         onClick={handleCreateStory}
                         className="admin-primary-button"
                     >
@@ -290,6 +382,7 @@ function AdminDashboard() {
                     </button>
 
                     <button
+                        type="button"
                         onClick={handleLogout}
                         className="admin-secondary-button"
                     >
@@ -298,8 +391,40 @@ function AdminDashboard() {
                 </div>
             </section>
 
+
+            {/* Dashboard summary */}
+            <section className="admin-stats-grid">
+
+                <AdminStatCard
+                    title="Total Stories"
+                    value={summary.total_stories}
+                    description="All stories"
+                />
+
+                <AdminStatCard
+                    title="Total Comments"
+                    value={summary.total_comments}
+                    description="Across all stories"
+                />
+
+                <AdminStatCard
+                    title="Total Views"
+                    value={summary.total_views}
+                    description="Across all stories"
+                />
+
+                <AdminStatCard
+                    title="Total Likes"
+                    value={summary.total_likes}
+                    description="Across all stories"
+                />
+
+            </section>
+
+
             {/* Stories section */}
             <section className="admin-section">
+
                 <div className="admin-section-header">
                     <h2>All Stories</h2>
 
@@ -311,8 +436,10 @@ function AdminDashboard() {
                     </span>
                 </div>
 
-                {/* Search and category filters */}
+
+                {/* Search, category and sort filters */}
                 <div className="admin-filters">
+
                     <input
                         type="text"
                         placeholder="Search stories..."
@@ -324,6 +451,7 @@ function AdminDashboard() {
                             setPage(1);
                         }}
                     />
+
 
                     <select
                         value={category}
@@ -354,131 +482,57 @@ function AdminDashboard() {
                             Other
                         </option>
                     </select>
+
+
+                    <select
+                        value={sort}
+                        onChange={(event) => {
+                            setSort(event.target.value);
+                            setPage(1);
+                        }}
+                    >
+                        <option value="latest">
+                            Latest
+                        </option>
+
+                        <option value="oldest">
+                            Oldest
+                        </option>
+
+                        <option value="popular">
+                            Popular
+                        </option>
+                    </select>
+
                 </div>
 
-                {posts.length === 0 ? (
-                    <div className="admin-empty">
-                        <h3>No stories found</h3>
 
-                        <p>
-                            Try changing your search or
-                            category filter.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="admin-story-grid">
-                        {posts.map((post) => (
-                            <article
-                                key={post.id}
-                                className="admin-story-card"
-                            >
-                                <h3>{post.title}</h3>
+                <AdminStoryList
+                    posts={posts}
+                    onViewStory={handleViewStory}
+                    onAddStory={handleAddStory}
+                    onEditStory={handleEditStory}
+                    onDeleteStory={handleDeleteStory}
+                />
 
-                                <p className="admin-story-description">
-                                    {post.description}
-                                </p>
 
-                                <div className="admin-story-info">
-                                    <span>
-                                        Category:{" "}
-                                        {post.category}
-                                    </span>
+                <Pagination
+                    page={page}
+                    totalPages={totalPages}
+                    onPrevious={() =>
+                        setPage(page - 1)
+                    }
+                    onNext={() =>
+                        setPage(page + 1)
+                    }
+                />
 
-                                    <span>
-                                        Storyteller:{" "}
-                                        {post.storyteller}
-                                    </span>
-
-                                    <span>
-                                        Views:{" "}
-                                        {post.views}
-                                    </span>
-                                </div>
-
-                                <div className="admin-story-actions">
-                                    <button
-                                        onClick={() =>
-                                            handleViewStory(
-                                                post.id
-                                            )
-                                        }
-                                    >
-                                        View Story
-                                    </button>
-
-                                    <button
-                                        onClick={() =>
-                                            navigate(
-                                                `/admin/posts/${post.id}/additional-story`
-                                            )
-                                        }
-                                    >
-                                        Add Story
-                                    </button>
-
-                                    <button
-                                        onClick={() =>
-                                            navigate(
-                                                `/admin/posts/${post.id}/edit`
-                                            )
-                                        }
-                                    >
-                                        Edit Story
-                                    </button>
-
-                                    <button
-                                        className="admin-delete-button"
-                                        onClick={() =>
-                                            handleDeleteStory(
-                                                post.id
-                                            )
-                                        }
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
-                )}
-
-                {/* Story pagination */}
-                {!loading &&
-                    !error &&
-                    totalPages > 1 && (
-                        <div className="admin-pagination">
-                            <button
-                                type="button"
-                                disabled={page === 1}
-                                onClick={() =>
-                                    setPage(page - 1)
-                                }
-                            >
-                                Previous
-                            </button>
-
-                            <span>
-                                Page {page} of{" "}
-                                {totalPages}
-                            </span>
-
-                            <button
-                                type="button"
-                                disabled={
-                                    page === totalPages
-                                }
-                                onClick={() =>
-                                    setPage(page + 1)
-                                }
-                            >
-                                Next
-                            </button>
-                        </div>
-                    )}
             </section>
+
 
             {/* Comment moderation section */}
             <section className="admin-section">
+
                 <div className="admin-section-header">
                     <h2>Comment Moderation</h2>
 
@@ -490,60 +544,19 @@ function AdminDashboard() {
                     </span>
                 </div>
 
-                {comments.length === 0 ? (
-                    <div className="admin-empty">
-                        <h3>No comments found</h3>
 
-                        <p>
-                            New comments will appear here
-                            for moderation.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="admin-comment-list">
-                        {comments.map((comment) => (
-                            <article
-                                key={comment.id}
-                                className="admin-comment-card"
-                            >
-                                <div>
-                                    <h3>
-                                        {comment.name}
-                                    </h3>
+                <AdminCommentList
+                    comments={comments}
+                    onDeleteComment={
+                        handleDeleteComment
+                    }
+                />
 
-                                    <p className="admin-comment-story">
-                                        Story:{" "}
-                                        <strong>
-                                            {
-                                                comment.post_title
-                                            }
-                                        </strong>
-                                    </p>
-
-                                    <p>
-                                        {
-                                            comment.content
-                                        }
-                                    </p>
-                                </div>
-
-                                <button
-                                    className="admin-delete-button"
-                                    onClick={() =>
-                                        handleDeleteComment(
-                                            comment.id
-                                        )
-                                    }
-                                >
-                                    Delete Comment
-                                </button>
-                            </article>
-                        ))}
-                    </div>
-                )}
             </section>
+
         </main>
     );
 }
+
 
 export default AdminDashboard;

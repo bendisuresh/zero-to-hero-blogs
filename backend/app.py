@@ -7,6 +7,7 @@ from flask_jwt_extended import JWTManager, get_jwt_identity
 from flask_migrate import Migrate
 from database import db
 from routes.auth import auth_bp, admin_required
+from routes.dashboard import dashboard_bp
 from routes.posts import posts_bp
 from routes.comments import comments_bp
 from routes.reactions import reactions_bp
@@ -77,6 +78,7 @@ jwt = JWTManager(app)
 # Register application routes
 app.register_blueprint(auth_bp)
 app.register_blueprint(posts_bp)
+app.register_blueprint(dashboard_bp)
 app.register_blueprint(additional_stories_bp)
 app.register_blueprint(comments_bp)
 app.register_blueprint(reactions_bp)

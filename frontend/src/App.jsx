@@ -85,6 +85,20 @@ function App() {
                         />
                     }
                 />
+                {/* =========================
+    PUBLIC ALL STORIES PAGE
+   ========================= */}
+
+                <Route
+                    path="/stories"
+                    element={
+                        <CategoryPage
+                            category=""
+                            title="All Stories"
+                            description="Explore stories, journeys, lessons, and experiences from across Zero to Hero."
+                        />
+                    }
+                />
 
 
                 {/* =========================

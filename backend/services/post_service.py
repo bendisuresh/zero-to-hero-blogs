@@ -30,6 +30,10 @@ def create_post(data):
             tags=data.get(
                 "tags",
                 ""
+            ).strip(),
+            image_url=data.get(
+                "image_url",
+                ""
             ).strip()
         )
 
@@ -65,6 +69,8 @@ def update_post(post, data):
 
         if "tags" in data:
             post.tags = data["tags"].strip()
+        if "image_url" in data:
+            post.image_url = data["image_url"].strip()
 
         db.session.commit()
 
@@ -110,6 +116,7 @@ def delete_post(post):
 def get_posts(
     category=None,
     search="",
+    tag="",
     sort="latest",
     page=1,
     limit=10
@@ -119,6 +126,13 @@ def get_posts(
     if category:
         query = query.filter_by(
             category=category
+        )
+
+    if tag:
+        tag_pattern = f"%{tag}%"
+
+        query = query.filter(
+            Post.tags.ilike(tag_pattern)
         )
 
     if search:
@@ -142,6 +156,12 @@ def get_posts(
                 - db.func.coalesce(Post.dislikes, 0)
             ).desc()
         )
+
+    elif sort == "oldest":
+        query = query.order_by(
+            Post.created_at.asc()
+        )
+
     else:
         query = query.order_by(
             Post.created_at.desc()

@@ -1,134 +1,548 @@
+/* ============================================================
+   POST CARD
+   ============================================================ */
+
 .post-card {
     display: flex;
+
     flex-direction: column;
 
     width: 100%;
     min-width: 0;
-    min-height: 300px;
-
-    padding: 24px;
+    height: 100%;
 
     box-sizing: border-box;
 
+    overflow: hidden;
+
+    border: 1px solid #e4e4ea;
+
+    border-radius: 16px;
+
     background: #ffffff;
-    border: 1px solid #dfe3e8;
-    border-radius: 12px;
 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    box-shadow:
+        0 6px 22px rgba(28, 28, 42, 0.05);
 
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
 }
 
 .post-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-5px);
 
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
+    border-color: #d8d2e9;
+
+    box-shadow:
+        0 15px 38px rgba(28, 28, 42, 0.10);
 }
 
 
-/* Story title */
+/* ============================================================
+   IMAGE
+   ============================================================ */
 
-.post-card h3 {
-    margin: 0 0 14px;
+.post-card-image-link {
+    position: relative;
 
-    font-size: 20px;
-    line-height: 1.4;
+    display: block;
 
-    color: #1f2937;
+    width: 100%;
+    height: 205px;
+
+    overflow: hidden;
+
+    background: #ececf1;
+
+    text-decoration: none;
+}
+
+.post-card-image {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    object-position: center;
+
+    transition:
+        transform 0.45s ease;
+}
+
+.post-card:hover .post-card-image {
+    transform: scale(1.045);
 }
 
 
-/* Story description */
+/* ============================================================
+   IMAGE OVERLAY
+   ============================================================ */
 
-.post-card-description {
-    margin: 0;
+.post-card-image-overlay {
+    position: absolute;
 
-    font-size: 15px;
-    line-height: 1.6;
+    right: 14px;
+    bottom: 14px;
 
-    color: #4b5563;
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 7px 11px;
+
+    border-radius: 999px;
+
+    background: rgba(20, 20, 25, 0.78);
+
+    color: white;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    opacity: 0;
+
+    transform: translateY(5px);
+
+    transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+}
+
+.post-card:hover .post-card-image-overlay {
+    opacity: 1;
+
+    transform: translateY(0);
 }
 
 
-/* Category + views */
+/* ============================================================
+   CONTENT
+   ============================================================ */
 
-.post-card-info {
+.post-card-content {
     display: flex;
+
     flex-direction: column;
 
-    gap: 6px;
+    flex: 1;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 20px 20px 18px;
+
+    background: #ffffff;
+}
+
+
+/* ============================================================
+   TOP ROW
+   ============================================================ */
+
+.post-card-top {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 11px;
+}
+
+.post-card-category {
+    display: inline-flex;
+
+    align-items: center;
+
+    max-width: 65%;
+
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    background: #f0ecff;
+
+    color: #6041b6;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    line-height: 1.2;
+
+    letter-spacing: 0.8px;
+
+    text-transform: uppercase;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.post-card-date {
+    flex-shrink: 0;
+
+    color: #8a8d97;
+
+    font-size: 11px;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   TITLE
+   ============================================================ */
+
+.post-card-title-link {
+    color: inherit;
+
+    text-decoration: none;
+}
+
+.post-card-content h3 {
+    display: -webkit-box;
+
+    margin: 0 0 10px;
+
+    overflow: hidden;
+
+    color: #1b1c22;
+
+    font-size: 20px;
+
+    line-height: 1.35;
+
+    letter-spacing: -0.3px;
+
+    font-weight: 750;
+
+    -webkit-box-orient: vertical;
+
+    -webkit-line-clamp: 2;
+}
+
+.post-card-title-link:hover h3 {
+    color: #6041b6;
+}
+
+
+/* ============================================================
+   DESCRIPTION
+   ============================================================ */
+
+.post-card-description {
+    display: -webkit-box;
+
+    margin: 0;
+
+    overflow: hidden;
+
+    color: #666a75;
+
+    font-size: 14px;
+
+    line-height: 1.65;
+
+    -webkit-box-orient: vertical;
+
+    -webkit-line-clamp: 3;
+}
+
+
+/* ============================================================
+   META
+   ============================================================ */
+
+.post-card-meta {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
 
     margin-top: auto;
-    margin-bottom: 20px;
 
-    padding-top: 20px;
-
-    border-top: 1px solid #eeeeee;
-
-    font-size: 13px;
-    color: #6b7280;
+    padding-top: 18px;
 }
 
-.post-card-info span {
-    display: block;
+.post-card-storyteller {
+    display: flex;
+
+    align-items: center;
+
+    min-width: 0;
+
+    gap: 8px;
 }
 
+.storyteller-avatar {
+    flex-shrink: 0;
 
-/* Read Story */
+    width: 28px;
+    height: 28px;
 
-.post-card-button {
-    display: inline-flex;
+    display: flex;
+
     align-items: center;
     justify-content: center;
 
-    width: fit-content;
+    border-radius: 50%;
 
-    padding: 10px 18px;
+    background: #eeeafb;
 
-    border-radius: 7px;
+    color: #6041b6;
 
-    background: #1f2937;
-    color: #ffffff;
+    font-size: 11px;
+
+    font-weight: 800;
+}
+
+.storyteller-name {
+    max-width: 125px;
+
+    overflow: hidden;
+
+    color: #444750;
+
+    font-size: 12px;
+
+    font-weight: 650;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+.post-card-reading-time {
+    flex-shrink: 0;
+
+    color: #8a8d97;
+
+    font-size: 11px;
+}
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.post-card-footer {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 17px;
+
+    padding-top: 14px;
+
+    border-top: 1px solid #eeeeF2;
+}
+
+.post-card-stats {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    color: #858892;
+
+    font-size: 11px;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   BUTTON
+   ============================================================ */
+
+.post-card-button {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    flex-shrink: 0;
+
+    padding: 9px 13px;
+
+    border-radius: 8px;
+
+    background: #6c3fd5;
+
+    color: white;
 
     text-decoration: none;
 
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 11px;
 
-    transition: background 0.2s ease;
+    font-weight: 750;
+
+    line-height: 1;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.post-card-button span {
+    font-size: 14px;
+
+    transition:
+        transform 0.2s ease;
 }
 
 .post-card-button:hover {
-    background: #374151;
+    background: #5930bd;
+
+    transform: translateY(-1px);
+}
+
+.post-card-button:hover span {
+    transform: translateX(2px);
 }
 
 
-/* Tablet */
+/* ============================================================
+   FEATURED STORY IMAGE
+   ============================================================ */
+
+.featured-story-image {
+    display: block;
+
+    width: 100%;
+    height: 280px;
+
+    overflow: hidden;
+
+    background: #ececf1;
+}
+
+.featured-story-image img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    object-position: center;
+}
+
+
+/* ============================================================
+   TABLET
+   ============================================================ */
 
 @media (max-width: 900px) {
 
-    .post-card {
-        min-height: 280px;
+    .post-card-image-link {
+        height: 190px;
     }
 
-}
-
-
-/* Mobile */
-
-@media (max-width: 600px) {
-
-    .post-card {
-        min-height: 260px;
-        padding: 20px;
+    .post-card-content {
+        padding: 18px;
     }
 
-    .post-card h3 {
-        font-size: 18px;
+    .post-card-content h3 {
+        font-size: 19px;
     }
 
     .post-card-description {
         font-size: 14px;
+    }
+
+    .featured-story-image {
+        height: 250px;
+    }
+
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+    .post-card-image-link {
+        height: 205px;
+    }
+
+    .post-card-content {
+        padding: 18px;
+    }
+
+    .post-card-content h3 {
+        font-size: 19px;
+    }
+
+    .post-card-description {
+        font-size: 14px;
+
+        line-height: 1.65;
+    }
+
+    .post-card-footer {
+        margin-top: 15px;
+    }
+
+    .post-card-stats {
+        gap: 9px;
+    }
+
+    .featured-story-image {
+        height: 225px;
+    }
+
+}
+
+
+/* ============================================================
+   VERY SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 380px) {
+
+    .post-card-image-link {
+        height: 185px;
+    }
+
+    .post-card-content {
+        padding: 16px;
+    }
+
+    .post-card-date {
+        display: none;
+    }
+
+    .post-card-button {
+        padding: 9px 11px;
+    }
+
+    .post-card-button span {
+        display: none;
     }
 
 }

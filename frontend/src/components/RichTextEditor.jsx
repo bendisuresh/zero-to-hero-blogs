@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 
 function RichTextEditor({
@@ -12,9 +11,6 @@ function RichTextEditor({
     const editor = useEditor({
         extensions: [
             StarterKit,
-            Link.configure({
-                openOnClick: false,
-            }),
             Image,
         ],
         content: value,
@@ -25,24 +21,12 @@ function RichTextEditor({
         },
     });
 
-    /*
-     * Expose the Tiptap editor instance to the parent page.
-     */
     useEffect(() => {
         if (editor && onEditorReady) {
             onEditorReady(editor);
         }
     }, [editor, onEditorReady]);
 
-    /*
-     * Synchronize external content with Tiptap.
-     *
-     * The comparison prevents the editor from being reset
-     * every time the parent form state changes.
-     *
-     * The second argument `false` prevents this external
-     * update from triggering Tiptap's onUpdate callback.
-     */
     useEffect(() => {
         if (!editor) {
             return;

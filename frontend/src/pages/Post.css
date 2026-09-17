@@ -3,277 +3,446 @@
    ============================================================ */
 
 .post-page {
-    width: 90%;
-    max-width: 1200px;
-    margin: 40px auto;
+    width: 100%;
+    min-height: 100vh;
+
+    box-sizing: border-box;
+
+    padding: 32px 24px 90px;
+
+    background: #f7f8fc;
+
+    color: #17171c;
 }
 
 
 /* ============================================================
-   HEADER
+   BACK NAVIGATION
+   ============================================================ */
+
+.post-navigation {
+    width: 100%;
+    max-width: 1180px;
+
+    margin: 0 auto 28px;
+}
+
+.post-back-link {
+    display: inline-flex;
+
+    align-items: center;
+
+    color: #6041b6;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.post-back-link:hover {
+    color: #45289a;
+
+    transform: translateX(-2px);
+}
+
+
+/* ============================================================
+   ARTICLE HEADER
    ============================================================ */
 
 .post-header {
-    background: white;
-    padding: 45px;
-    border-radius: 18px;
-    margin-bottom: 25px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 1000px;
+
+    margin: 0 auto;
+
+    text-align: center;
 }
 
 .post-category {
-    display: inline-block;
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
 
     padding: 7px 14px;
 
-    border-radius: 20px;
+    border-radius: 999px;
 
-    background: #eee7ff;
-    color: #6c3fd5;
+    background: #eee8ff;
 
-    font-size: 14px;
-    font-weight: bold;
+    color: #6941c6;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    letter-spacing: 0.8px;
+
+    text-transform: uppercase;
 }
 
 .post-header h1 {
-    margin: 18px 0 12px;
+    max-width: 950px;
 
-    font-size: 42px;
-    line-height: 1.2;
+    margin: 20px auto 18px;
+
+    color: #15151a;
+
+    font-size: clamp(38px, 5vw, 62px);
+
+    line-height: 1.08;
+
+    letter-spacing: -1.8px;
+
+    font-weight: 800;
 }
 
 .post-description {
-    max-width: 850px;
+    max-width: 780px;
 
-    margin: 0;
+    margin: 0 auto;
+
+    color: #606572;
 
     font-size: 18px;
-    line-height: 1.7;
 
-    color: #666;
+    line-height: 1.75;
 }
 
 .post-meta {
     display: flex;
 
-    gap: 25px;
+    justify-content: center;
+    align-items: center;
 
-    margin-top: 25px;
+    flex-wrap: wrap;
 
-    color: #666;
+    gap: 9px 22px;
 
-    font-size: 14px;
+    margin-top: 24px;
+
+    color: #777b86;
+
+    font-size: 13px;
+}
+
+.post-meta span {
+    position: relative;
+}
+
+.post-meta span:not(:last-child)::after {
+    content: "•";
+
+    position: absolute;
+
+    right: -14px;
+
+    color: #b6b8c0;
+}
+
+.post-meta strong {
+    color: #34363e;
 }
 
 
 /* ============================================================
-   MAIN 70% + SIDEBAR 30%
+   HERO IMAGE
    ============================================================ */
 
-.post-layout {
+.post-hero-image {
+    width: 100%;
+    max-width: 1180px;
+
+    margin: 42px auto 64px;
+
+    overflow: hidden;
+
+    border-radius: 22px;
+
+    background: #e8e9ef;
+
+    box-shadow:
+        0 20px 55px rgba(30, 30, 45, 0.12);
+}
+
+.post-hero-image img {
+    display: block;
+
+    width: 100%;
+    height: 460px;
+
+    object-fit: cover;
+}
+
+
+/* ============================================================
+   ARTICLE CONTENT LAYOUT
+   ============================================================ */
+
+.post-content-layout {
+    width: 100%;
+    max-width: 1180px;
+
+    margin: 0 auto;
+
     display: grid;
 
-    /*
-       Main Story = 70%
-       Sidebar    = 30%
-    */
-    grid-template-columns: 7fr 3fr;
+    grid-template-columns:
+        minmax(0, 760px)
+        290px;
 
-    gap: 25px;
+    justify-content: space-between;
+
+    gap: 70px;
 
     align-items: start;
 }
 
 
 /* ============================================================
-   MAIN STORY - 70%
+   MAIN ARTICLE
    ============================================================ */
 
 .main-story {
     width: 100%;
+    max-width: 760px;
+
     min-width: 0;
 
-    box-sizing: border-box;
-
-    background: white;
-
-    padding: 40px;
-
-    border-radius: 18px;
-
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
-}
-
-.main-story-label {
-    display: inline-block;
-
-    margin-bottom: 25px;
-
-    padding: 7px 13px;
-
-    border-radius: 20px;
-
-    background: #e9f4ff;
-    color: #2774c7;
-
-    font-size: 13px;
-    font-weight: bold;
-
-    text-transform: uppercase;
-
-    letter-spacing: 0.5px;
-}
-
-.main-story-content {
-    min-width: 0;
-
-    font-size: 18px;
-
-    line-height: 1.9;
-
-    color: #333;
-
-    overflow-wrap: break-word;
-}
-
-.main-story-content > p {
-    margin: 0;
-
-    line-height: 1.9;
+    text-align: left;
 }
 
 
 /* ============================================================
-   SIDEBAR - 30%
+   JOURNEY INTRODUCTION
+   ============================================================ */
+
+.story-introduction {
+    margin: 0 0 48px;
+
+    padding: 0 0 30px;
+
+    border-bottom: 1px solid #dedfe5;
+
+    text-align: left;
+}
+
+.story-introduction span,
+.section-heading span,
+.comments-heading span,
+.lessons-heading span,
+.sidebar-label {
+    display: block;
+
+    margin-bottom: 9px;
+
+    color: #7352d4;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 1.2px;
+
+    text-transform: uppercase;
+}
+
+.story-introduction p {
+    max-width: 720px;
+
+    margin: 0;
+
+    color: #454851;
+
+    font-size: 19px;
+
+    line-height: 1.8;
+
+    text-align: left;
+}
+
+
+/* ============================================================
+   STORY SECTIONS
+   ============================================================ */
+
+.story-section {
+    width: 100%;
+
+    margin: 0 0 42px;
+
+    text-align: left;
+}
+
+.story-section h2 {
+    margin: 0 0 14px;
+
+    color: #17171c;
+
+    font-size: 29px;
+
+    line-height: 1.25;
+
+    letter-spacing: -0.5px;
+
+    font-weight: 750;
+
+    text-align: left;
+}
+
+.story-section-content {
+    width: 100%;
+
+    color: #3f424b;
+
+    font-size: 18px;
+
+    line-height: 1.85;
+
+    text-align: left;
+}
+
+.story-section-content p {
+    margin: 0;
+
+    color: inherit;
+
+    font-size: inherit;
+
+    line-height: inherit;
+
+    text-align: left;
+
+    white-space: pre-line;
+}
+
+
+/* ============================================================
+   LESSONS
+   ============================================================ */
+
+.lessons-section {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    margin: 58px 0 0;
+
+    padding: 34px;
+
+    border: 1px solid #f0dfb5;
+
+    border-radius: 18px;
+
+    background: #fffaf0;
+}
+
+.lessons-heading {
+    margin-bottom: 20px;
+
+    text-align: left;
+}
+
+.lessons-heading h2 {
+    margin: 0;
+
+    color: #211f1a;
+
+    font-size: 30px;
+
+    line-height: 1.25;
+
+    text-align: left;
+}
+
+.story-rich-content {
+    color: #4d4b45;
+
+    font-size: 16px;
+
+    line-height: 1.8;
+
+    text-align: left;
+}
+
+.story-rich-content p {
+    margin: 0 0 12px;
+}
+
+.story-rich-content h1,
+.story-rich-content h2,
+.story-rich-content h3 {
+    margin-top: 22px;
+
+    margin-bottom: 10px;
+
+    color: #25231e;
+
+    text-align: left;
+}
+
+.story-rich-content ul,
+.story-rich-content ol {
+    margin: 12px 0;
+
+    padding-left: 25px;
+}
+
+.story-rich-content li {
+    margin-bottom: 8px;
+}
+
+
+/* ============================================================
+   SIDEBAR
    ============================================================ */
 
 .post-sidebar {
     width: 100%;
+
     min-width: 0;
 
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 15px;
-
-    /*
-       Keep sidebar visible while
-       reading a long story.
-    */
     position: sticky;
 
-    top: 20px;
+    top: 28px;
+
+    align-self: start;
 }
 
+.sidebar-section {
+    padding: 23px 0;
 
-/* ============================================================
-   SIDEBAR CARDS
-   ============================================================ */
-
-.side-card {
-    width: 100%;
-
-    box-sizing: border-box;
-
-    background: white;
-
-    padding: 22px;
-
-    border-radius: 15px;
-
-    border-left: 4px solid #6c3fd5;
-
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-
-    overflow: hidden;
+    border-bottom: 1px solid #dedfe5;
 }
 
-.side-card h3 {
-    margin: 0 0 10px;
-
-    font-size: 17px;
+.sidebar-section:first-child {
+    padding-top: 0;
 }
 
-.side-card p {
-    margin: 0;
-
-    color: #555;
-
-    font-size: 14px;
-
-    line-height: 1.7;
-
-    overflow-wrap: break-word;
+.sidebar-section:last-child {
+    border-bottom: none;
 }
 
+.sidebar-label {
+    margin-bottom: 12px;
 
-/* ============================================================
-   LESSONS SIDEBAR
-   ============================================================ */
-
-.lessons-card {
-    background: #fff8e8;
-
-    border-left-color: #e2a526;
+    color: #7a7e89;
 }
 
-.sidebar-lessons {
-    color: #555;
+.sidebar-section h3 {
+    margin: 0 0 16px;
 
-    font-size: 14px;
+    color: #202127;
 
-    line-height: 1.7;
+    font-size: 21px;
 
-    overflow-wrap: break-word;
+    line-height: 1.35;
 
-    word-break: normal;
-}
-
-.sidebar-lessons p {
-    margin-bottom: 8px;
-}
-
-.sidebar-lessons h2,
-.sidebar-lessons h3 {
-    margin-top: 10px;
-
-    margin-bottom: 8px;
-}
-
-.sidebar-lessons ul,
-.sidebar-lessons ol {
-    padding-left: 20px;
-
-    margin-top: 8px;
-}
-
-
-/* ============================================================
-   SIDEBAR IMAGES
-   ============================================================ */
-
-/*
-   Images inside the Lessons sidebar
-   must never become huge.
-*/
-
-.sidebar-lessons img {
-    display: block;
-
-    width: 100%;
-
-    max-width: 100%;
-
-    height: auto;
-
-    max-height: 220px;
-
-    margin: 15px auto;
-
-    border-radius: 8px;
-
-    object-fit: contain;
+    font-weight: 750;
 }
 
 
@@ -281,40 +450,76 @@
    CONTACT STORYTELLER
    ============================================================ */
 
-.storyteller-contact {
-    margin-top: 15px;
-}
-
 .contact-storyteller-btn {
-    display: inline-block;
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
 
     width: 100%;
 
     box-sizing: border-box;
 
-    padding: 10px 15px;
+    padding: 11px 15px;
+
+    border-radius: 9px;
 
     background: #6c3fd5;
 
     color: white;
 
-    text-align: center;
-
     text-decoration: none;
 
-    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
 
-    font-size: 14px;
-
-    font-weight: bold;
-
-    transition: 0.2s ease;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
 }
 
 .contact-storyteller-btn:hover {
-    opacity: 0.85;
+    background: #5930bd;
 
     transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   STORY DETAILS
+   ============================================================ */
+
+.story-detail {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 11px 0;
+
+    border-bottom: 1px solid #eeeeF2;
+}
+
+.story-detail:last-child {
+    border-bottom: none;
+}
+
+.story-detail span {
+    color: #777b85;
+
+    font-size: 13px;
+}
+
+.story-detail strong {
+    color: #292b32;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    text-align: right;
 }
 
 
@@ -327,109 +532,88 @@
 
     flex-wrap: wrap;
 
-    gap: 7px;
+    gap: 8px;
 }
 
 .post-tag {
+    display: inline-flex;
+
+    align-items: center;
+
     padding: 6px 10px;
 
-    border-radius: 15px;
+    border-radius: 999px;
 
-    background: #f0f3ff;
+    background: #f0edff;
 
-    color: #4c63c9;
+    color: #6041b6;
 
-    font-size: 12px;
+    font-size: 11px;
+
+    font-weight: 700;
 }
 
 
 /* ============================================================
-   RICH TEXT
+   FEEDBACK
    ============================================================ */
 
-/*
-   This class is kept for rich-text content if
-   you use it elsewhere in the post page.
-*/
-
-.rich-text-content {
-    max-width: 100%;
-
-    font-size: 18px;
-
-    line-height: 1.9;
-
-    overflow-wrap: break-word;
+.feedback-section {
+    border-bottom: none;
 }
 
-.rich-text-content p {
-    margin-bottom: 15px;
+.post-actions {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 9px;
 }
 
-.rich-text-content h2 {
-    margin-top: 30px;
+.post-actions button {
+    display: flex;
 
-    margin-bottom: 12px;
+    align-items: center;
+    justify-content: center;
 
-    font-size: 27px;
-}
+    gap: 8px;
 
-.rich-text-content h3 {
-    margin-top: 25px;
+    min-height: 46px;
 
-    margin-bottom: 10px;
+    padding: 10px;
 
-    font-size: 22px;
-}
-
-.rich-text-content strong {
-    font-weight: bold;
-}
-
-.rich-text-content em {
-    font-style: italic;
-}
-
-.rich-text-content ul,
-.rich-text-content ol {
-    margin-bottom: 15px;
-
-    padding-left: 25px;
-}
-
-.rich-text-content li {
-    margin-bottom: 7px;
-}
-
-
-/* ============================================================
-   RICH TEXT IMAGES
-   ============================================================ */
-
-/*
-   Safety size for any rich-text image.
-
-   The image can never become wider than
-   the available content area and will not
-   become extremely tall.
-*/
-
-.rich-text-content img {
-    display: block;
-
-    width: 100%;
-
-    max-width: 650px;
-
-    height: auto;
-
-    max-height: 350px;
-
-    margin: 30px auto;
+    border: 1px solid #dedfe6;
 
     border-radius: 10px;
 
-    object-fit: contain;
+    background: white;
+
+    color: #30323a;
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.post-actions button:hover {
+    background: #f5f3fb;
+
+    border-color: #cfc7e8;
+
+    transform: translateY(-1px);
+}
+
+.post-actions button span {
+    font-size: 15px;
+}
+
+.post-actions button strong {
+    font-size: 13px;
 }
 
 
@@ -437,71 +621,74 @@
    ADDITIONAL STORIES
    ============================================================ */
 
-.additional-stories {
-    margin-top: 0;
+.additional-stories-section {
+    margin-top: 72px;
+
+    padding-top: 38px;
+
+    border-top: 1px solid #dedfe5;
+}
+
+.section-heading {
+    margin-bottom: 24px;
+
+    text-align: left;
+}
+
+.section-heading h2 {
+    margin: 0;
+
+    color: #17171c;
+
+    font-size: 30px;
+
+    line-height: 1.25;
+
+    text-align: left;
+}
+
+.additional-stories-list {
+    display: flex;
+
+    flex-direction: column;
 }
 
 .additional-story {
-    padding: 15px 0;
+    padding: 22px 0;
 
-    margin-bottom: 10px;
+    border-bottom: 1px solid #e2e3e8;
+}
 
-    border-bottom: 1px solid #eee;
+.additional-story:first-child {
+    padding-top: 0;
 }
 
 .additional-story:last-child {
     border-bottom: none;
-
-    margin-bottom: 0;
 }
 
-.additional-story h4 {
-    margin: 0 0 8px;
+.additional-story h3 {
+    margin: 0 0 9px;
 
-    font-size: 15px;
+    color: #25262d;
+
+    font-size: 19px;
+
+    line-height: 1.4;
+
+    text-align: left;
 }
 
 .additional-story p {
     margin: 0;
 
-    color: #555;
+    color: #646872;
 
-    line-height: 1.7;
-}
+    font-size: 15px;
 
+    line-height: 1.75;
 
-/* ============================================================
-   ACTION BUTTONS
-   ============================================================ */
-
-.post-actions {
-    display: flex;
-
-    gap: 10px;
-}
-
-.post-actions button {
-    flex: 1;
-
-    border: none;
-
-    padding: 10px 14px;
-
-    border-radius: 10px;
-
-    cursor: pointer;
-
-    background: #f2f2f2;
-
-    font-size: 14px;
-
-    transition: 0.2s ease;
-}
-
-.post-actions button:hover {
-    background: #e8e8e8;
-
-    transform: translateY(-1px);
+    text-align: left;
 }
 
 
@@ -510,22 +697,36 @@
    ============================================================ */
 
 .comments-section {
-    margin-top: 30px;
+    width: 100%;
+    max-width: 900px;
 
-    background: white;
+    margin: 88px auto 0;
 
-    padding: 35px;
+    padding-top: 55px;
 
-    border-radius: 18px;
-
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+    border-top: 1px solid #dedfe5;
 }
 
-.comments-section h2 {
-    margin-top: 0;
-
-    margin-bottom: 25px;
+.comments-heading {
+    text-align: left;
 }
+
+.comments-heading h2 {
+    margin: 0 0 28px;
+
+    color: #17171c;
+
+    font-size: 31px;
+
+    line-height: 1.25;
+
+    text-align: left;
+}
+
+
+/* ============================================================
+   COMMENT FORM
+   ============================================================ */
 
 .comment-form {
     display: flex;
@@ -534,7 +735,7 @@
 
     gap: 12px;
 
-    margin-bottom: 30px;
+    margin-bottom: 36px;
 }
 
 .comment-form input,
@@ -543,19 +744,37 @@
 
     box-sizing: border-box;
 
-    padding: 13px;
+    padding: 14px 15px;
 
-    border: 1px solid #ddd;
+    border: 1px solid #dfe0e6;
 
     border-radius: 10px;
+
+    background: white;
+
+    color: #25262d;
 
     font-family: inherit;
 
     font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.comment-form input:focus,
+.comment-form textarea:focus {
+    border-color: #7653d3;
+
+    box-shadow:
+        0 0 0 3px rgba(118, 83, 211, 0.10);
 }
 
 .comment-form textarea {
-    min-height: 120px;
+    min-height: 130px;
 
     resize: vertical;
 }
@@ -563,67 +782,253 @@
 .comment-form button {
     align-self: flex-start;
 
-    border: none;
-
     padding: 12px 20px;
 
-    border-radius: 10px;
+    border: none;
 
-    cursor: pointer;
+    border-radius: 9px;
 
     background: #6c3fd5;
 
     color: white;
 
-    font-weight: bold;
+    cursor: pointer;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
 }
 
 .comment-form button:hover {
-    opacity: 0.9;
-}
+    background: #5930bd;
 
-.comment-card {
-    padding: 18px;
-
-    margin-bottom: 12px;
-
-    background: #f7f7f7;
-
-    border-radius: 12px;
-}
-
-.comment-card strong {
-    display: block;
-
-    margin-bottom: 5px;
-}
-
-.comment-card p {
-    margin-top: 8px;
-
-    line-height: 1.6;
-}
-
-.empty-comments {
-    color: #777;
+    transform: translateY(-1px);
 }
 
 
 /* ============================================================
-   STATUS / ERROR
+   COMMENTS LIST
    ============================================================ */
 
-.post-status,
-.post-error {
-    text-align: center;
+.comments-list {
+    display: flex;
 
-    padding: 50px;
+    flex-direction: column;
 
-    font-size: 18px;
+    gap: 15px;
 }
 
-.post-error {
-    color: #c0392b;
+.comment-card {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    padding: 18px;
+
+    border: 1px solid #e5e5ea;
+
+    border-radius: 13px;
+
+    background: white;
+}
+
+.comment-avatar {
+    flex-shrink: 0;
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #eee8ff;
+
+    color: #6041b6;
+
+    font-size: 14px;
+
+    font-weight: 800;
+}
+
+.comment-content {
+    min-width: 0;
+
+    flex: 1;
+}
+
+.comment-content strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #292a31;
+
+    font-size: 14px;
+}
+
+.comment-content p {
+    margin: 0;
+
+    color: #60636d;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+
+    overflow-wrap: break-word;
+}
+
+.empty-comments {
+    padding: 25px;
+
+    border-radius: 12px;
+
+    background: white;
+
+    color: #777b85;
+
+    text-align: center;
+}
+
+.empty-comments p {
+    margin: 0;
+}
+
+
+/* ============================================================
+   LOADING / ERROR
+   ============================================================ */
+
+.post-status-card {
+    width: 100%;
+    max-width: 600px;
+
+    margin: 120px auto;
+
+    padding: 50px 30px;
+
+    box-sizing: border-box;
+
+    border-radius: 18px;
+
+    background: white;
+
+    text-align: center;
+
+    box-shadow:
+        0 12px 40px rgba(30, 30, 40, 0.08);
+}
+
+.post-status-card h2 {
+    margin: 0 0 10px;
+
+    color: #202128;
+
+    font-size: 25px;
+}
+
+.post-status-card p {
+    margin: 0 0 20px;
+
+    color: #71747e;
+
+    line-height: 1.6;
+}
+
+.post-status-card .post-back-link {
+    display: inline-flex;
+}
+
+.post-error-card h2 {
+    color: #a33b3b;
+}
+
+.status-spinner {
+    display: block;
+
+    width: 30px;
+    height: 30px;
+
+    margin: 0 auto 18px;
+
+    border: 3px solid #e5e0f6;
+
+    border-top-color: #6c3fd5;
+
+    border-radius: 50%;
+
+    animation: post-spinner 0.8s linear infinite;
+}
+
+@keyframes post-spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 1000px) {
+
+    .post-content-layout {
+        grid-template-columns: minmax(0, 1fr) 250px;
+
+        gap: 40px;
+    }
+
+    .post-hero-image img {
+        height: 390px;
+    }
+
+}
+
+
+/* ============================================================
+   TABLET / SMALL LAPTOP
+   ============================================================ */
+
+@media (max-width: 850px) {
+
+    .post-content-layout {
+        display: block;
+    }
+
+    .main-story {
+        max-width: none;
+    }
+
+    .post-sidebar {
+        position: static;
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        column-gap: 35px;
+
+        margin-top: 50px;
+    }
+
+    .feedback-section {
+        grid-column: 1 / -1;
+    }
+
 }
 
 
@@ -631,104 +1036,162 @@
    MOBILE
    ============================================================ */
 
-@media (max-width: 800px) {
+@media (max-width: 600px) {
 
     .post-page {
-        width: 94%;
-
-        margin: 25px auto;
+        padding: 22px 15px 60px;
     }
 
-
-    /* Header */
-
-    .post-header {
-        padding: 28px;
+    .post-navigation {
+        margin-bottom: 22px;
     }
 
     .post-header h1 {
-        font-size: 30px;
+        margin-top: 17px;
+
+        font-size: 35px;
+
+        line-height: 1.1;
+
+        letter-spacing: -0.8px;
     }
 
     .post-description {
         font-size: 16px;
+
+        line-height: 1.65;
     }
 
     .post-meta {
-        flex-wrap: wrap;
+        gap: 8px 16px;
 
-        gap: 12px;
+        margin-top: 20px;
+
+        font-size: 12px;
     }
 
-
-    /* Main story + sidebar stack */
-
-    .post-layout {
-        grid-template-columns: 1fr;
-
-        gap: 20px;
+    .post-meta span:not(:last-child)::after {
+        right: -11px;
     }
 
+    .post-hero-image {
+        margin: 30px auto 42px;
 
-    /* Sidebar is no longer sticky */
+        border-radius: 15px;
+    }
+
+    .post-hero-image img {
+        height: 240px;
+    }
+
+    .story-introduction {
+        margin-bottom: 40px;
+
+        padding-bottom: 25px;
+    }
+
+    .story-introduction p {
+        font-size: 17px;
+
+        line-height: 1.75;
+    }
+
+    .story-section {
+        margin-bottom: 36px;
+    }
+
+    .story-section h2 {
+        font-size: 24px;
+
+        line-height: 1.3;
+    }
+
+    .story-section-content {
+        font-size: 16px;
+
+        line-height: 1.8;
+    }
+
+    .lessons-section {
+        margin-top: 45px;
+
+        padding: 22px;
+
+        border-radius: 14px;
+    }
+
+    .lessons-heading h2 {
+        font-size: 26px;
+    }
+
+    .story-rich-content {
+        font-size: 15px;
+
+        line-height: 1.75;
+    }
 
     .post-sidebar {
-        position: static;
+        display: block;
+
+        margin-top: 42px;
     }
 
-
-    /* Main story */
-
-    .main-story {
-        padding: 25px;
+    .sidebar-section {
+        padding: 20px 0;
     }
 
-    .main-story-content {
-        font-size: 16px;
+    .additional-stories-section {
+        margin-top: 52px;
+
+        padding-top: 30px;
     }
 
-
-    /* Rich text */
-
-    .rich-text-content {
-        font-size: 16px;
+    .section-heading h2 {
+        font-size: 26px;
     }
 
-
-    /*
-       Mobile images stay controlled.
-       They use the available width but
-       cannot become excessively tall.
-    */
-
-    .sidebar-lessons img {
-        width: 100%;
-
-        max-width: 100%;
-
-        height: auto;
-
-        max-height: 300px;
+    .additional-story h3 {
+        font-size: 18px;
     }
-
-    .rich-text-content img {
-        width: 100%;
-
-        max-width: 100%;
-
-        height: auto;
-
-        max-height: 300px;
-    }
-
-
-    /* Comments */
 
     .comments-section {
-        padding: 25px;
+        margin-top: 60px;
+
+        padding-top: 40px;
+    }
+
+    .comments-heading h2 {
+        font-size: 27px;
     }
 
     .comment-form button {
         width: 100%;
     }
+
+}
+
+
+/* ============================================================
+   VERY SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 380px) {
+
+    .post-page {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .post-header h1 {
+        font-size: 31px;
+    }
+
+    .post-hero-image img {
+        height: 210px;
+    }
+
+    .lessons-section {
+        padding: 18px;
+    }
+
 }

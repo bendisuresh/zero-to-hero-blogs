@@ -38,7 +38,14 @@ class Post(db.Model):
     views = db.Column(db.Integer, default=0)
     likes = db.Column(db.Integer, default=0)
     dislikes = db.Column(db.Integer, default=0)
-    tags = db.Column(db.String(300), default="")
+    tags = db.Column(
+            db.String(300),
+            default=""
+        )
+
+    image_url = db.Column(
+            db.String(500)
+        )
 
     created_at = db.Column(
         db.DateTime,
