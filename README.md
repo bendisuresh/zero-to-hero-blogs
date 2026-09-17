@@ -1,92 +1,97 @@
 # Zero to Hero Blogs
 
-Zero to Hero Blogs is a full-stack platform where people can discover and share real stories about how they started their journey from zero and worked toward success.
+A full-stack blog platform where readers can explore real-world stories and administrators can create, manage, and publish blog content through a protected admin panel.
 
-## Problem Statement
+## Live Project
 
-It is difficult to find structured stories about how successful, wealthy, business, and other inspiring people actually started their journey.
+- Frontend: https://zero-to-hero-blogs.vercel.app
+- Backend API: https://zero-to-hero-blogs.onrender.com
+- GitHub: https://github.com/bendisuresh/zero-to-hero-blogs
 
-Many websites provide information about successful people, but their complete journey is often not available in one structured place.
+## Overview
 
-Even when these stories are available, they are usually:
+Zero to Hero Blogs is a full-stack web application designed around a public storytelling platform and an administrator-controlled content management system.
 
-- Scattered across different websites and platforms.
-- Difficult to search and discover.
-- Not presented in a consistent and structured format.
-- Difficult to find together in one place.
-- Missing a simple way to contact the person who shared the story.
+The application allows visitors to:
 
-Because of this, users who want to learn how people started from zero or from very limited resources have to search through many different sources.
+- Browse published stories
+- Explore stories by category
+- Search and filter stories
+- Sort stories by latest, oldest, or popularity
+- Read complete stories
+- View story statistics such as views and reactions
+- Submit comments
+- Explore related and additional stories
+- Browse story topics through tags
 
-## Solution
+Administrators can securely:
 
-I built Zero to Hero Blogs to bring these stories together in one platform.
+- Log in through the protected admin system
+- Create stories
+- Edit existing stories
+- Delete stories
+- Upload and replace story images
+- Manage story categories and tags
+- Add additional stories
+- Moderate comments
+- View dashboard statistics
+- Search, filter, sort, and paginate stories
 
-The platform allows successful people, business professionals, working professionals, and other inspiring individuals to share their journey in a structured format.
+## Key Features
 
-A story can include:
+### Public Blog
 
-- Starting point
-- How they started
-- Financial journey
-- Their approach
-- How their life changed
-- Failures
-- Lessons learned
-- Tags
-- Contact information
-
-Users can easily search and explore these stories in one place and learn how different people started their journey from zero or from very limited resources.
-
-The platform also allows users to contact storytellers through their provided email address.
-
-## Features
-
-### Public Features
-
-- Browse stories
-- Search stories
-- Category-based stories
-- Individual story pages
-- View counter
-- Like and dislike feedback
+- Responsive home page
+- Featured stories
+- Latest stories
+- Category-based browsing
+- Story search
+- Tag-based filtering
+- Story detail pages
+- Related/additional stories
+- Reading time information
+- Views, likes, and dislikes
 - Comments
-- Contact storyteller
-- Tags
-- Additional stories
 - RSS feed
 
-### Admin Features
+### Admin Panel
 
-- Admin authentication
-- JWT-based authorization
-- Admin dashboard
-- Create stories
-- Edit stories
-- Delete stories
-- Rich text editor
+- JWT-based admin authentication
+- Role-based admin authorization
+- Protected admin routes
+- Story CRUD operations
+- Rich text story editor
 - Image upload
-- Add additional stories
+- Image replacement when editing stories
+- Category and tag management
 - Comment moderation
+- Dashboard statistics
+- Story search
+- Category filtering
+- Sorting
+- Pagination
 
-## Categories
+### Security
 
-Stories are organized into:
+- JWT authentication for admin operations
+- Admin role authorization
+- Protected story creation
+- Protected story editing and deletion
+- Protected image uploads
+- Request validation
+- HTML sanitization using Bleach
+- CORS configuration
 
-- Business
-- Job
-- Investment
-- Other
-
-## Tech Stack
+## Technology Stack
 
 ### Frontend
 
-- JavaScript
 - React.js
-- React Router
 - Vite
+- React Router
 - Tiptap
+- JavaScript
+- HTML
 - CSS
 
 ### Backend
@@ -94,34 +99,50 @@ Stories are organized into:
 - Python
 - Flask
 - Flask-SQLAlchemy
+- Flask-Migrate
 - Flask-JWT-Extended
 - Flask-CORS
 - Bleach
+- Gunicorn
 
 ### Database
 
 - PostgreSQL
-- Neon PostgreSQL
+- Neon PostgreSQL for the deployed database
+- SQLite in the automated test environment
 
 ### Deployment
 
-- Vercel - Frontend
-- Render - Backend
-- Neon - Database
+- Vercel — Frontend
+- Render — Backend
+- Neon — PostgreSQL database
 
-## Application Architecture
+## Architecture
 
-                    Users
-                      |
-                      v
-                React Frontend
-                    Vercel
-                      |
-                      | REST API
-                      v
-                Flask Backend
-                    Render
-                      |
-                      v
-                  PostgreSQL
-                     Neon
+Zero to Hero Blogs follows a client-server architecture where the React frontend communicates with the Flask backend through REST APIs.
+
+```mermaid
+flowchart TD
+    A[Web Browser] --> B[React Frontend]
+    B -->|HTTP / JSON| C[Flask REST API]
+
+    C --> D[Authentication]
+    C --> E[API Blueprints]
+
+    E --> F[Service Layer]
+    F --> G[SQLAlchemy ORM]
+    G --> H[(PostgreSQL / Neon)]
+
+    D --> E
+
+    E --> E1[Posts]
+    E --> E2[Comments]
+    E --> E3[Reactions]
+    E --> E4[Image Uploads]
+    E --> E5[RSS]
+    E --> E6[Dashboard]
+    E --> E7[Additional Stories]
+
+    F --> F1[Business Logic]
+    F --> F2[Validation]
+    F --> F3[Data Processing]
