@@ -1195,3 +1195,66 @@
     }
 
 }
+/* ============================================================
+   HERO IMAGE
+   ============================================================ */
+
+.post-hero-image {
+    width: 100%;
+    max-width: 1000px;
+    height: 520px;
+    margin: 0 auto 50px;
+    overflow: hidden;
+    border-radius: 18px;
+    background: #111;
+}
+
+.post-hero-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* ============================================================
+   RICH CONTENT IMAGES
+   ============================================================ */
+
+.story-rich-content img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 500px;
+    margin: 30px auto;
+    border-radius: 14px;
+    object-fit: contain;
+}
+
+
+/* ============================================================
+   MOBILE HERO IMAGE
+   ============================================================ */
+
+@media (max-width: 800px) {
+
+    .post-hero-image {
+        width: 100%;
+        height: 320px;
+        margin-bottom: 35px;
+        border-radius: 12px;
+    }
+
+    .post-hero-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .story-rich-content img {
+        max-width: 100%;
+        max-height: 320px;
+        margin: 24px auto;
+    }
+}

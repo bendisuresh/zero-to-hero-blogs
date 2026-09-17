@@ -27,6 +27,7 @@ function EditStory() {
         failures: "",
         lessons: "",
         tags: "",
+        image_url: "",
     });
 
     // ============================================================
@@ -44,6 +45,14 @@ function EditStory() {
     // ============================================================
 
     const [editor, setEditor] = useState(null);
+
+    // ============================================================
+    // IMAGE STATE
+    // ============================================================
+
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imageUrl, setImageUrl] = useState("");
+    const [uploadingImage, setUploadingImage] = useState(false);
 
     // ============================================================
     // LOAD EXISTING STORY
@@ -113,7 +122,14 @@ function EditStory() {
 
                     tags:
                         data.tags || "",
+
+                    image_url:
+                        data.image_url || "",
                 });
+
+                setImageUrl(
+                    data.image_url || ""
+                );
             } catch {
                 setError(
                     "Unable to connect to the server"
@@ -140,11 +156,109 @@ function EditStory() {
     };
 
     // ============================================================
+    // SELECT NEW IMAGE
+    // ============================================================
+
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        setSelectedImage(file);
+
+        setError("");
+        setMessage("");
+    };
+
+    // ============================================================
+    // UPLOAD NEW IMAGE
+    // ============================================================
+
+    const handleImageUpload = async () => {
+        if (!selectedImage) {
+            setError(
+                "Please select an image first"
+            );
+
+            return;
+        }
+
+        const token =
+            localStorage.getItem("admin_token");
+
+        if (!token) {
+            navigate("/admin/login");
+            return;
+        }
+
+        setError("");
+        setMessage("");
+        setUploadingImage(true);
+
+        const uploadData = new FormData();
+
+        uploadData.append(
+            "image",
+            selectedImage
+        );
+
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/admin/upload`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`,
+                    },
+
+                    body: uploadData,
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setError(
+                    data.message ||
+                    "Failed to upload image"
+                );
+
+                return;
+            }
+
+            setImageUrl(data.image_url);
+
+            setFormData((currentData) => ({
+                ...currentData,
+                image_url: data.image_url,
+            }));
+
+            setSelectedImage(null);
+
+            setMessage(
+                "New image uploaded successfully!"
+            );
+        } catch {
+            setError(
+                "Unable to connect to the server"
+            );
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
+    // ============================================================
     // ADD LINK
     // ============================================================
 
     const handleAddLink = () => {
-        const url = window.prompt("Enter URL:");
+        const url = window.prompt(
+            "Enter URL:"
+        );
 
         if (!url) {
             return;
@@ -215,6 +329,10 @@ function EditStory() {
             navigate("/admin/login");
             return;
         }
+
+        // ========================================================
+        // VALIDATION
+        // ========================================================
 
         if (!formData.financial_info.trim()) {
             setError(
@@ -297,18 +415,25 @@ function EditStory() {
 
     return (
         <main className="create-story-page">
-
             <section className="create-story-container">
 
                 <h1>
                     Edit Story
                 </h1>
 
+                {/* ====================================================
+                    SUCCESS MESSAGE
+                ==================================================== */}
+
                 {message && (
                     <p className="success-message">
                         {message}
                     </p>
                 )}
+
+                {/* ====================================================
+                    ERROR MESSAGE
+                ==================================================== */}
 
                 {error && (
                     <p className="error-message">
@@ -317,6 +442,10 @@ function EditStory() {
                 )}
 
                 <form onSubmit={handleSubmit}>
+
+                    {/* ====================================================
+                        REUSABLE STORY FORM
+                    ==================================================== */}
 
                     <StoryForm
                         formData={formData}
@@ -327,6 +456,64 @@ function EditStory() {
                         handleEditLink={handleEditLink}
                         handleRemoveLink={handleRemoveLink}
                     />
+
+                    {/* ====================================================
+                        STORY IMAGE
+                    ==================================================== */}
+
+                    <div className="form-group edit-story-image">
+
+                        <label htmlFor="edit-story-image">
+                            Story Image
+                        </label>
+
+                        {/* Current image */}
+
+                        {imageUrl && (
+                            <div className="existing-image-preview">
+
+                                <p>
+                                    Current Story Image
+                                </p>
+
+                                <img
+                                    src={imageUrl}
+                                    alt="Current story"
+                                />
+
+                            </div>
+                        )}
+
+                        {/* Select new image */}
+
+                        <input
+                            id="edit-story-image"
+                            type="file"
+                            accept="image/png,image/jpeg,image/gif,image/webp"
+                            onChange={handleImageChange}
+                        />
+
+                        {/* Upload replacement */}
+
+                        <button
+                            type="button"
+                            onClick={handleImageUpload}
+                            disabled={
+                                !selectedImage ||
+                                uploadingImage
+                            }
+                            className="upload-image-button"
+                        >
+                            {uploadingImage
+                                ? "Uploading..."
+                                : "Replace Image"}
+                        </button>
+
+                    </div>
+
+                    {/* ====================================================
+                        SAVE / CANCEL
+                    ==================================================== */}
 
                     <div className="form-group edit-story-actions">
 
@@ -358,7 +545,6 @@ function EditStory() {
                 </form>
 
             </section>
-
         </main>
     );
 }
