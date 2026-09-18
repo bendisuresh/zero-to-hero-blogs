@@ -1,10 +1,19 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
+import apiFetch from "../services/api";
+import useAuth from "../hooks/useAuth";
+
 import "./AddAdditionalStory.css";
 
 function AddAdditionalStory() {
     const { id } = useParams();
     const navigate = useNavigate();
+
+    const {
+        isAuthenticated,
+        logout,
+    } = useAuth();
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
@@ -18,18 +27,17 @@ function AddAdditionalStory() {
         setMessage("");
         setError("");
 
-        if (!title.trim() || !content.trim()) {
+        if (
+            !title.trim() ||
+            !content.trim()
+        ) {
             setError(
                 "Please enter both a title and story content."
             );
             return;
         }
 
-        const token = localStorage.getItem(
-            "admin_token"
-        );
-
-        if (!token) {
+        if (!isAuthenticated) {
             navigate("/admin/login");
             return;
         }
@@ -37,30 +45,16 @@ function AddAdditionalStory() {
         setSubmitting(true);
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/admin/posts/${id}/additional-stories`,
+            await apiFetch(
+                `/api/admin/posts/${id}/additional-stories`,
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
+                    body: {
                         title: title.trim(),
                         content: content.trim(),
-                    }),
+                    },
                 }
             );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setError(
-                    data.message ||
-                    "Failed to add additional story."
-                );
-                return;
-            }
 
             setMessage(
                 "Additional story added successfully!"
@@ -68,9 +62,20 @@ function AddAdditionalStory() {
 
             setTitle("");
             setContent("");
-        } catch {
+        } catch (error) {
+            if (
+                error.status === 401 ||
+                error.status === 422 ||
+                error.status === 403
+            ) {
+                logout();
+                navigate("/admin/login");
+                return;
+            }
+
             setError(
-                "Unable to connect to the server."
+                error.message ||
+                "Failed to add additional story."
             );
         } finally {
             setSubmitting(false);
@@ -131,6 +136,7 @@ function AddAdditionalStory() {
 
                         <div className="additional-story-tip">
                             <strong>Tip</strong>
+
                             <span>
                                 Keep the title short and make
                                 the content easy to read.
@@ -161,14 +167,20 @@ function AddAdditionalStory() {
                             {message && (
                                 <div className="additional-story-success">
                                     <span>✓</span>
-                                    <p>{message}</p>
+
+                                    <p>
+                                        {message}
+                                    </p>
                                 </div>
                             )}
 
                             {error && (
                                 <div className="additional-story-error">
                                     <span>!</span>
-                                    <p>{error}</p>
+
+                                    <p>
+                                        {error}
+                                    </p>
                                 </div>
                             )}
 

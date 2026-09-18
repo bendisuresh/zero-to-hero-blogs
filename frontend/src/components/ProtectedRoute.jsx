@@ -1,39 +1,41 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
+import apiFetch from "../services/api";
+import useAuth from "../hooks/useAuth";
+
 function ProtectedRoute({ children }) {
     const [checking, setChecking] = useState(true);
     const [authorized, setAuthorized] = useState(false);
 
+    const {
+        isAuthenticated,
+        logout,
+    } = useAuth();
+
     useEffect(() => {
         const verifyAdmin = async () => {
-            const token = localStorage.getItem("admin_token");
-
-            if (!token) {
+            if (!isAuthenticated) {
                 setAuthorized(false);
                 setChecking(false);
                 return;
             }
 
             try {
-                const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/admin/dashboard`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
+                await apiFetch(
+                    "/api/admin/dashboard"
                 );
 
-                if (!response.ok) {
-                    localStorage.removeItem("admin_token");
-                    setAuthorized(false);
-                    setChecking(false);
-                    return;
+                setAuthorized(true);
+            } catch (error) {
+                if (
+                    error.status === 401 ||
+                    error.status === 422 ||
+                    error.status === 403
+                ) {
+                    logout();
                 }
 
-                setAuthorized(true);
-            } catch {
                 setAuthorized(false);
             } finally {
                 setChecking(false);
@@ -41,12 +43,17 @@ function ProtectedRoute({ children }) {
         };
 
         verifyAdmin();
-    }, []);
+    }, [
+        isAuthenticated,
+        logout,
+    ]);
 
     if (checking) {
         return (
             <main className="admin-route-loading">
-                <p>Checking admin access...</p>
+                <p>
+                    Checking admin access...
+                </p>
             </main>
         );
     }
