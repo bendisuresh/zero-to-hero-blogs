@@ -108,6 +108,49 @@ def get_comments(post_id):
 
     return comments_data, 200
 
+# ============================================================
+# GET ALL COMMENTS - ADMIN
+# ============================================================
+
+@comments_bp.route(
+    "/api/admin/comments",
+    methods=["GET"]
+)
+@admin_required()
+def get_all_comments():
+
+    rows = (
+        db.session.query(
+            Comment,
+            Post.title
+        )
+        .join(
+            Post,
+            Comment.post_id == Post.id
+        )
+        .order_by(
+            Comment.created_at.desc()
+        )
+        .all()
+    )
+
+    comments_data = []
+
+    for comment, post_title in rows:
+        comments_data.append({
+            "id": comment.id,
+            "post_id": comment.post_id,
+            "post_title": post_title,
+            "name": comment.name,
+            "content": comment.content,
+            "created_at": comment.created_at
+        })
+
+    return {
+        "comments": comments_data,
+        "total": len(comments_data)
+    }, 200
+
 
 # ============================================================
 # DELETE COMMENT - ADMIN

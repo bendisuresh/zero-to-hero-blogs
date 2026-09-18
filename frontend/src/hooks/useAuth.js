@@ -1,4 +1,5 @@
 import {
+    useCallback,
     useEffect,
     useState,
 } from "react";
@@ -48,7 +49,7 @@ function useAuth() {
     }, []);
 
 
-    const login = (newToken) => {
+    const login = useCallback((newToken) => {
 
         localStorage.setItem(
             "admin_token",
@@ -64,10 +65,10 @@ function useAuth() {
             )
         );
 
-    };
+    }, []);
 
 
-    const logout = () => {
+    const logout = useCallback(() => {
 
         localStorage.removeItem(
             "admin_token"
@@ -82,7 +83,7 @@ function useAuth() {
             )
         );
 
-    };
+    }, []);
 
 
     return {

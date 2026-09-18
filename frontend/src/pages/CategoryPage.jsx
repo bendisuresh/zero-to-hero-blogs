@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import PostCard from "../components/PostCard";
+import apiFetch from "../services/api";
 import "./CategoryPage.css";
 
 
@@ -73,19 +74,9 @@ function CategoryPage({
                 }
 
 
-                const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/posts?${params.toString()}`
+                const data = await apiFetch(
+                    `/api/posts?${params.toString()}`
                 );
-
-                const data = await response.json();
-
-
-                if (!response.ok) {
-                    throw new Error(
-                        data.message ||
-                        "Failed to fetch stories"
-                    );
-                }
 
 
                 setPosts(

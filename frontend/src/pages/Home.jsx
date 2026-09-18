@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PostCard from "../components/PostCard";
 import getStoryImage from "../utils/storyImage";
+import apiFetch from "../services/api";
 import "./Home.css";
 
 
@@ -78,15 +79,9 @@ function Home() {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/posts?limit=6&sort=latest`
+                const data = await apiFetch(
+                    "/api/posts?limit=6&sort=latest"
                 );
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch posts");
-                }
-
-                const data = await response.json();
 
                 setPosts(data.posts || []);
             } catch {

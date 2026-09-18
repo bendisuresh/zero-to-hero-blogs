@@ -67,7 +67,7 @@
 
     object-fit: cover;
 
-    object-position: center;
+    object-position: center center;
 
     transition:
         transform 0.45s ease;

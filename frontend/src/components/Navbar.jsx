@@ -1,56 +1,24 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
     Link,
     useNavigate
 } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 import "./Navbar.css";
 
 function Navbar() {
     const navigate = useNavigate();
+    const { isAuthenticated, logout } = useAuth();
 
     const [menuOpen, setMenuOpen] = useState(false);
-
-    const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(
-        Boolean(localStorage.getItem("admin_token"))
-    );
-
-    useEffect(() => {
-        const handleAuthChange = () => {
-            setIsAdminLoggedIn(
-                Boolean(
-                    localStorage.getItem("admin_token")
-                )
-            );
-        };
-
-        window.addEventListener(
-            "admin-auth-changed",
-            handleAuthChange
-        );
-
-        return () => {
-            window.removeEventListener(
-                "admin-auth-changed",
-                handleAuthChange
-            );
-        };
-    }, []);
 
     const closeMenu = () => {
         setMenuOpen(false);
     };
 
     const handleAdminLogout = () => {
-        localStorage.removeItem("admin_token");
-
-        setIsAdminLoggedIn(false);
-
+        logout();
         setMenuOpen(false);
-
-        window.dispatchEvent(
-            new Event("admin-auth-changed")
-        );
-
         navigate("/admin/login");
     };
 
@@ -132,7 +100,7 @@ function Navbar() {
 
                 <div className="mobile-admin">
 
-                    {isAdminLoggedIn ? (
+                    {isAuthenticated ? (
                         <button
                             type="button"
                             onClick={
@@ -159,7 +127,7 @@ function Navbar() {
 
             <div className="navbar-admin">
 
-                {isAdminLoggedIn ? (
+                {isAuthenticated ? (
                     <button
                         type="button"
                         onClick={
@@ -169,7 +137,10 @@ function Navbar() {
                         Admin Logout
                     </button>
                 ) : (
-                    <Link to="/admin/login">
+                    <Link
+                        to="/admin/login"
+                        onClick={closeMenu}
+                    >
                         Admin Login
                     </Link>
                 )}

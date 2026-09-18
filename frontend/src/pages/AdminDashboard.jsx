@@ -96,35 +96,15 @@ function AdminDashboard() {
                 );
 
 
-                // Get comments from every story
-                const allComments = [];
+                // Get all comments for admin moderation
+                const commentsData =
+                    await apiFetch(
+                        "/api/admin/comments"
+                    );
 
-                for (const post of fetchedPosts) {
-                    let commentsData;
-
-try {
-
-    commentsData =
-        await apiFetch(
-            `/api/posts/${post.id}/comments`
-        );
-
-} catch {
-
-    continue;
-
-}
-
-                    commentsData.forEach((comment) => {
-                        allComments.push({
-                            ...comment,
-                            post_id: post.id,
-                            post_title: post.title,
-                        });
-                    });
-                }
-
-                setComments(allComments);
+                setComments(
+                    commentsData.comments || []
+                );
             } catch (error) {
 
     if (

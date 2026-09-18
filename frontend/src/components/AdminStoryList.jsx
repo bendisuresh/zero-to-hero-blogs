@@ -58,33 +58,35 @@ function AdminStoryList({
                             </td>
 
                             <td>
-    {post.likes}
-</td>
+                                {post.likes}
+                            </td>
 
-<td>
-    <span
-        className={
-            post.status === "draft"
-                ? "story-status story-status-draft"
-                : "story-status story-status-published"
-        }
-    >
-        {post.status === "draft"
-            ? "Draft"
-            : "Published"}
-    </span>
-</td>
+                            <td>
+                                <span
+                                    className={
+                                        post.status === "draft"
+                                            ? "story-status story-status-draft"
+                                            : "story-status story-status-published"
+                                    }
+                                >
+                                    {post.status === "draft"
+                                        ? "Draft"
+                                        : "Published"}
+                                </span>
+                            </td>
 
-<td>
-    <div className="admin-table-actions">
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            onViewStory(post.id)
-                                        }
-                                    >
-                                        View
-                                    </button>
+                            <td>
+                                <div className="admin-table-actions">
+                                    {post.status !== "draft" && (
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                onViewStory(post.id)
+                                            }
+                                        >
+                                            View
+                                        </button>
+                                    )}
 
                                     <button
                                         type="button"

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Toast from "../components/Toast";
 import getStoryImage from "../utils/storyImage";
+import apiFetch from "../services/api";
 import "./Post.css";
 
 
@@ -40,7 +41,6 @@ function Post() {
         message: ""
     });
 
-    const API_URL = import.meta.env.VITE_API_URL;
 
 
     const showToast = (message) => {
@@ -70,27 +70,17 @@ function Post() {
             setError("");
 
             try {
-                const response = await fetch(
-                    `${API_URL}/api/posts/${id}`
+                const data = await apiFetch(
+                    `/api/posts/${id}`
                 );
 
-                const data = await response.json();
-
-                if (!response.ok) {
-                    setError(
-                        data.message ||
-                        "Failed to load story"
-                    );
-                } else {
-                    setPost(data);
-                }
-
-            } catch {
+                setPost(data);
+            } catch (error) {
                 setError(
+                    error.message ||
                     "Unable to connect to the server"
                 );
             }
-
 
             /*
             ----------------------------------------------------
@@ -99,23 +89,17 @@ function Post() {
             */
 
             try {
-                const response = await fetch(
-                    `${API_URL}/api/posts/${id}/additional-stories`
+                const data = await apiFetch(
+                    `/api/posts/${id}/additional-stories`
                 );
 
-                const data = await response.json();
-
-                if (response.ok) {
-                    setAdditionalStories(data);
-                }
-
+                setAdditionalStories(data);
             } catch (error) {
                 console.error(
                     "Failed to fetch additional stories",
                     error
                 );
             }
-
 
             /*
             ----------------------------------------------------
@@ -124,23 +108,17 @@ function Post() {
             */
 
             try {
-                const response = await fetch(
-                    `${API_URL}/api/posts/${id}/comments`
+                const data = await apiFetch(
+                    `/api/posts/${id}/comments`
                 );
 
-                const data = await response.json();
-
-                if (response.ok) {
-                    setComments(data);
-                }
-
+                setComments(data);
             } catch (error) {
                 console.error(
                     "Failed to fetch comments",
                     error
                 );
             }
-
 
             /*
             ----------------------------------------------------
@@ -149,13 +127,12 @@ function Post() {
             */
 
             try {
-                await fetch(
-                    `${API_URL}/api/posts/${id}/view`,
+                await apiFetch(
+                    `/api/posts/${id}/view`,
                     {
                         method: "POST"
                     }
                 );
-
             } catch (error) {
                 console.error(
                     "Failed to record view",
@@ -168,7 +145,7 @@ function Post() {
 
         loadPost();
 
-    }, [id, API_URL]);
+    }, [id]);
 
 
     /*
@@ -179,23 +156,12 @@ function Post() {
 
     const handleLike = async () => {
         try {
-            const response = await fetch(
-                `${API_URL}/api/posts/${id}/like`,
+            const data = await apiFetch(
+                `/api/posts/${id}/like`,
                 {
                     method: "POST"
                 }
             );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                showToast(
-                    data.message ||
-                    "Unable to like story"
-                );
-
-                return;
-            }
 
             setPost((currentPost) => ({
                 ...currentPost,
@@ -220,23 +186,12 @@ function Post() {
 
     const handleDislike = async () => {
         try {
-            const response = await fetch(
-                `${API_URL}/api/posts/${id}/dislike`,
+            const data = await apiFetch(
+                `/api/posts/${id}/dislike`,
                 {
                     method: "POST"
                 }
             );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                showToast(
-                    data.message ||
-                    "Unable to dislike story"
-                );
-
-                return;
-            }
 
             setPost((currentPost) => ({
                 ...currentPost,
@@ -271,30 +226,16 @@ function Post() {
         }
 
         try {
-            const response = await fetch(
-                `${API_URL}/api/posts/${id}/comments`,
+            await apiFetch(
+                `/api/posts/${id}/comments`,
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
+                    body: {
                         name: name.trim(),
                         content: comment.trim()
-                    })
+                    }
                 }
             );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                showToast(
-                    data.message ||
-                    "Failed to add comment"
-                );
-
-                return;
-            }
 
             setName("");
             setComment("");
@@ -307,16 +248,11 @@ function Post() {
             */
 
             try {
-                const commentsResponse = await fetch(
-                    `${API_URL}/api/posts/${id}/comments`
+                const commentsData = await apiFetch(
+                    `/api/posts/${id}/comments`
                 );
 
-                const commentsData =
-                    await commentsResponse.json();
-
-                if (commentsResponse.ok) {
-                    setComments(commentsData);
-                }
+                setComments(commentsData);
 
             } catch (error) {
                 console.error(
