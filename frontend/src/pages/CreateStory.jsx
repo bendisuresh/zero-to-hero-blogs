@@ -2,10 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import StoryForm from "../components/StoryForm";
+import apiFetch from "../services/api";
+import useAuth from "../hooks/useAuth";
 import "./CreateStory.css";
 
 function CreateStory() {
     const navigate = useNavigate();
+    const { isAuthenticated, logout } = useAuth();
 
     // ============================================================
     // FORM DATA
@@ -83,12 +86,10 @@ function CreateStory() {
             return;
         }
 
-        const token = localStorage.getItem("admin_token");
-
-        if (!token) {
-            navigate("/admin/login");
-            return;
-        }
+        if (!isAuthenticated) {
+    navigate("/admin/login");
+    return;
+}
 
         setError("");
         setMessage("");
@@ -99,27 +100,13 @@ function CreateStory() {
         uploadData.append("image", selectedImage);
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/admin/upload`,
+            const data = await apiFetch(
+                "/api/admin/upload",
                 {
                     method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
                     body: uploadData,
                 }
             );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setError(
-                    data.message ||
-                    "Failed to upload image"
-                );
-
-                return;
-            }
 
             setImageUrl(data.image_url);
 
@@ -135,9 +122,19 @@ function CreateStory() {
             setMessage(
                 "Image uploaded successfully!"
             );
-        } catch {
+        } catch (error) {
+            if (
+                error.status === 401 ||
+                error.status === 422
+            ) {
+                logout();
+                navigate("/admin/login");
+                return;
+            }
+
             setError(
-                "Unable to connect to the server"
+                error.message ||
+                "Failed to upload image"
             );
         } finally {
             setUploadingImage(false);
@@ -250,9 +247,7 @@ function CreateStory() {
         setMessage("");
         setError("");
 
-        const token = localStorage.getItem("admin_token");
-
-        if (!token) {
+        if (!isAuthenticated) {
             navigate("/admin/login");
             return;
         }
@@ -261,30 +256,21 @@ function CreateStory() {
             setError("Lessons field is required");
             return;
         }
+        const status =
+            event.nativeEvent.submitter?.value ||
+            "published";
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/admin/posts`,
+            await apiFetch(
+                "/api/admin/posts",
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
+                    body: {
+                        ...formData,
+                        status,
                     },
-                    body: JSON.stringify(formData),
                 }
             );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setError(
-                    data.message ||
-                    "Failed to create story"
-                );
-
-                return;
-            }
 
             setMessage(
                 "Story created successfully!"
@@ -315,9 +301,19 @@ function CreateStory() {
             setSelectedImage(null);
             setImageUrl("");
 
-        } catch {
+        } catch (error) {
+            if (
+                error.status === 401 ||
+                error.status === 422
+            ) {
+                logout();
+                navigate("/admin/login");
+                return;
+            }
+
             setError(
-                "Unable to connect to the server"
+                error.message ||
+                "Failed to create story"
             );
         }
     };
@@ -364,12 +360,27 @@ function CreateStory() {
                         onImageUpload={handleImageUpload}
                     />
 
-                    <button
-                        type="submit"
-                        className="create-story-button"
-                    >
-                        Create Story
-                    </button>
+                    <div className="story-action-buttons">
+
+                        <button
+                            type="submit"
+                            name="status"
+                            value="draft"
+                            className="save-draft-button"
+                        >
+                            Save Draft
+                        </button>
+
+                        <button
+                            type="submit"
+                            name="status"
+                            value="published"
+                            className="create-story-button"
+                        >
+                            Publish
+                        </button>
+
+                    </div>
 
                 </form>
 

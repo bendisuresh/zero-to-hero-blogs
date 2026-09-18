@@ -2,12 +2,18 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import StoryForm from "../components/StoryForm";
+import apiFetch from "../services/api";
+import useAuth from "../hooks/useAuth";
 
 import "./CreateStory.css";
 
 function EditStory() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const {
+        isAuthenticated,
+        logout,
+    } = useAuth();
 
     // ============================================================
     // FORM DATA
@@ -27,6 +33,7 @@ function EditStory() {
         failures: "",
         lessons: "",
         tags: "",
+        status: "published",
         image_url: "",
     });
 
@@ -60,29 +67,15 @@ function EditStory() {
 
     useEffect(() => {
         const getPost = async () => {
-            const token =
-                localStorage.getItem("admin_token");
-
-            if (!token) {
+            if (!isAuthenticated) {
                 navigate("/admin/login");
                 return;
             }
 
             try {
-                const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/posts/${id}`
+                const data = await apiFetch(
+                    `/api/admin/posts/${id}`
                 );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    setError(
-                        data.message ||
-                        "Unable to load story"
-                    );
-
-                    return;
-                }
 
                 setFormData({
                     title: data.title || "",
@@ -125,14 +118,26 @@ function EditStory() {
 
                     image_url:
                         data.image_url || "",
+                    status:
+    data.status || "published",
                 });
 
                 setImageUrl(
                     data.image_url || ""
                 );
-            } catch {
+            } catch (error) {
+                if (
+                    error.status === 401 ||
+                    error.status === 422
+                ) {
+                    logout();
+                    navigate("/admin/login");
+                    return;
+                }
+
                 setError(
-                    "Unable to connect to the server"
+                    error.message ||
+                    "Unable to load story"
                 );
             } finally {
                 setLoading(false);
@@ -140,7 +145,12 @@ function EditStory() {
         };
 
         getPost();
-    }, [id, navigate]);
+    }, [
+        id,
+        navigate,
+        isAuthenticated,
+        logout,
+    ]);
 
     // ============================================================
     // HANDLE INPUT CHANGES
@@ -185,10 +195,7 @@ function EditStory() {
             return;
         }
 
-        const token =
-            localStorage.getItem("admin_token");
-
-        if (!token) {
+        if (!isAuthenticated) {
             navigate("/admin/login");
             return;
         }
@@ -205,30 +212,13 @@ function EditStory() {
         );
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/admin/upload`,
+            const data = await apiFetch(
+                "/api/admin/upload",
                 {
                     method: "POST",
-
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`,
-                    },
-
                     body: uploadData,
                 }
             );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setError(
-                    data.message ||
-                    "Failed to upload image"
-                );
-
-                return;
-            }
 
             setImageUrl(data.image_url);
 
@@ -242,9 +232,19 @@ function EditStory() {
             setMessage(
                 "New image uploaded successfully!"
             );
-        } catch {
+        } catch (error) {
+            if (
+                error.status === 401 ||
+                error.status === 422
+            ) {
+                logout();
+                navigate("/admin/login");
+                return;
+            }
+
             setError(
-                "Unable to connect to the server"
+                error.message ||
+                "Failed to upload image"
             );
         } finally {
             setUploadingImage(false);
@@ -322,13 +322,14 @@ function EditStory() {
         setMessage("");
         setError("");
 
-        const token =
-            localStorage.getItem("admin_token");
-
-        if (!token) {
+        if (!isAuthenticated) {
             navigate("/admin/login");
             return;
         }
+        const status =
+            event.nativeEvent.submitter?.value ||
+            formData.status ||
+            "published";
 
         // ========================================================
         // VALIDATION
@@ -353,40 +354,33 @@ function EditStory() {
         setSaving(true);
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/admin/posts/${id}`,
+            await apiFetch(
+                `/api/admin/posts/${id}`,
                 {
                     method: "PUT",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-
-                        Authorization:
-                            `Bearer ${token}`,
+                    body: {
+                        ...formData,
+                        status,
                     },
-
-                    body: JSON.stringify(formData),
                 }
             );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setError(
-                    data.message ||
-                    "Failed to update story"
-                );
-
-                return;
-            }
 
             setMessage(
                 "Story updated successfully!"
             );
-        } catch {
+        } catch (error) {
+            if (
+                error.status === 401 ||
+                error.status === 422
+            ) {
+                logout();
+                navigate("/admin/login");
+                return;
+            }
+
             setError(
-                "Unable to connect to the server"
+                error.message ||
+                "Failed to update story"
             );
         } finally {
             setSaving(false);
@@ -518,27 +512,28 @@ function EditStory() {
                     <div className="form-group edit-story-actions">
 
                         <button
-                            type="submit"
-                            className="create-story-button"
-                            disabled={saving}
-                        >
-                            {saving
-                                ? "Saving..."
-                                : "Save Changes"}
-                        </button>
+    type="submit"
+    name="status"
+    value="draft"
+    className="save-draft-button"
+    disabled={saving}
+>
+    {saving
+        ? "Saving..."
+        : "Save Draft"}
+</button>
 
-                        <button
-                            type="button"
-                            className="cancel-story-button"
-                            onClick={() =>
-                                navigate(
-                                    "/admin/dashboard"
-                                )
-                            }
-                            disabled={saving}
-                        >
-                            Cancel
-                        </button>
+<button
+    type="submit"
+    name="status"
+    value="published"
+    className="create-story-button"
+    disabled={saving}
+>
+    {saving
+        ? "Saving..."
+        : "Publish"}
+</button>
 
                     </div>
 
