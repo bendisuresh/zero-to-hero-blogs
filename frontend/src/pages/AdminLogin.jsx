@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import apiFetch from "../services/api";
+import useAuth from "../hooks/useAuth";
+
 import "./AdminLogin.css";
 
 function AdminLogin() {
     const navigate = useNavigate();
+
+    const { login } = useAuth();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -17,40 +23,35 @@ function AdminLogin() {
         setLoading(true);
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/admin/login`,
+            const data = await apiFetch(
+                "/api/admin/login",
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
+                    body: {
                         email,
                         password,
-                    }),
+                    },
                 }
             );
 
-            const data = await response.json();
+            login(data.access_token);
 
-            if (!response.ok) {
+            navigate("/admin/dashboard");
+        } catch (error) {
+            if (
+                error.status === 401 ||
+                error.status === 422
+            ) {
                 setError(
-                    data.message ||
+                    error.message ||
                     "Invalid email or password"
                 );
 
                 return;
             }
 
-            localStorage.setItem(
-                "admin_token",
-                data.access_token
-            );
-
-            navigate("/admin/dashboard");
-
-        } catch {
             setError(
+                error.message ||
                 "Unable to connect to the server. Please try again."
             );
         } finally {
@@ -90,6 +91,7 @@ function AdminLogin() {
 
                         <div>
                             <span>01</span>
+
                             <p>
                                 Create and manage stories
                             </p>
@@ -97,6 +99,7 @@ function AdminLogin() {
 
                         <div>
                             <span>02</span>
+
                             <p>
                                 Moderate community comments
                             </p>
@@ -104,6 +107,7 @@ function AdminLogin() {
 
                         <div>
                             <span>03</span>
+
                             <p>
                                 Keep your content organized
                             </p>
@@ -157,7 +161,9 @@ function AdminLogin() {
                                 placeholder="admin@example.com"
                                 value={email}
                                 onChange={(event) =>
-                                    setEmail(event.target.value)
+                                    setEmail(
+                                        event.target.value
+                                    )
                                 }
                                 autoComplete="email"
                                 required
@@ -180,7 +186,9 @@ function AdminLogin() {
                                 placeholder="Enter your password"
                                 value={password}
                                 onChange={(event) =>
-                                    setPassword(event.target.value)
+                                    setPassword(
+                                        event.target.value
+                                    )
                                 }
                                 autoComplete="current-password"
                                 required
