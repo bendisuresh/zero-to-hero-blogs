@@ -31,6 +31,13 @@ def validate_post(data):
 
     if not data:
         return "Request body is required"
+    status = data.get(
+        "status",
+        "published"
+    )
+
+    if status not in {"draft", "published"}:
+        return "Invalid status"
 
     if data.get("category") not in ALLOWED_CATEGORIES:
         return "Invalid category"

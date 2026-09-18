@@ -98,7 +98,7 @@ def get_post(post_id):
         post_id
     )
 
-    if post is None:
+    if post is None or post.status != "published":
         return {
             "message": "Post not found"
         }, 404
@@ -159,7 +159,8 @@ def get_admin_posts():
         search=search,
         sort=sort,
         page=page,
-        limit=limit
+        limit=limit,
+        include_drafts=True
     )
 
     posts_data = []
@@ -180,6 +181,12 @@ def get_admin_posts():
             "created_at": (
                 post.created_at.isoformat()
                 if post.created_at
+                else None
+            ),
+            "status": post.status,
+            "published_at": (
+                post.published_at.isoformat()
+                if post.published_at
                 else None
             )
         })
@@ -258,6 +265,53 @@ def update_post(post_id):
     return {
         "message": "Story updated successfully",
         "post_id": post.id
+    }, 200
+@posts_bp.route(
+    "/api/admin/posts/<int:post_id>",
+    methods=["GET"]
+)
+@admin_required()
+def get_admin_post(post_id):
+    post = db.session.get(
+        Post,
+        post_id
+    )
+
+    if not post:
+        return {
+            "message": "Post not found"
+        }, 404
+
+    return {
+        "id": post.id,
+        "title": post.title,
+        "description": post.description,
+        "category": post.category,
+        "storyteller": post.storyteller,
+        "storyteller_email": post.storyteller_email,
+        "image_url": post.image_url,
+        "created_at": (
+            post.created_at.isoformat()
+            if post.created_at
+            else None
+        ),
+        "starting_point": post.starting_point,
+        "how_started": post.how_started,
+        "financial_info": post.financial_info,
+        "approach": post.approach,
+        "life_changed": post.life_changed,
+        "failures": post.failures,
+        "lessons": post.lessons,
+        "views": post.views or 0,
+        "likes": post.likes or 0,
+        "dislikes": post.dislikes or 0,
+        "tags": post.tags,
+        "status": post.status,
+        "published_at": (
+            post.published_at.isoformat()
+            if post.published_at
+            else None
+        )
     }, 200
 
 

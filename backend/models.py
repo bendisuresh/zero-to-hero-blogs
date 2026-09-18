@@ -52,6 +52,16 @@ class Post(db.Model):
         server_default=db.func.now(),
         nullable=False
     )
+    status = db.Column(
+        db.String(20),
+        nullable=False,
+        default="published"
+    )
+
+    published_at = db.Column(
+        db.DateTime,
+        nullable=True
+    )
 
 
 class Admin(db.Model):

@@ -1,6 +1,5 @@
 from flask_jwt_extended import create_access_token
-
-
+from database import db
 def post_payload():
     return {
         "title": "Test Blog Post",
@@ -601,3 +600,173 @@ def test_admin_posts_allows_admin(client, admin_token):
     assert "posts" in data
     assert "page" in data
     assert "total_pages" in data
+
+def test_admin_can_create_draft_post(client, admin_token):
+    data = post_payload()
+    data["status"] = "draft"
+
+    response = client.post(
+        "/api/admin/posts",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        },
+        json=data
+    )
+
+    assert response.status_code == 201
+
+    result = response.get_json()
+    assert "post_id" in result
+
+    post_id = result["post_id"]
+
+    from models import Post
+    post = db.session.get(Post, post_id)
+
+    assert post.status == "draft"
+    assert post.published_at is None
+
+
+def test_draft_post_is_not_visible_publicly(
+    client,
+    admin_token
+):
+    data = post_payload()
+    data["status"] = "draft"
+    data["title"] = "Private Draft Story"
+
+    response = client.post(
+        "/api/admin/posts",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        },
+        json=data
+    )
+
+    assert response.status_code == 201
+
+    post_id = response.get_json()["post_id"]
+
+    list_response = client.get(
+        "/api/posts"
+    )
+
+    assert list_response.status_code == 200
+
+    posts = list_response.get_json()["posts"]
+
+    assert all(
+        post["id"] != post_id
+        for post in posts
+    )
+
+
+def test_draft_post_is_not_visible_by_public_id(
+    client,
+    admin_token
+):
+    data = post_payload()
+    data["status"] = "draft"
+
+    response = client.post(
+        "/api/admin/posts",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        },
+        json=data
+    )
+
+    assert response.status_code == 201
+
+    post_id = response.get_json()["post_id"]
+
+    public_response = client.get(
+        f"/api/posts/{post_id}"
+    )
+
+    assert public_response.status_code == 404
+
+
+def test_admin_can_see_draft_post(
+    client,
+    admin_token
+):
+    data = post_payload()
+    data["status"] = "draft"
+    data["title"] = "Admin Draft Story"
+
+    create_response = client.post(
+        "/api/admin/posts",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        },
+        json=data
+    )
+
+    assert create_response.status_code == 201
+
+    post_id = create_response.get_json()["post_id"]
+
+    response = client.get(
+        "/api/admin/posts",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        }
+    )
+
+    assert response.status_code == 200
+
+    posts = response.get_json()["posts"]
+
+    draft = next(
+        post for post in posts
+        if post["id"] == post_id
+    )
+
+    assert draft["status"] == "draft"
+    assert draft["published_at"] is None
+
+
+def test_admin_can_publish_draft_post(
+    client,
+    admin_token
+):
+    data = post_payload()
+    data["status"] = "draft"
+
+    create_response = client.post(
+        "/api/admin/posts",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        },
+        json=data
+    )
+
+    assert create_response.status_code == 201
+
+    post_id = create_response.get_json()["post_id"]
+
+    update_data = post_payload()
+    update_data["status"] = "published"
+
+    update_response = client.put(
+        f"/api/admin/posts/{post_id}",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        },
+        json=update_data
+    )
+
+    assert update_response.status_code == 200
+
+    from models import Post
+    post = db.session.get(Post, post_id)
+
+    assert post.status == "published"
+    assert post.published_at is not None
+
+    public_response = client.get(
+        f"/api/posts/{post_id}"
+    )
+
+    assert public_response.status_code == 200

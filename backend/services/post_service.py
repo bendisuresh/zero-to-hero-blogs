@@ -34,8 +34,17 @@ def create_post(data):
             image_url=data.get(
                 "image_url",
                 ""
-            ).strip()
-        )
+            ).strip(),
+            status=data.get(
+                "status",
+                "published"
+            )
+            )
+        if post.status == "published":
+            post.published_at = datetime.now(
+                timezone.utc
+            ).replace(tzinfo=None)
+        
 
         db.session.add(post)
         db.session.commit()
@@ -71,6 +80,20 @@ def update_post(post, data):
             post.tags = data["tags"].strip()
         if "image_url" in data:
             post.image_url = data["image_url"].strip()
+        if "status" in data:
+            previous_status = post.status
+            post.status = data["status"]
+
+            if (
+                post.status == "published"
+                and previous_status != "published"
+            ):
+                post.published_at = datetime.now(
+                    timezone.utc
+                ).replace(tzinfo=None)
+
+            elif post.status == "draft":
+                post.published_at = None
 
         db.session.commit()
 
@@ -119,9 +142,15 @@ def get_posts(
     tag="",
     sort="latest",
     page=1,
-    limit=10
+    limit=10,
+    include_drafts=False
 ):
     query = Post.query
+
+    if not include_drafts:
+        query = query.filter(
+            Post.status == "published"
+        )
 
     if category:
         query = query.filter_by(

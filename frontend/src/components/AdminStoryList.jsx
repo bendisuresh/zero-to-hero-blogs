@@ -26,6 +26,7 @@ function AdminStoryList({
                         <th>Storyteller</th>
                         <th>Views</th>
                         <th>Likes</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -57,11 +58,25 @@ function AdminStoryList({
                             </td>
 
                             <td>
-                                {post.likes}
-                            </td>
+    {post.likes}
+</td>
 
-                            <td>
-                                <div className="admin-table-actions">
+<td>
+    <span
+        className={
+            post.status === "draft"
+                ? "story-status story-status-draft"
+                : "story-status story-status-published"
+        }
+    >
+        {post.status === "draft"
+            ? "Draft"
+            : "Published"}
+    </span>
+</td>
+
+<td>
+    <div className="admin-table-actions">
                                     <button
                                         type="button"
                                         onClick={() =>

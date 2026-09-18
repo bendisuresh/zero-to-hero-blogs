@@ -912,3 +912,21 @@
         grid-template-columns: 1fr;
     }
 }
+
+.story-status {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+}
+
+.story-status-draft {
+    color: #92400e;
+    background: #fef3c7;
+}
+
+.story-status-published {
+    color: #166534;
+    background: #dcfce7;
+}

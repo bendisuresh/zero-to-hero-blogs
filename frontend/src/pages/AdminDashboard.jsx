@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AdminDashboard.css";
 
+import apiFetch from "../services/api";
+import useAuth from "../hooks/useAuth";
+
 import AdminStoryList from "../components/AdminStoryList";
 import AdminCommentList from "../components/AdminCommentList";
 import Pagination from "../components/Pagination";
@@ -10,6 +13,11 @@ import AdminStatCard from "../components/AdminStatCard";
 
 function AdminDashboard() {
     const navigate = useNavigate();
+
+    const {
+        isAuthenticated,
+        logout,
+    } = useAuth();
 
     const [message, setMessage] = useState("");
     const [admin, setAdmin] = useState("");
@@ -35,57 +43,24 @@ function AdminDashboard() {
 
     useEffect(() => {
         const getDashboard = async () => {
-            const token = localStorage.getItem("admin_token");
 
-            if (!token) {
-                navigate("/admin/login");
-                return;
-            }
+        if (!isAuthenticated) {
+            navigate("/admin/login");
+            return;
+        }
 
-            try {
+        try {
                 // Check whether the admin token is valid
-                const dashboardResponse = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/admin/dashboard`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-
                 const dashboardData =
-                    await dashboardResponse.json();
-
-                if (!dashboardResponse.ok) {
-                    localStorage.removeItem("admin_token");
-                    navigate("/admin/login");
-                    return;
-                }
+                    await apiFetch("/api/admin/dashboard");
 
                 setMessage(dashboardData.message);
                 setAdmin(dashboardData.admin);
 
 
                 // Get dashboard summary
-                const summaryResponse = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/admin/summary`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-
                 const summaryData =
-                    await summaryResponse.json();
-
-                if (!summaryResponse.ok) {
-                    setError(
-                        summaryData.message ||
-                        "Unable to load dashboard summary"
-                    );
-                    return;
-                }
+                    await apiFetch("/api/admin/summary");
 
                 setSummary(summaryData);
 
@@ -106,25 +81,10 @@ function AdminDashboard() {
                     params.set("category", category);
                 }
 
-                const postsResponse = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/admin/posts?${params.toString()}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-
                 const postsData =
-                    await postsResponse.json();
-
-                if (!postsResponse.ok) {
-                    setError(
-                        postsData.message ||
-                        "Unable to load stories"
+                    await apiFetch(
+                        `/api/admin/posts?${params.toString()}`
                     );
-                    return;
-                }
 
                 const fetchedPosts =
                     postsData.posts || [];
@@ -140,16 +100,20 @@ function AdminDashboard() {
                 const allComments = [];
 
                 for (const post of fetchedPosts) {
-                    const commentsResponse = await fetch(
-                        `${import.meta.env.VITE_API_URL}/api/posts/${post.id}/comments`
-                    );
+                    let commentsData;
 
-                    if (!commentsResponse.ok) {
-                        continue;
-                    }
+try {
 
-                    const commentsData =
-                        await commentsResponse.json();
+    commentsData =
+        await apiFetch(
+            `/api/posts/${post.id}/comments`
+        );
+
+} catch {
+
+    continue;
+
+}
 
                     commentsData.forEach((comment) => {
                         allComments.push({
@@ -161,11 +125,22 @@ function AdminDashboard() {
                 }
 
                 setComments(allComments);
-            } catch {
-                setError(
-                    "Unable to connect to the server"
-                );
-            } finally {
+            } catch (error) {
+
+    if (
+        error.status === 401 ||
+        error.status === 422
+    ) {
+        logout();
+        navigate("/admin/login");
+        return;
+    }
+
+    setError(
+        "Unable to connect to the server"
+    );
+
+} finally {
                 setLoading(false);
             }
         };
@@ -173,6 +148,8 @@ function AdminDashboard() {
         getDashboard();
     }, [
         navigate,
+        isAuthenticated,
+        logout,
         page,
         searchTerm,
         category,
@@ -181,9 +158,9 @@ function AdminDashboard() {
 
 
     const handleLogout = () => {
-        localStorage.removeItem("admin_token");
-        navigate("/admin/login");
-    };
+    logout();
+    navigate("/admin/login");
+};
 
 
     const handleCreateStory = () => {
@@ -217,34 +194,18 @@ function AdminDashboard() {
             return;
         }
 
-        const token =
-            localStorage.getItem("admin_token");
-
-        if (!token) {
-            navigate("/admin/login");
-            return;
-        }
+        if (!isAuthenticated) {
+    navigate("/admin/login");
+    return;
+}
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/admin/posts/${id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setError(
-                    data.message ||
-                    "Unable to delete story"
-                );
-                return;
-            }
+            await apiFetch(
+    `/api/admin/posts/${id}`,
+    {
+        method: "DELETE",
+    }
+);
 
             // Remove deleted story from the screen
             setPosts((currentPosts) =>
@@ -279,34 +240,18 @@ function AdminDashboard() {
             return;
         }
 
-        const token =
-            localStorage.getItem("admin_token");
-
-        if (!token) {
-            navigate("/admin/login");
-            return;
-        }
+        if (!isAuthenticated) {
+    navigate("/admin/login");
+    return;
+}
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/admin/comments/${commentId}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setError(
-                    data.message ||
-                    "Unable to delete comment"
-                );
-                return;
-            }
+            await apiFetch(
+    `/api/admin/comments/${commentId}`,
+    {
+        method: "DELETE",
+    }
+);
 
             // Remove deleted comment from the screen
             setComments((currentComments) =>
