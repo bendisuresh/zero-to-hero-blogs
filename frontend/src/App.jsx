@@ -7,7 +7,7 @@ import {
     Routes,
     Route,
 } from "react-router-dom";
-
+import ScrollToTop from "./components/ScrollToTop";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -39,6 +39,7 @@ function RouteLoading() {
 function App() {
     return (
         <BrowserRouter>
+        <ScrollToTop />
             <Navbar />
 
             <Suspense fallback={<RouteLoading />}>
