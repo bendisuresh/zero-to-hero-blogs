@@ -365,13 +365,3 @@ Blueprints and service modules keep the backend modular as features grow.
 Database-level pagination and indexes reduce unnecessary data processing.
 
 ---
-
-## 14. Interview Explanation
-
-> "The project uses a React frontend and Flask REST API with a layered backend
-> architecture. Flask blueprints handle HTTP routes, validation handles input,
-> and service modules contain business logic. SQLAlchemy manages database access
-> to PostgreSQL. JWT authentication protects administrative operations.
-> On the frontend, reusable components and hooks separate UI concerns from
-> application logic. The backend is tested with pytest and the test suite runs
-> through GitHub Actions CI."
