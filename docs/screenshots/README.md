@@ -232,14 +232,5 @@ docs/
     ├── comment-moderation.png
 ```
 
-The PNG files should only be added after the corresponding real screens have
-been captured and verified.
 
----
 
-# Important
-
-Do not add fake screenshots just to fill the directory.
-
-A smaller set of genuine, clean screenshots is better for a portfolio and
-technical interview than a larger set of placeholder images.
