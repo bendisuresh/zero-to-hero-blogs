@@ -9,7 +9,7 @@
 
     width: 100%;
     min-width: 0;
-    height: 100%;
+    height: auto;
 
     box-sizing: border-box;
 
@@ -19,7 +19,7 @@
 
     border-radius: 16px;
 
-    background: var(--color-surface);
+    background: #ffffff;
 
     box-shadow:
         0 6px 22px rgba(28, 28, 42, 0.05);
@@ -54,7 +54,7 @@
 
     overflow: hidden;
 
-    background: var(--color-background);
+    background: #ececf1;
 
     text-decoration: none;
 }
@@ -94,7 +94,7 @@
 
     padding: 7px 11px;
 
-    border-radius:var(--radius-pill);
+    border-radius: 999px;
 
     background: rgba(20, 20, 25, 0.78);
 
@@ -137,7 +137,7 @@
 
     padding: 20px 20px 18px;
 
-    background: var(--color-surface);
+    background: #ffffff;
 }
 
 
@@ -166,7 +166,7 @@
 
     padding: 5px 9px;
 
-    border-radius:var(--radius-pill);
+    border-radius: 999px;
 
     background: #f0ecff;
 
@@ -192,7 +192,7 @@
 .post-card-date {
     flex-shrink: 0;
 
-    color: var(--color-muted);
+    color: #8a8d97;
 
     font-size: 11px;
 
@@ -217,7 +217,7 @@
 
     overflow: hidden;
 
-    color: var(--color-text);
+    color: #1b1c22;
 
     font-size: 20px;
 
@@ -248,7 +248,7 @@
 
     overflow: hidden;
 
-    color: var(--color-secondary-text);
+    color: #666a75;
 
     font-size: 14px;
 
@@ -273,9 +273,9 @@
 
     gap: 10px;
 
-    margin-top: auto;
+    margin-top: 18px;
 
-    padding-top: 18px;
+    padding-top: 0;
 }
 
 .post-card-storyteller {
@@ -315,7 +315,7 @@
 
     overflow: hidden;
 
-    color:var(--color-secondary-text);
+    color: #444750;
 
     font-size: 12px;
 
@@ -329,7 +329,7 @@
 .post-card-reading-time {
     flex-shrink: 0;
 
-    color: var(--color-muted);
+    color: #8a8d97;
 
     font-size: 11px;
 }
@@ -362,7 +362,7 @@
 
     gap: 12px;
 
-    color: var(--color-muted);
+    color: #858892;
 
     font-size: 11px;
 
@@ -389,9 +389,11 @@
 
     border-radius: 8px;
 
-    border-radius: var(--radius-md);
-    background: var(--color-primary);
-    color: var(--color-surface);
+    background: #6c3fd5;
+
+    color: white;
+
+    text-decoration: none;
 
     font-size: 11px;
 
@@ -412,7 +414,7 @@
 }
 
 .post-card-button:hover {
-    background: var(--color-primary-hover);
+    background: #5930bd;
 
     transform: translateY(-1px);
 }
@@ -434,7 +436,7 @@
 
     overflow: hidden;
 
-    background: var(--color-background);
+    background: #ececf1;
 }
 
 .featured-story-image img {

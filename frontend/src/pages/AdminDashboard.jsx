@@ -320,10 +320,17 @@ function AdminDashboard() {
 
         } catch (error) {
 
+            if (error.status === 403) {
+                window.alert(
+                    error.message ||
+                    "Stories can only be deleted within 24 hours of creation."
+                );
+                return;
+            }
+
             if (
                 error.status === 401 ||
-                error.status === 422 ||
-                error.status === 403
+                error.status === 422
             ) {
                 logout();
                 navigate("/admin/login");
