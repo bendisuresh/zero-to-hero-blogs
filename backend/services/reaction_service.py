@@ -1,4 +1,12 @@
 from database import db
+from models import Post
+
+
+def get_post(post_id):
+    return db.session.get(
+        Post,
+        post_id
+    )
 
 
 def like_post(post):

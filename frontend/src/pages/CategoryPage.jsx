@@ -4,7 +4,6 @@ import PostCard from "../components/PostCard";
 import apiFetch from "../services/api";
 import "./CategoryPage.css";
 
-
 function CategoryPage({
     category,
     title,
@@ -25,7 +24,6 @@ function CategoryPage({
     const [error, setError] = useState("");
     const [retryCount, setRetryCount] = useState(0);
 
-
     /*
     ============================================================
     FETCH STORIES
@@ -45,7 +43,6 @@ function CategoryPage({
                     limit: 9
                 });
 
-
                 /*
                 ------------------------------------------------
                 CATEGORY FILTER
@@ -58,7 +55,6 @@ function CategoryPage({
                         category
                     );
                 }
-
 
                 /*
                 ------------------------------------------------
@@ -73,11 +69,9 @@ function CategoryPage({
                     );
                 }
 
-
                 const data = await apiFetch(
                     `/api/posts?${params.toString()}`
                 );
-
 
                 setPosts(
                     data.posts || []
@@ -86,22 +80,18 @@ function CategoryPage({
                 setTotalPages(
                     data.total_pages || 1
                 );
-
             } catch {
                 setPosts([]);
 
                 setError(
                     "Unable to load stories. Please try again."
                 );
-
             } finally {
                 setLoading(false);
             }
         };
 
-
         fetchPosts();
-
     }, [
         category,
         searchTerm,
@@ -110,7 +100,6 @@ function CategoryPage({
         retryCount,
         tag
     ]);
-
 
     /*
     ============================================================
@@ -126,7 +115,6 @@ function CategoryPage({
         setPage(1);
     };
 
-
     /*
     ============================================================
     CLEAR SEARCH
@@ -137,7 +125,6 @@ function CategoryPage({
         setSearchTerm("");
         setPage(1);
     };
-
 
     /*
     ============================================================
@@ -152,7 +139,6 @@ function CategoryPage({
 
         setPage(1);
     };
-
 
     /*
     ============================================================
@@ -173,7 +159,6 @@ function CategoryPage({
         }
     };
 
-
     /*
     ============================================================
     NEXT PAGE
@@ -192,7 +177,6 @@ function CategoryPage({
             });
         }
     };
-
 
     /*
     ============================================================
@@ -217,7 +201,6 @@ function CategoryPage({
         });
     };
 
-
     /*
     ============================================================
     PAGINATION NUMBERS
@@ -226,7 +209,6 @@ function CategoryPage({
 
     const getPageNumbers = () => {
         const pages = [];
-
 
         if (totalPages <= 5) {
             for (
@@ -240,14 +222,11 @@ function CategoryPage({
             return pages;
         }
 
-
         pages.push(1);
-
 
         if (page > 3) {
             pages.push("...");
         }
-
 
         let start = Math.max(
             2,
@@ -259,18 +238,15 @@ function CategoryPage({
             page + 1
         );
 
-
         if (page <= 2) {
             start = 2;
             end = 3;
         }
 
-
         if (page >= totalPages - 1) {
             start = totalPages - 2;
             end = totalPages - 1;
         }
-
 
         for (
             let number = start;
@@ -280,17 +256,14 @@ function CategoryPage({
             pages.push(number);
         }
 
-
         if (page < totalPages - 2) {
             pages.push("...");
         }
-
 
         pages.push(totalPages);
 
         return pages;
     };
-
 
     /*
     ============================================================
@@ -300,7 +273,6 @@ function CategoryPage({
 
     return (
         <main className="category-page">
-
 
             {/* =================================================
                 CATEGORY HERO
@@ -314,18 +286,15 @@ function CategoryPage({
                         ZERO TO HERO
                     </span>
 
-
                     <h1>
-    {tag
-        ? `Stories tagged #${tag}`
-        : title}
-</h1>
-
+                        {tag
+                            ? `Stories tagged #${tag}`
+                            : title}
+                    </h1>
 
                     <p>
                         {description}
                     </p>
-
 
                     <div className="category-hero-line"></div>
 
@@ -333,13 +302,11 @@ function CategoryPage({
 
             </section>
 
-
             {/* =================================================
                 CONTENT
                ================================================= */}
 
             <section className="category-content">
-
 
                 {/* =================================================
                     SECTION HEADING
@@ -353,37 +320,29 @@ function CategoryPage({
                             EXPLORE STORIES
                         </span>
 
-
                         <h2>
                             {tag
                                 ? `Stories tagged "${tag}"`
                                 : category
                                     ? `${category} Journeys`
-                                    : "All Stories"
-                            }
+                                    : "All Stories"}
                         </h2>
 
                     </div>
 
-
                     {!loading &&
                         !error && (
                             <span className="story-count">
-
                                 {posts.length}{" "}
-
                                 {posts.length === 1
                                     ? "story"
                                     : "stories"
                                 }{" "}
-
                                 on this page
-
                             </span>
                         )}
 
                 </div>
-
 
                 {/* =================================================
                     ACTIVE TAG
@@ -405,13 +364,11 @@ function CategoryPage({
 
                 )}
 
-
                 {/* =================================================
                     TOOLBAR
                    ================================================= */}
 
                 <div className="category-toolbar">
-
 
                     {/* SEARCH */}
 
@@ -423,7 +380,6 @@ function CategoryPage({
                         >
                             ⌕
                         </span>
-
 
                         <input
                             type="search"
@@ -444,7 +400,6 @@ function CategoryPage({
                             }
                         />
 
-
                         {searchTerm && (
 
                             <button
@@ -462,7 +417,6 @@ function CategoryPage({
 
                     </div>
 
-
                     {/* SORT */}
 
                     <div className="category-sort-wrapper">
@@ -473,7 +427,6 @@ function CategoryPage({
                             Sort
                         </label>
 
-
                         <select
                             id="category-sort"
                             value={sort}
@@ -481,27 +434,22 @@ function CategoryPage({
                                 handleSortChange
                             }
                         >
-
                             <option value="latest">
                                 Latest
                             </option>
-
 
                             <option value="popular">
                                 Popular
                             </option>
 
-
                             <option value="oldest">
                                 Oldest
                             </option>
-
                         </select>
 
                     </div>
 
                 </div>
-
 
                 {/* =================================================
                     LOADING
@@ -509,24 +457,40 @@ function CategoryPage({
 
                 {loading && (
 
-                    <div className="category-loading">
+                    <div className="category-skeleton-grid">
 
-                        <div className="category-spinner"></div>
+                        {Array.from(
+                            { length: 6 },
+                            (_, index) => (
+                                <div
+                                    className="category-skeleton-card"
+                                    key={index}
+                                    aria-hidden="true"
+                                >
 
+                                    <div className="category-skeleton-image"></div>
 
-                        <h3>
-                            Loading stories
-                        </h3>
+                                    <div className="category-skeleton-content">
 
+                                        <div className="category-skeleton-line category-skeleton-meta"></div>
 
-                        <p>
-                            Finding journeys for you...
-                        </p>
+                                        <div className="category-skeleton-line category-skeleton-title"></div>
+
+                                        <div className="category-skeleton-line category-skeleton-title-short"></div>
+
+                                        <div className="category-skeleton-line category-skeleton-description"></div>
+
+                                        <div className="category-skeleton-line category-skeleton-description-short"></div>
+
+                                    </div>
+
+                                </div>
+                            )
+                        )}
 
                     </div>
 
                 )}
-
 
                 {/* =================================================
                     ERROR
@@ -541,16 +505,13 @@ function CategoryPage({
                                 !
                             </div>
 
-
                             <h3>
                                 Something went wrong
                             </h3>
 
-
                             <p>
                                 {error}
                             </p>
-
 
                             <button
                                 type="button"
@@ -568,7 +529,6 @@ function CategoryPage({
                         </div>
 
                     )}
-
 
                 {/* =================================================
                     STORIES
@@ -593,7 +553,6 @@ function CategoryPage({
 
                     )}
 
-
                 {/* =================================================
                     EMPTY RESULT
                    ================================================= */}
@@ -608,14 +567,11 @@ function CategoryPage({
                                 ?
                             </div>
 
-
                             <h3>
                                 No stories found
                             </h3>
 
-
                             <p>
-
                                 We couldn't find any{" "}
 
                                 {tag
@@ -629,9 +585,7 @@ function CategoryPage({
                                     ? "matching your search."
                                     : "matching your selection."
                                 }
-
                             </p>
-
 
                             {searchTerm && (
 
@@ -651,7 +605,6 @@ function CategoryPage({
 
                     )}
 
-
                 {/* =================================================
                     PAGINATION
                    ================================================= */}
@@ -665,7 +618,6 @@ function CategoryPage({
                             aria-label="Story pagination"
                         >
 
-
                             {/* PREVIOUS */}
 
                             <button
@@ -676,15 +628,12 @@ function CategoryPage({
                                     handlePreviousPage
                                 }
                             >
-
                                 ←
 
                                 <span>
                                     Previous
                                 </span>
-
                             </button>
-
 
                             {/* PAGE NUMBERS */}
 
@@ -696,22 +645,17 @@ function CategoryPage({
                                         if (
                                             item === "..."
                                         ) {
-
                                             return (
-
                                                 <span
                                                     key={`ellipsis-${index}`}
                                                     className="pagination-ellipsis"
                                                 >
                                                     …
                                                 </span>
-
                                             );
                                         }
 
-
                                         return (
-
                                             <button
                                                 type="button"
                                                 key={item}
@@ -733,13 +677,11 @@ function CategoryPage({
                                             >
                                                 {item}
                                             </button>
-
                                         );
                                     }
                                 )}
 
                             </div>
-
 
                             {/* NEXT */}
 
@@ -753,13 +695,11 @@ function CategoryPage({
                                     handleNextPage
                                 }
                             >
-
                                 <span>
                                     Next
                                 </span>
 
                                 →
-
                             </button>
 
                         </nav>
@@ -771,6 +711,5 @@ function CategoryPage({
         </main>
     );
 }
-
 
 export default CategoryPage;

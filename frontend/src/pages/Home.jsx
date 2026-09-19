@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PostCard from "../components/PostCard";
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
+import EmptyState from "../components/EmptyState";
 import getStoryImage from "../utils/storyImage";
 import apiFetch from "../services/api";
 import "./Home.css";
-
 
 const categories = [
     {
@@ -41,7 +43,6 @@ const categories = [
     },
 ];
 
-
 const journeySteps = [
     {
         number: "01",
@@ -68,36 +69,70 @@ const journeySteps = [
             "Learn what changed, what worked, and what the journey taught them.",
     },
 ];
+function getReadingTime(post) {
+    const content = [
+        post.description,
+        post.starting_point,
+        post.how_started,
+        post.approach,
+        post.life_changed,
+        post.failures,
+        post.financial_info,
+        post.lessons
+    ]
+        .filter(Boolean)
+        .join(" ");
 
+    const wordCount = content
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .length;
+
+    return Math.max(
+        1,
+        Math.ceil(wordCount / 200)
+    );
+}
 
 function Home() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-
+    const [retryCount, setRetryCount] = useState(0);
 
     useEffect(() => {
         const fetchPosts = async () => {
             try {
+                setLoading(true);
+                setError("");
+
                 const data = await apiFetch(
                     "/api/posts?limit=6&sort=latest"
                 );
 
                 setPosts(data.posts || []);
             } catch {
-                setError("Unable to load latest stories.");
+                setPosts([]);
+                setError(
+                    "Unable to load latest stories. Please try again."
+                );
             } finally {
                 setLoading(false);
             }
         };
 
         fetchPosts();
-    }, []);
-
+    }, [retryCount]);
 
     const featuredPosts = posts.slice(0, 3);
     const latestPosts = posts.slice(3, 6);
 
+    const handleRetry = () => {
+        setRetryCount(
+            (current) => current + 1
+        );
+    };
 
     return (
         <main className="home-page">
@@ -112,7 +147,6 @@ function Home() {
 
                 <div className="home-hero-glow home-hero-glow-two"></div>
 
-
                 <div className="home-hero-content">
 
                     <div className="home-hero-label">
@@ -120,19 +154,16 @@ function Home() {
                         REAL STORIES. REAL JOURNEYS.
                     </div>
 
-
                     <h1>
                         Everyone starts
                         <span> from zero.</span>
                     </h1>
-
 
                     <p className="home-hero-description">
                         Read real stories of people who started with
                         uncertainty, took risks, faced failure, learned
                         from the journey, and built something meaningful.
                     </p>
-
 
                     <div className="home-hero-actions">
 
@@ -144,7 +175,6 @@ function Home() {
                             <span>→</span>
                         </a>
 
-
                         <a
                             href="#categories"
                             className="home-secondary-button"
@@ -154,14 +184,12 @@ function Home() {
 
                     </div>
 
-
                     <div className="home-hero-note">
                         <span></span>
                         Stories about the journey, not just the destination.
                     </div>
 
                 </div>
-
 
                 <div className="home-hero-bottom">
                     <span>SCROLL TO EXPLORE</span>
@@ -170,7 +198,6 @@ function Home() {
                 </div>
 
             </section>
-
 
             {/* =========================================
                 INTRO
@@ -182,19 +209,16 @@ function Home() {
                     01
                 </div>
 
-
                 <div className="home-intro-content">
 
                     <span className="home-section-kicker">
                         THE IDEA
                     </span>
 
-
                     <h2>
                         Behind every success story
                         <em> is a beginning.</em>
                     </h2>
-
 
                     <p>
                         Zero to Hero Blogs is a collection of real
@@ -206,7 +230,6 @@ function Home() {
                 </div>
 
             </section>
-
 
             {/* =========================================
                 CATEGORIES
@@ -225,13 +248,11 @@ function Home() {
                             EXPLORE
                         </span>
 
-
                         <h2>
                             Choose a journey.
                         </h2>
 
                     </div>
-
 
                     <p>
                         Different paths. Different challenges.
@@ -239,7 +260,6 @@ function Home() {
                     </p>
 
                 </div>
-
 
                 <div className="category-container">
 
@@ -257,13 +277,11 @@ function Home() {
                                     {category.number}
                                 </span>
 
-
                                 <span className="category-arrow">
                                     ↗
                                 </span>
 
                             </div>
-
 
                             <div className="category-card-content">
 
@@ -271,13 +289,11 @@ function Home() {
                                     {category.name}
                                 </h3>
 
-
                                 <p>
                                     {category.description}
                                 </p>
 
                             </div>
-
 
                             <span className="category-explore">
                                 Explore {category.name}
@@ -290,7 +306,6 @@ function Home() {
                 </div>
 
             </section>
-
 
             {/* =========================================
                 FEATURED STORIES
@@ -309,7 +324,6 @@ function Home() {
                             FEATURED STORIES
                         </span>
 
-
                         <h2>
                             Stories worth
                             <br />
@@ -317,7 +331,6 @@ function Home() {
                         </h2>
 
                     </div>
-
 
                     <Link
                         to="/business"
@@ -329,38 +342,19 @@ function Home() {
 
                 </div>
 
-
                 {loading && (
-
-                    <div className="home-state">
-
-                        <div className="home-loading-dot"></div>
-
-                        <p>
-                            Discovering stories...
-                        </p>
-
-                    </div>
-
+                    <LoadingState
+                        message="Discovering stories..."
+                    />
                 )}
 
-
-                {error && (
-
-                    <div className="home-state home-error">
-
-                        <h3>
-                            Stories are taking a moment.
-                        </h3>
-
-                        <p>
-                            {error}
-                        </p>
-
-                    </div>
-
+                {!loading && error && (
+                    <ErrorState
+                        title="Stories are taking a moment."
+                        message={error}
+                        onRetry={handleRetry}
+                    />
                 )}
-
 
                 {!loading && !error && (
 
@@ -392,51 +386,50 @@ function Home() {
                                                 }
                                             />
 
-
                                             <span className="featured-story-category">
                                                 {post.category}
                                             </span>
 
                                         </Link>
 
-
                                         <div className="featured-story-content">
 
                                             <div className="featured-story-meta">
 
-                                                <span>
-                                                    {post.storyteller}
-                                                </span>
+    <span>
+        {post.storyteller}
+    </span>
 
+    {post.created_at && (
+        <>
+            <span>
+                •
+            </span>
 
-                                                {post.created_at && (
+            <span>
+                {new Date(
+                    post.created_at
+                ).toLocaleDateString(
+                    "en-IN",
+                    {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                    }
+                )}
+            </span>
+        </>
+    )}
 
-                                                    <>
+    <span>
+        •
+    </span>
 
-                                                        <span>
-                                                            •
-                                                        </span>
+    <span>
+        {getReadingTime(post)} min read
+    </span>
 
-
-                                                        <span>
-                                                            {new Date(
-                                                                post.created_at
-                                                            ).toLocaleDateString(
-                                                                "en-IN",
-                                                                {
-                                                                    day: "numeric",
-                                                                    month: "short",
-                                                                    year: "numeric",
-                                                                }
-                                                            )}
-                                                        </span>
-
-                                                    </>
-
-                                                )}
-
-                                            </div>
-
+</div>
 
                                             <Link
                                                 to={`/post/${post.id}`}
@@ -445,23 +438,19 @@ function Home() {
                                                 {post.title}
                                             </Link>
 
-
                                             <p>
                                                 {post.description}
                                             </p>
 
-
                                             <div className="featured-story-footer">
 
                                                 <span>
-                                                    ♡ {post.likes || 0}
+                                                    Likes {post.likes || 0}
                                                 </span>
-
 
                                                 <span>
-                                                    ◉ {post.views || 0}
+                                                    Views {post.views || 0}
                                                 </span>
-
 
                                                 <Link
                                                     to={`/post/${post.id}`}
@@ -481,20 +470,12 @@ function Home() {
 
                         ) : (
 
-                            <div className="home-state">
-
-                                <h3>
-                                    No stories available yet.
-                                </h3>
-
-                                <p>
-                                    New journeys will appear here soon.
-                                </p>
-
-                            </div>
+                            <EmptyState
+                                title="No stories available yet."
+                                message="New journeys will appear here soon."
+                            />
 
                         )}
-
 
                         {latestPosts.length > 0 && (
 
@@ -506,13 +487,11 @@ function Home() {
                                         MORE TO EXPLORE
                                     </span>
 
-
                                     <h3>
                                         Latest journeys
                                     </h3>
 
                                 </div>
-
 
                                 <div className="home-latest-posts">
 
@@ -537,7 +516,6 @@ function Home() {
 
             </section>
 
-
             {/* =========================================
                 WHY ZERO TO HERO
             ========================================= */}
@@ -550,13 +528,11 @@ function Home() {
                         WHY ZERO TO HERO?
                     </span>
 
-
                     <h2>
                         Don't just see
                         <br />
                         the <em>result.</em>
                     </h2>
-
 
                     <p>
                         Understand what happened before the success,
@@ -564,7 +540,6 @@ function Home() {
                     </p>
 
                 </div>
-
 
                 <div className="home-why-grid">
 
@@ -585,7 +560,6 @@ function Home() {
 
                     </div>
 
-
                     <div className="why-card">
 
                         <span>
@@ -602,7 +576,6 @@ function Home() {
                         </p>
 
                     </div>
-
 
                     <div className="why-card">
 
@@ -621,7 +594,6 @@ function Home() {
 
                     </div>
 
-
                     <div className="why-card">
 
                         <span>
@@ -639,13 +611,11 @@ function Home() {
 
                     </div>
 
-
                     <div className="why-card why-card-wide">
 
                         <span>
                             05
                         </span>
-
 
                         <div>
 
@@ -666,7 +636,6 @@ function Home() {
 
             </section>
 
-
             {/* =========================================
                 JOURNEY
             ========================================= */}
@@ -679,12 +648,10 @@ function Home() {
                         THE JOURNEY
                     </span>
 
-
                     <h2>
                         From zero
                         <span> to hero.</span>
                     </h2>
-
 
                     <p>
                         Success is only one chapter.
@@ -692,7 +659,6 @@ function Home() {
                     </p>
 
                 </div>
-
 
                 <div className="journey-steps">
 
@@ -707,14 +673,11 @@ function Home() {
                                 {step.number}
                             </span>
 
-
                             <div className="journey-step-line"></div>
-
 
                             <h3>
                                 {step.title}
                             </h3>
-
 
                             <p>
                                 {step.description}
@@ -728,7 +691,6 @@ function Home() {
 
             </section>
 
-
             {/* =========================================
                 FINAL CTA
             ========================================= */}
@@ -739,13 +701,11 @@ function Home() {
                     02
                 </div>
 
-
                 <div className="home-cta-content">
 
                     <span className="home-section-kicker">
                         START EXPLORING
                     </span>
-
 
                     <h2>
                         Your next
@@ -754,12 +714,10 @@ function Home() {
                         {" "}could be one story away.
                     </h2>
 
-
                     <p>
                         Explore the journeys. Learn from the failures.
                         Take something useful with you.
                     </p>
-
 
                     <a
                         href="#featured-stories"
@@ -776,6 +734,5 @@ function Home() {
         </main>
     );
 }
-
 
 export default Home;

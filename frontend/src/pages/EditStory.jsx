@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
 import StoryForm from "../components/StoryForm";
+
 import apiFetch from "../services/api";
 import useAuth from "../hooks/useAuth";
 
@@ -10,6 +13,7 @@ import "./CreateStory.css";
 function EditStory() {
     const { id } = useParams();
     const navigate = useNavigate();
+
     const {
         isAuthenticated,
         logout,
@@ -47,6 +51,14 @@ function EditStory() {
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
 
+    const [retryCount, setRetryCount] = useState(0);
+
+    const handleRetry = () => {
+        setError("");
+        setLoading(true);
+        setRetryCount((count) => count + 1);
+    };
+
     // ============================================================
     // RICH TEXT EDITOR
     // ============================================================
@@ -72,6 +84,9 @@ function EditStory() {
                 return;
             }
 
+            setLoading(true);
+            setError("");
+
             try {
                 const data = await apiFetch(
                     `/api/admin/posts/${id}`
@@ -79,52 +94,23 @@ function EditStory() {
 
                 setFormData({
                     title: data.title || "",
-
-                    description:
-                        data.description || "",
-
-                    category:
-                        data.category || "Business",
-
-                    storyteller:
-                        data.storyteller || "",
-
-                    storyteller_email:
-                        data.storyteller_email || "",
-
-                    starting_point:
-                        data.starting_point || "",
-
-                    how_started:
-                        data.how_started || "",
-
-                    financial_info:
-                        data.financial_info || "",
-
-                    approach:
-                        data.approach || "",
-
-                    life_changed:
-                        data.life_changed || "",
-
-                    failures:
-                        data.failures || "",
-
-                    lessons:
-                        data.lessons || "",
-
-                    tags:
-                        data.tags || "",
-
-                    image_url:
-                        data.image_url || "",
-                    status:
-    data.status || "published",
+                    description: data.description || "",
+                    category: data.category || "Business",
+                    storyteller: data.storyteller || "",
+                    storyteller_email: data.storyteller_email || "",
+                    starting_point: data.starting_point || "",
+                    how_started: data.how_started || "",
+                    financial_info: data.financial_info || "",
+                    approach: data.approach || "",
+                    life_changed: data.life_changed || "",
+                    failures: data.failures || "",
+                    lessons: data.lessons || "",
+                    tags: data.tags || "",
+                    image_url: data.image_url || "",
+                    status: data.status || "published",
                 });
 
-                setImageUrl(
-                    data.image_url || ""
-                );
+                setImageUrl(data.image_url || "");
             } catch (error) {
                 if (
                     error.status === 401 ||
@@ -150,6 +136,7 @@ function EditStory() {
         navigate,
         isAuthenticated,
         logout,
+        retryCount,
     ]);
 
     // ============================================================
@@ -177,7 +164,6 @@ function EditStory() {
         }
 
         setSelectedImage(file);
-
         setError("");
         setMessage("");
     };
@@ -326,6 +312,7 @@ function EditStory() {
             navigate("/admin/login");
             return;
         }
+
         const status =
             event.nativeEvent.submitter?.value ||
             formData.status ||
@@ -395,9 +382,25 @@ function EditStory() {
         return (
             <main className="create-story-page">
                 <section className="create-story-container">
-                    <h1>
-                        Loading Story...
-                    </h1>
+                    <LoadingState message="Loading story..." />
+                </section>
+            </main>
+        );
+    }
+
+    // ============================================================
+    // ERROR SCREEN
+    // ============================================================
+
+    if (error && !formData.title) {
+        return (
+            <main className="create-story-page">
+                <section className="create-story-container">
+                    <ErrorState
+                        title="Unable to load story"
+                        message={error}
+                        onRetry={handleRetry}
+                    />
                 </section>
             </main>
         );
@@ -512,28 +515,28 @@ function EditStory() {
                     <div className="form-group edit-story-actions">
 
                         <button
-    type="submit"
-    name="status"
-    value="draft"
-    className="save-draft-button"
-    disabled={saving}
->
-    {saving
-        ? "Saving..."
-        : "Save Draft"}
-</button>
+                            type="submit"
+                            name="status"
+                            value="draft"
+                            className="save-draft-button"
+                            disabled={saving}
+                        >
+                            {saving
+                                ? "Saving..."
+                                : "Save Draft"}
+                        </button>
 
-<button
-    type="submit"
-    name="status"
-    value="published"
-    className="create-story-button"
-    disabled={saving}
->
-    {saving
-        ? "Saving..."
-        : "Publish"}
-</button>
+                        <button
+                            type="submit"
+                            name="status"
+                            value="published"
+                            className="create-story-button"
+                            disabled={saving}
+                        >
+                            {saving
+                                ? "Saving..."
+                                : "Publish"}
+                        </button>
 
                     </div>
 

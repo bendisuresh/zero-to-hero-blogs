@@ -1,5 +1,6 @@
 function AdminCommentList({
     comments,
+    onChangeStatus,
     onDeleteComment,
 }) {
     if (comments.length === 0) {
@@ -38,23 +39,53 @@ function AdminCommentList({
                                 {comment.post_title}
                             </strong>
                         </p>
+                        <p>
+    Status:{" "}
+    <strong>
+        {comment.status}
+    </strong>
+</p>
 
                         <p>
                             {comment.content}
                         </p>
 
-                    </div>
+                    </div><div className="admin-comment-actions">
+    <button
+        type="button"
+        onClick={() =>
+            onChangeStatus(
+                comment.id,
+                "approved"
+            )
+        }
+    >
+        Approve
+    </button>
 
-                    <button
-                        type="button"
-                        className="admin-delete-button"
-                        onClick={() =>
-                            onDeleteComment(comment.id)
-                        }
-                    >
-                        Delete Comment
-                    </button>
+    <button
+        type="button"
+        onClick={() =>
+            onChangeStatus(
+                comment.id,
+                "rejected"
+            )
+        }
+    >
+        Reject
+    </button>
 
+    <button
+        type="button"
+        className="admin-delete-button"
+        onClick={() =>
+            onDeleteComment(comment.id)
+        }
+    >
+        Delete Comment
+    </button>
+
+</div>
                 </article>
             ))}
 

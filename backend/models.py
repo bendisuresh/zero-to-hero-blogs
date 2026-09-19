@@ -136,3 +136,9 @@ class Comment(db.Model):
         db.DateTime,
         server_default=db.func.now()
     )
+    status = db.Column(
+        db.String(20),
+        nullable=False,
+        default="pending",
+        index=True
+    )

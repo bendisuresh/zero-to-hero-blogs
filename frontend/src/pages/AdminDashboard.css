@@ -930,3 +930,41 @@
     color: #166534;
     background: #dcfce7;
 }
+.admin-comment-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    flex-shrink: 0;
+}
+
+.admin-comment-actions button {
+    border: 1px solid #e4dfe8;
+    border-radius: 7px;
+    padding: 8px 11px;
+    background: #f4f1f6;
+    color: #3c3048;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.admin-comment-actions button:hover {
+    background: #ebe5ef;
+}
+
+@media (max-width: 650px) {
+    .admin-comment-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .admin-comment-actions button {
+        width: 100%;
+    }
+
+    .admin-comment-actions .admin-delete-button {
+        grid-column: 1 / -1;
+    }
+}

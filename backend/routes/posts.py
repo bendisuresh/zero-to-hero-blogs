@@ -1,12 +1,14 @@
 from flask import Blueprint, jsonify, request
-from database import db
 
-from models import (
-    Post
+from serializers.post_serializer import (
+    serialize_post,
+    serialize_post_summary,
+    serialize_admin_post
 )
 
 from services.post_service import (
-    create_post,
+    create_post as create_post_service,
+    get_post_by_id,
     get_posts as get_posts_service,
     update_post as update_post_service,
     delete_post as delete_post_service
@@ -33,6 +35,7 @@ def get_posts():
         "search",
         default=""
     ).strip()
+
     sort = request.args.get(
         "sort",
         default="latest"
@@ -43,6 +46,7 @@ def get_posts():
         default=1,
         type=int
     )
+
     limit = request.args.get(
         "limit",
         default=10,
@@ -67,20 +71,9 @@ def get_posts():
     posts_data = []
 
     for post in pagination.items:
-        posts_data.append({
-            "id": post.id,
-            "title": post.title,
-            "description": post.description,
-            "category": post.category,
-            "storyteller": post.storyteller,
-            "storyteller_email": post.storyteller_email,
-            "image_url": post.image_url,
-            "created_at": post.created_at.isoformat() if post.created_at else None,
-            "views": post.views or 0,
-            "likes": post.likes or 0,
-            "dislikes": post.dislikes or 0,
-            "tags": post.tags
-        })
+        posts_data.append(
+            serialize_post_summary(post)
+        )
 
     return {
         "posts": posts_data,
@@ -88,50 +81,35 @@ def get_posts():
         "total_pages": pagination.pages
     }, 200
 
+
 @posts_bp.route(
     "/api/posts/<int:post_id>",
     methods=["GET"]
 )
 def get_post(post_id):
-    post = db.session.get(
-        Post,
-        post_id
-    )
+    post = get_post_by_id(post_id)
 
-    if post is None or post.status != "published":
+    if not post:
         return {
             "message": "Post not found"
         }, 404
 
-    return {
-        "id": post.id,
-        "title": post.title,
-        "description": post.description,
-        "category": post.category,
-        "storyteller": post.storyteller,
-        "storyteller_email": post.storyteller_email,
-        "image_url": post.image_url,
-        "created_at": post.created_at.isoformat() if post.created_at else None,
-        "starting_point": post.starting_point,
-        "how_started": post.how_started,
-        "financial_info": post.financial_info,
-        "approach": post.approach,
-        "life_changed": post.life_changed,
-        "failures": post.failures,
-        "lessons": post.lessons,
-        "views": post.views or 0,
-        "likes": post.likes or 0,
-        "dislikes": post.dislikes or 0,
-        "tags": post.tags
-    }, 200
-@posts_bp.route("/api/admin/posts", methods=["GET"])
+    return serialize_post(post), 200
+
+
+@posts_bp.route(
+    "/api/admin/posts",
+    methods=["GET"]
+)
 @admin_required()
 def get_admin_posts():
     category = request.args.get("category")
+
     search = request.args.get(
         "search",
         default=""
     ).strip()
+
     sort = request.args.get(
         "sort",
         default="latest"
@@ -142,6 +120,7 @@ def get_admin_posts():
         default=1,
         type=int
     )
+
     limit = request.args.get(
         "limit",
         default=10,
@@ -166,36 +145,16 @@ def get_admin_posts():
     posts_data = []
 
     for post in pagination.items:
-        posts_data.append({
-            "id": post.id,
-            "title": post.title,
-            "description": post.description,
-            "category": post.category,
-            "storyteller": post.storyteller,
-            "storyteller_email": post.storyteller_email,
-            "views": post.views or 0,
-            "likes": post.likes or 0,
-            "dislikes": post.dislikes or 0,
-            "tags": post.tags,
-            "image_url": post.image_url,
-            "created_at": (
-                post.created_at.isoformat()
-                if post.created_at
-                else None
-            ),
-            "status": post.status,
-            "published_at": (
-                post.published_at.isoformat()
-                if post.published_at
-                else None
-            )
-        })
+        posts_data.append(
+            serialize_admin_post(post)
+        )
 
     return {
         "posts": posts_data,
         "page": pagination.page,
         "total_pages": pagination.pages
     }, 200
+
 
 @posts_bp.route(
     "/api/admin/posts",
@@ -205,7 +164,6 @@ def get_admin_posts():
 def admin_create_post():
     data = request.get_json()
 
-    # Validate post data
     validation_error = validate_post(data)
 
     if validation_error:
@@ -213,12 +171,11 @@ def admin_create_post():
             "message": validation_error
         }, 400
 
-    # Sanitize Tiptap HTML before storing it
     data["lessons"] = sanitize_rich_text(
         data["lessons"]
     )
 
-    post = create_post(data)
+    post = create_post_service(data)
 
     return {
         "message": "Story created successfully",
@@ -232,9 +189,9 @@ def admin_create_post():
 )
 @admin_required()
 def update_post(post_id):
-    post = db.session.get(
-        Post,
-        post_id
+    post = get_post_by_id(
+        post_id,
+        include_drafts=True
     )
 
     if not post:
@@ -244,7 +201,6 @@ def update_post(post_id):
 
     data = request.get_json()
 
-    # Validate post data
     validation_error = validate_post(data)
 
     if validation_error:
@@ -252,7 +208,6 @@ def update_post(post_id):
             "message": validation_error
         }, 400
 
-    # Sanitize rich text before saving
     data["lessons"] = sanitize_rich_text(
         data["lessons"]
     )
@@ -266,15 +221,17 @@ def update_post(post_id):
         "message": "Story updated successfully",
         "post_id": post.id
     }, 200
+
+
 @posts_bp.route(
     "/api/admin/posts/<int:post_id>",
     methods=["GET"]
 )
 @admin_required()
 def get_admin_post(post_id):
-    post = db.session.get(
-        Post,
-        post_id
+    post = get_post_by_id(
+        post_id,
+        include_drafts=True
     )
 
     if not post:
@@ -282,37 +239,7 @@ def get_admin_post(post_id):
             "message": "Post not found"
         }, 404
 
-    return {
-        "id": post.id,
-        "title": post.title,
-        "description": post.description,
-        "category": post.category,
-        "storyteller": post.storyteller,
-        "storyteller_email": post.storyteller_email,
-        "image_url": post.image_url,
-        "created_at": (
-            post.created_at.isoformat()
-            if post.created_at
-            else None
-        ),
-        "starting_point": post.starting_point,
-        "how_started": post.how_started,
-        "financial_info": post.financial_info,
-        "approach": post.approach,
-        "life_changed": post.life_changed,
-        "failures": post.failures,
-        "lessons": post.lessons,
-        "views": post.views or 0,
-        "likes": post.likes or 0,
-        "dislikes": post.dislikes or 0,
-        "tags": post.tags,
-        "status": post.status,
-        "published_at": (
-            post.published_at.isoformat()
-            if post.published_at
-            else None
-        )
-    }, 200
+    return serialize_admin_post(post), 200
 
 
 @posts_bp.route(
@@ -321,9 +248,9 @@ def get_admin_post(post_id):
 )
 @admin_required()
 def delete_post(post_id):
-    post = db.session.get(
-        Post,
-        post_id
+    post = get_post_by_id(
+        post_id,
+        include_drafts=True
     )
 
     if not post:

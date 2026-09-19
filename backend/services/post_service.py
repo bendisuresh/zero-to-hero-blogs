@@ -135,6 +135,19 @@ def delete_post(post):
     except Exception:
         db.session.rollback()
         raise
+def get_post_by_id(post_id, include_drafts=False):
+    post = db.session.get(
+        Post,
+        post_id
+    )
+
+    if post is None:
+        return None
+
+    if not include_drafts and post.status != "published":
+        return None
+
+    return post
 
 def get_posts(
     category=None,

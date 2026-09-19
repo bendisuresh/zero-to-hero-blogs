@@ -1,8 +1,10 @@
 from flask import Blueprint, request
 
-from database import db
-from models import Post, AdditionalStory
 from routes.auth import admin_required
+from services.additional_story_service import (
+    create_additional_story,
+    get_additional_stories
+)
 
 
 additional_stories_bp = Blueprint(
@@ -37,27 +39,16 @@ def add_additional_story(post_id):
             "message": "Title and content are required"
         }, 400
 
-    post = db.session.get(
-        Post,
-        post_id
+    additional_story = create_additional_story(
+        post_id=post_id,
+        title=title,
+        content=content
     )
 
-    if not post:
+    if not additional_story:
         return {
             "message": "Post not found"
         }, 404
-
-    additional_story = AdditionalStory(
-        post_id=post_id,
-        title=title.strip(),
-        content=content.strip()
-    )
-
-    db.session.add(
-        additional_story
-    )
-
-    db.session.commit()
 
     return {
         "message": "Additional story added successfully",
@@ -73,26 +64,14 @@ def add_additional_story(post_id):
     "/api/posts/<int:post_id>/additional-stories",
     methods=["GET"]
 )
-def get_additional_stories(post_id):
+def get_post_additional_stories(post_id):
 
-    post = db.session.get(
-        Post,
-        post_id
-    )
+    stories = get_additional_stories(post_id)
 
-    if not post:
+    if stories is None:
         return {
             "message": "Post not found"
         }, 404
-
-    stories = (
-        AdditionalStory.query
-        .filter_by(post_id=post_id)
-        .order_by(
-            AdditionalStory.created_at.asc()
-        )
-        .all()
-    )
 
     stories_data = []
 

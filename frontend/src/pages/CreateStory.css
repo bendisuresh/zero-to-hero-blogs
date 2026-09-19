@@ -1,451 +1,496 @@
 /* ============================================================
-   CREATE STORY PAGE
+   CREATE / EDIT STORY
+   Shared form styling for CreateStory.jsx and EditStory.jsx
    ============================================================ */
 
 .create-story-page {
     min-height: calc(100vh - 70px);
-    background: #f5f7fb;
-    padding: 40px 20px 60px;
+    padding: 48px 20px 80px;
     box-sizing: border-box;
+    background: #f7f7f9;
+    color: #21172e;
 }
-
-
-/* ============================================================
-   MAIN CONTAINER
-   ============================================================ */
 
 .create-story-container {
-    width: 100%;
-    max-width: 900px;
+    width: min(920px, 100%);
     margin: 0 auto;
-    padding: 35px;
+    padding: 38px 42px;
     box-sizing: border-box;
-
     background: #ffffff;
-    border-radius: 16px;
-
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e7e2eb;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(35, 24, 45, 0.07);
 }
-
 
 .create-story-container h1 {
-    margin: 0 0 30px;
-
+    margin: 0 0 32px;
+    color: #21172e;
+    font-size: 34px;
+    line-height: 1.2;
+    letter-spacing: -0.7px;
+    font-weight: 800;
     text-align: center;
-
-    font-size: 32px;
-    color: #1f2937;
 }
-
-
-/* ============================================================
-   MESSAGES
-   ============================================================ */
-
-.success-message {
-    margin-bottom: 20px;
-    padding: 12px 15px;
-
-    border-radius: 8px;
-
-    background: #ecfdf5;
-    color: #047857;
-
-    font-size: 14px;
-}
-
-
-.error-message {
-    margin-bottom: 20px;
-    padding: 12px 15px;
-
-    border-radius: 8px;
-
-    background: #fef2f2;
-    color: #b91c1c;
-
-    font-size: 14px;
-}
-
 
 /* ============================================================
    FORM
    ============================================================ */
 
+.create-story-container form {
+    width: 100%;
+}
+
 .form-group {
     margin-bottom: 24px;
 }
 
-
-.form-group label {
+.form-group > label,
+.create-story-container > form label {
     display: block;
-
     margin-bottom: 8px;
-
-    font-size: 14px;
-    font-weight: 600;
-
-    color: #374151;
+    color: #33283d;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 700;
 }
-
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-    width: 100%;
-    box-sizing: border-box;
-
-    padding: 12px 14px;
-
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-
-    background: #ffffff;
-
-    font-family: inherit;
-    font-size: 15px;
-
-    outline: none;
-}
-
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-    border-color: #6c3fd5;
-}
-
-
-.form-group textarea {
-    min-height: 120px;
-
-    resize: vertical;
-
-    line-height: 1.6;
-}
-
 
 /* ============================================================
-   EDITOR
+   INPUTS
+   ============================================================ */
+
+.create-story-container input[type="text"],
+.create-story-container input[type="email"],
+.create-story-container input[type="url"],
+.create-story-container input[type="file"],
+.create-story-container select,
+.create-story-container textarea {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.create-story-container input[type="text"],
+.create-story-container input[type="email"],
+.create-story-container input[type="url"],
+.create-story-container select,
+.create-story-container textarea {
+    padding: 12px 14px;
+    border: 1px solid #d9d2df;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #29212f;
+    outline: none;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.create-story-container input[type="text"],
+.create-story-container input[type="email"],
+.create-story-container input[type="url"],
+.create-story-container select {
+    min-height: 44px;
+}
+
+.create-story-container textarea {
+    min-height: 115px;
+    resize: vertical;
+    line-height: 1.55;
+}
+
+.create-story-container input::placeholder,
+.create-story-container textarea::placeholder {
+    color: #9a939f;
+}
+
+.create-story-container input[type="text"]:focus,
+.create-story-container input[type="email"]:focus,
+.create-story-container input[type="url"]:focus,
+.create-story-container select:focus,
+.create-story-container textarea:focus {
+    border-color: #75519a;
+    box-shadow: 0 0 0 3px rgba(117, 81, 154, 0.10);
+}
+
+/* ============================================================
+   FILE INPUT
+   ============================================================ */
+
+.create-story-container input[type="file"] {
+    padding: 10px;
+    border: 1px dashed #cfc6d7;
+    border-radius: 9px;
+    background: #faf9fb;
+    color: #554a5e;
+    cursor: pointer;
+}
+
+.create-story-container input[type="file"]::file-selector-button {
+    margin-right: 10px;
+    padding: 8px 12px;
+    border: 1px solid #d7cfdf;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #3e3348;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* ============================================================
+   TAGS
+   ============================================================ */
+
+.create-story-container .form-group:has(#tags) {
+    margin-bottom: 24px;
+}
+
+/* ============================================================
+   RICH TEXT EDITOR
    ============================================================ */
 
 .editor-toolbar {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-
-    margin-bottom: 10px;
+    gap: 7px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #d9d2df;
+    border-bottom: none;
+    border-radius: 9px 9px 0 0;
+    background: #f5f2f7;
 }
-
 
 .editor-button {
     padding: 8px 12px;
-
-    border: 1px solid #d1d5db;
+    border: 1px solid #d8d1df;
     border-radius: 7px;
-
     background: #ffffff;
-
-    color: #374151;
-
-    font-size: 13px;
-    font-weight: 600;
-
+    color: #3c3048;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
     cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
 }
-
 
 .editor-button:hover {
-    background: #f3f4f6;
+    background: #ebe6f0;
 }
-
 
 .editor-button.active {
-    background: #6c3fd5;
-    color: #ffffff;
-
     border-color: #6c3fd5;
-}
-
-
-.rich-text-editor {
-    min-height: 280px;
-
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-
-    background: #ffffff;
-}
-
-
-.rich-text-editor .ProseMirror {
-    min-height: 280px;
-
-    padding: 15px;
-
-    box-sizing: border-box;
-
-    outline: none;
-
-    font-size: 16px;
-    line-height: 1.7;
-}
-
-
-.rich-text-editor img {
-    display: block;
-
-    width: auto;
-    max-width: 100%;
-
-    max-height: 350px;
-
-    margin: 20px auto;
-
-    border-radius: 8px;
-
-    object-fit: contain;
-}
-
-
-/* ============================================================
-   IMAGE UPLOAD
-   ============================================================ */
-
-.upload-image-button {
-    margin-top: 10px;
-
-    padding: 10px 16px;
-
-    border: none;
-    border-radius: 7px;
-
-    background: #374151;
-    color: #ffffff;
-
-    font-size: 14px;
-    font-weight: 600;
-
-    cursor: pointer;
-}
-
-
-.upload-image-button:hover {
-    background: #1f2937;
-}
-
-
-.upload-image-button:disabled {
-    opacity: 0.6;
-
-    cursor: not-allowed;
-}
-
-
-/* ============================================================
-   UPLOADED IMAGE PREVIEW
-   ============================================================ */
-
-.uploaded-image-preview {
-    margin-top: 20px;
-    padding: 15px;
-
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-
-    background: #f9fafb;
-
-    overflow: hidden;
-}
-
-
-.uploaded-image-preview p {
-    margin: 0 0 12px;
-
-    font-size: 13px;
-    color: #4b5563;
-}
-
-
-/*
-   This controls ONLY the preview image.
-   It prevents the uploaded image from
-   taking over the entire page.
-*/
-
-.uploaded-image-preview img {
-    display: block;
-
-    width: auto;
-    max-width: 100%;
-
-    height: auto;
-    max-height: 300px;
-
-    margin: 0 auto;
-
-    border-radius: 8px;
-
-    object-fit: contain;
-}
-
-
-/* Prevent a long image URL from
-   creating horizontal scrolling. */
-
-.image-url {
-    margin-top: 12px !important;
-
-    overflow-wrap: anywhere;
-
-    word-break: break-word;
-
-    font-size: 12px !important;
-    color: #6b7280 !important;
-}
-
-
-/* ============================================================
-   CREATE BUTTON
-   ============================================================ */
-
-.create-story-button {
-    display: block;
-
-    width: 100%;
-
-    padding: 13px 20px;
-
-    border: none;
-    border-radius: 8px;
-
     background: #6c3fd5;
     color: #ffffff;
+}
 
+.ProseMirror {
+    min-height: 220px;
+    padding: 16px;
+    box-sizing: border-box;
+    border: 1px solid #d9d2df;
+    border-radius: 0 0 9px 9px;
+    background: #ffffff;
+    color: #332d38;
+    font-family: inherit;
     font-size: 15px;
-    font-weight: 600;
-
-    cursor: pointer;
+    line-height: 1.75;
+    outline: none;
 }
 
-
-.create-story-button:hover {
-    background: #5930b7;
+.ProseMirror:focus {
+    border-color: #75519a;
+    box-shadow: 0 0 0 3px rgba(117, 81, 154, 0.08);
 }
 
+.ProseMirror p {
+    margin: 0 0 12px;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+    margin: 12px 0;
+    padding-left: 25px;
+}
+
+.ProseMirror li {
+    margin-bottom: 6px;
+}
+
+.ProseMirror a {
+    color: #6840bd;
+    text-decoration: underline;
+}
+
+.ProseMirror img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 16px auto;
+    border-radius: 10px;
+}
 
 /* ============================================================
-   MOBILE
+   IMAGE UPLOADER
    ============================================================ */
 
-@media (max-width: 600px) {
-
-    .create-story-page {
-        padding: 20px 12px 40px;
-    }
-
-
-    .create-story-container {
-        padding: 22px 18px;
-        border-radius: 12px;
-    }
-
-
-    .create-story-container h1 {
-        font-size: 27px;
-    }
-
-
-    .editor-toolbar {
-        gap: 6px;
-    }
-
-
-    .editor-button {
-        padding: 7px 9px;
-
-        font-size: 12px;
-    }
-
-
-    .rich-text-editor .ProseMirror {
-        min-height: 240px;
-    }
-
-
-    .rich-text-editor img {
-        max-height: 250px;
-    }
-
-
-    .uploaded-image-preview img {
-        max-height: 220px;
-    }
-
+.create-story-container .image-uploader {
+    margin-bottom: 24px;
 }
+
+.create-story-container .image-preview {
+    margin-top: 14px;
+}
+
+.create-story-container .image-preview img {
+    display: block;
+    width: 100%;
+    max-width: 560px;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
 /* ============================================================
    EDIT STORY IMAGE
    ============================================================ */
 
 .edit-story-image {
-    margin-top: 30px;
+    margin-top: 8px;
 }
 
 .existing-image-preview {
-    margin: 15px 0 20px;
+    margin: 12px 0 15px;
     padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    background: #fafafa;
+    box-sizing: border-box;
+    border: 1px solid #e5dfe9;
+    border-radius: 11px;
+    background: #faf9fb;
 }
 
 .existing-image-preview p {
-    margin: 0 0 12px;
-    font-weight: 600;
+    margin: 0 0 11px;
+    color: #4b3e54;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .existing-image-preview img {
     display: block;
     width: 100%;
-    max-width: 500px;
-    max-height: 280px;
+    max-width: 560px;
+    max-height: 320px;
     object-fit: cover;
     border-radius: 10px;
 }
 
 .upload-image-button {
-    margin-top: 12px;
-    padding: 12px 20px;
-    border: none;
+    margin-top: 11px;
+    padding: 10px 16px;
+    border: 1px solid #6c3fd5;
     border-radius: 8px;
     background: #6c3fd5;
-    color: white;
-    font-weight: 600;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
     cursor: pointer;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
 }
 
 .upload-image-button:hover {
-    opacity: 0.9;
+    background: #5930bd;
+    transform: translateY(-1px);
 }
 
 .upload-image-button:disabled {
     opacity: 0.55;
     cursor: not-allowed;
+    transform: none;
 }
 
+/* ============================================================
+   MESSAGES
+   ============================================================ */
+
+.success-message,
+.error-message {
+    margin: 0 0 24px;
+    padding: 12px 15px;
+    box-sizing: border-box;
+    border-radius: 9px;
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 600;
+}
+
+.success-message {
+    border: 1px solid #b9e4c8;
+    background: #effaf2;
+    color: #176b36;
+}
+
+.error-message {
+    border: 1px solid #efc6c6;
+    background: #fff2f2;
+    color: #a52d2d;
+}
 
 /* ============================================================
-   MOBILE
+   ACTION BUTTONS
+   ============================================================ */
+
+.story-action-buttons,
+.edit-story-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+    margin-bottom: 0;
+}
+
+.save-draft-button,
+.create-story-button,
+.cancel-story-button {
+    min-width: 125px;
+    padding: 11px 18px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.save-draft-button {
+    border: 1px solid #6c3fd5;
+    background: #ffffff;
+    color: #6c3fd5;
+}
+
+.save-draft-button:hover {
+    background: #f3eff9;
+}
+
+.create-story-button {
+    border: 1px solid #6c3fd5;
+    background: #6c3fd5;
+    color: #ffffff;
+}
+
+.create-story-button:hover {
+    background: #5930bd;
+}
+
+.cancel-story-button {
+    border: 1px solid #d8d1df;
+    background: #ffffff;
+    color: #4a3d54;
+}
+
+.cancel-story-button:hover {
+    background: #f5f2f7;
+}
+
+.save-draft-button:active,
+.create-story-button:active,
+.cancel-story-button:active {
+    transform: translateY(1px);
+}
+
+.save-draft-button:disabled,
+.create-story-button:disabled,
+.cancel-story-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   LOADING / ERROR CONTAINER
+   ============================================================ */
+
+.create-story-container .status-card {
+    text-align: center;
+}
+
+/* ============================================================
+   RESPONSIVE
    ============================================================ */
 
 @media (max-width: 800px) {
-
-    .existing-image-preview img {
-        max-width: 100%;
-        max-height: 220px;
+    .create-story-page {
+        padding: 30px 14px 60px;
     }
 
+    .create-story-container {
+        padding: 30px 24px;
+        border-radius: 14px;
+    }
+
+    .create-story-container h1 {
+        font-size: 29px;
+        margin-bottom: 27px;
+    }
+}
+
+@media (max-width: 560px) {
+    .create-story-page {
+        padding: 20px 10px 45px;
+    }
+
+    .create-story-container {
+        padding: 23px 16px;
+    }
+
+    .create-story-container h1 {
+        font-size: 25px;
+        margin-bottom: 24px;
+    }
+
+    .editor-toolbar {
+        gap: 5px;
+        padding: 8px;
+    }
+
+    .editor-button {
+        padding: 7px 9px;
+        font-size: 11px;
+    }
+
+    .ProseMirror {
+        min-height: 180px;
+        padding: 13px;
+        font-size: 14px;
+    }
+
+    .story-action-buttons,
+    .edit-story-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 9px;
+    }
+
+    .save-draft-button,
+    .create-story-button,
+    .cancel-story-button,
     .upload-image-button {
         width: 100%;
+    }
+
+    .existing-image-preview img {
+        max-height: 240px;
     }
 }

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Toast from "../components/Toast";
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
+import EmptyState from "../components/EmptyState";
 import getStoryImage from "../utils/storyImage";
 import apiFetch from "../services/api";
 import "./Post.css";
-
 
 function StorySection({ title, children }) {
     if (!children) {
@@ -22,7 +24,6 @@ function StorySection({ title, children }) {
     );
 }
 
-
 function Post() {
     const { id } = useParams();
 
@@ -35,13 +36,18 @@ function Post() {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [retryCount, setRetryCount] = useState(0);
 
     const [toast, setToast] = useState({
         show: false,
         message: ""
     });
 
-
+    /*
+    ============================================================
+    TOAST
+    ============================================================
+    */
 
     const showToast = (message) => {
         setToast({
@@ -56,7 +62,6 @@ function Post() {
             });
         }, 2500);
     };
-
 
     /*
     ============================================================
@@ -76,6 +81,8 @@ function Post() {
 
                 setPost(data);
             } catch (error) {
+                setPost(null);
+
                 setError(
                     error.message ||
                     "Unable to connect to the server"
@@ -95,6 +102,8 @@ function Post() {
 
                 setAdditionalStories(data);
             } catch (error) {
+                setAdditionalStories([]);
+
                 console.error(
                     "Failed to fetch additional stories",
                     error
@@ -114,6 +123,8 @@ function Post() {
 
                 setComments(data);
             } catch (error) {
+                setComments([]);
+
                 console.error(
                     "Failed to fetch comments",
                     error
@@ -144,9 +155,19 @@ function Post() {
         };
 
         loadPost();
+    }, [id, retryCount]);
 
-    }, [id]);
+    /*
+    ============================================================
+    RETRY
+    ============================================================
+    */
 
+    const handleRetry = () => {
+        setRetryCount(
+            (current) => current + 1
+        );
+    };
 
     /*
     ============================================================
@@ -169,14 +190,12 @@ function Post() {
             }));
 
             showToast("Story liked!");
-
         } catch {
             showToast(
                 "Unable to connect to the server"
             );
         }
     };
-
 
     /*
     ============================================================
@@ -199,14 +218,38 @@ function Post() {
             }));
 
             showToast("Feedback recorded");
-
         } catch {
             showToast(
                 "Unable to connect to the server"
             );
         }
     };
+    const handleShare = async () => {
+    const shareUrl = window.location.href;
 
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: post.title,
+                text: post.description,
+                url: shareUrl
+            });
+        } catch (error) {
+            if (error.name !== "AbortError") {
+                showToast("Unable to share this story");
+            }
+        }
+
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(shareUrl);
+        showToast("Story link copied");
+    } catch {
+        showToast("Unable to copy story link");
+    }
+};
 
     /*
     ============================================================
@@ -240,7 +283,6 @@ function Post() {
             setName("");
             setComment("");
 
-
             /*
             ----------------------------------------------------
             REFRESH COMMENTS
@@ -253,7 +295,6 @@ function Post() {
                 );
 
                 setComments(commentsData);
-
             } catch (error) {
                 console.error(
                     "Failed to refresh comments",
@@ -261,15 +302,15 @@ function Post() {
                 );
             }
 
-            showToast("Comment added!");
-
+            showToast(
+                "Comment submitted for moderation"
+            );
         } catch {
             showToast(
                 "Unable to connect to the server"
             );
         }
     };
-
 
     /*
     ============================================================
@@ -280,21 +321,12 @@ function Post() {
     if (loading) {
         return (
             <main className="post-page">
-
-                <div className="post-status-card">
-
-                    <span className="status-spinner"></span>
-
-                    <p>
-                        Loading story...
-                    </p>
-
-                </div>
-
+                <LoadingState
+                    message="Loading story..."
+                />
             </main>
         );
     }
-
 
     /*
     ============================================================
@@ -305,30 +337,23 @@ function Post() {
     if (error) {
         return (
             <main className="post-page">
+                <ErrorState
+                    title="Unable to load this story"
+                    message={error}
+                    onRetry={handleRetry}
+                />
 
-                <div className="post-status-card post-error-card">
-
-                    <h2>
-                        Unable to load this story
-                    </h2>
-
-                    <p>
-                        {error}
-                    </p>
-
+                <div className="post-error-navigation">
                     <Link
                         to="/"
                         className="post-back-link"
                     >
                         ← Back to Home
                     </Link>
-
                 </div>
-
             </main>
         );
     }
-
 
     /*
     ============================================================
@@ -339,26 +364,22 @@ function Post() {
     if (!post) {
         return (
             <main className="post-page">
+                <EmptyState
+                    title="Story not found"
+                    message="The story you are looking for does not exist or is no longer available."
+                />
 
-                <div className="post-status-card">
-
-                    <h2>
-                        Story not found
-                    </h2>
-
+                <div className="post-error-navigation">
                     <Link
                         to="/"
                         className="post-back-link"
                     >
                         ← Back to Home
                     </Link>
-
                 </div>
-
             </main>
         );
     }
-
 
     /*
     ============================================================
@@ -379,7 +400,6 @@ function Post() {
         post.lessons
     ];
 
-
     const totalWords = storyParts
         .filter(Boolean)
         .join(" ")
@@ -388,12 +408,10 @@ function Post() {
         .filter(Boolean)
         .length;
 
-
     const readingTime = Math.max(
         1,
         Math.ceil(totalWords / 200)
     );
-
 
     const formattedDate = post.created_at
         ? new Date(
@@ -408,7 +426,6 @@ function Post() {
         )
         : "";
 
-
     /*
     ============================================================
     PAGE
@@ -418,22 +435,46 @@ function Post() {
     return (
         <main className="post-page">
 
-
             {/* =================================================
                 BACK NAVIGATION
                ================================================= */}
 
             <div className="post-navigation">
 
-                <Link
-                    to="/"
-                    className="post-back-link"
-                >
-                    ← Back to Stories
-                </Link>
+    <nav className="post-breadcrumbs" aria-label="Breadcrumb">
 
-            </div>
+        <Link to="/">
+            Home
+        </Link>
 
+        <span aria-hidden="true">
+            /
+        </span>
+
+        <Link
+            to={`/stories?category=${encodeURIComponent(post.category)}`}
+        >
+            {post.category}
+        </Link>
+
+        <span aria-hidden="true">
+            /
+        </span>
+
+        <span className="post-breadcrumb-current">
+            {post.title}
+        </span>
+
+    </nav>
+
+    <Link
+        to="/"
+        className="post-back-link"
+    >
+        ← Back to Stories
+    </Link>
+
+</div>
 
             {/* =================================================
                 ARTICLE HEADER
@@ -445,16 +486,13 @@ function Post() {
                     {post.category}
                 </span>
 
-
                 <h1>
                     {post.title}
                 </h1>
 
-
                 <p className="post-description">
                     {post.description}
                 </p>
-
 
                 <div className="post-meta">
 
@@ -466,18 +504,15 @@ function Post() {
                         </strong>
                     </span>
 
-
                     {formattedDate && (
                         <span>
                             {formattedDate}
                         </span>
                     )}
 
-
                     <span>
                         {readingTime} min read
                     </span>
-
 
                     <span>
                         {post.views || 0} views
@@ -486,7 +521,6 @@ function Post() {
                 </div>
 
             </header>
-
 
             {/* =================================================
                 HERO IMAGE
@@ -501,20 +535,17 @@ function Post() {
 
             </figure>
 
-
             {/* =================================================
                 ARTICLE + SIDEBAR
                ================================================= */}
 
             <div className="post-content-layout">
 
-
                 {/* =================================================
                     MAIN ARTICLE
                    ================================================= */}
 
                 <article className="main-story">
-
 
                     <div className="story-introduction">
 
@@ -532,36 +563,29 @@ function Post() {
 
                     </div>
 
-
                     <StorySection title="Starting Point">
                         {post.starting_point}
                     </StorySection>
-
 
                     <StorySection title="How It Started">
                         {post.how_started}
                     </StorySection>
 
-
                     <StorySection title="The Approach">
                         {post.approach}
                     </StorySection>
-
 
                     <StorySection title="How Life Changed">
                         {post.life_changed}
                     </StorySection>
 
-
                     <StorySection title="Challenges & Failures">
                         {post.failures}
                     </StorySection>
 
-
                     <StorySection title="Financial Context">
                         {post.financial_info}
                     </StorySection>
-
 
                     {/* =================================================
                         LESSONS
@@ -583,7 +607,6 @@ function Post() {
 
                             </div>
 
-
                             <div
                                 className="story-rich-content"
                                 dangerouslySetInnerHTML={{
@@ -594,7 +617,6 @@ function Post() {
                         </section>
 
                     )}
-
 
                     {/* =================================================
                         ADDITIONAL STORIES
@@ -615,7 +637,6 @@ function Post() {
                                 </h2>
 
                             </div>
-
 
                             <div className="additional-stories-list">
 
@@ -648,13 +669,11 @@ function Post() {
 
                 </article>
 
-
                 {/* =================================================
                     SIDEBAR
                    ================================================= */}
 
                 <aside className="post-sidebar">
-
 
                     {/* =================================================
                         STORYTELLER
@@ -670,7 +689,6 @@ function Post() {
                             {post.storyteller}
                         </h3>
 
-
                         {post.storyteller_email && (
 
                             <a
@@ -684,7 +702,6 @@ function Post() {
 
                     </section>
 
-
                     {/* =================================================
                         STORY DETAILS
                        ================================================= */}
@@ -694,7 +711,6 @@ function Post() {
                         <span className="sidebar-label">
                             STORY DETAILS
                         </span>
-
 
                         <div className="story-detail">
 
@@ -708,7 +724,6 @@ function Post() {
 
                         </div>
 
-
                         <div className="story-detail">
 
                             <span>
@@ -721,7 +736,6 @@ function Post() {
 
                         </div>
 
-
                         <div className="story-detail">
 
                             <span>
@@ -733,7 +747,6 @@ function Post() {
                             </strong>
 
                         </div>
-
 
                         {formattedDate && (
 
@@ -753,37 +766,42 @@ function Post() {
 
                     </section>
 
-
                     {/* =================================================
                         CLICKABLE TAGS
                        ================================================= */}
 
                     {post.tags && (
-    <section className="sidebar-section">
-        <span className="sidebar-label">
-            TOPICS
-        </span>
 
-        <div className="post-tags">
-            {post.tags
-                .split(",")
-                .map((tag) => {
-                    const cleanTag = tag.trim();
+                        <section className="sidebar-section">
 
-                    return (
-                        <Link
-                            key={cleanTag}
-                            to={`/stories?tag=${encodeURIComponent(cleanTag)}`}
-                            className="post-tag"
-                        >
-                            #{cleanTag}
-                        </Link>
-                    );
-                })}
-        </div>
-    </section>
-)}
+                            <span className="sidebar-label">
+                                TOPICS
+                            </span>
 
+                            <div className="post-tags">
+
+                                {post.tags
+                                    .split(",")
+                                    .map((tag) => {
+                                        const cleanTag =
+                                            tag.trim();
+
+                                        return (
+                                            <Link
+                                                key={cleanTag}
+                                                to={`/stories?tag=${encodeURIComponent(cleanTag)}`}
+                                                className="post-tag"
+                                            >
+                                                #{cleanTag}
+                                            </Link>
+                                        );
+                                    })}
+
+                            </div>
+
+                        </section>
+
+                    )}
 
                     {/* =================================================
                         FEEDBACK
@@ -795,9 +813,7 @@ function Post() {
                             YOUR FEEDBACK
                         </span>
 
-
                         <div className="post-actions">
-
 
                             <button
                                 type="button"
@@ -814,7 +830,6 @@ function Post() {
                                 </strong>
 
                             </button>
-
 
                             <button
                                 type="button"
@@ -835,18 +850,70 @@ function Post() {
                         </div>
 
                     </section>
+                    <section className="sidebar-section share-section">
+
+    <span className="sidebar-label">
+        SHARE STORY
+    </span>
+
+    <div className="post-share-actions">
+
+        <button
+            type="button"
+            onClick={handleShare}
+        >
+            Share
+        </button>
+
+        <button
+            type="button"
+            onClick={async () => {
+                try {
+                    await navigator.clipboard.writeText(
+                        window.location.href
+                    );
+
+                    showToast("Story link copied");
+                } catch {
+                    showToast("Unable to copy story link");
+                }
+            }}
+        >
+            Copy Link
+        </button>
+
+        <a
+            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            LinkedIn
+        </a>
+
+        <a
+            href={`https://wa.me/?text=${encodeURIComponent(
+                `${post.title} ${window.location.href}`
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            WhatsApp
+        </a>
+
+    </div>
+
+</section>
+
 
                 </aside>
 
             </div>
-
 
             {/* =====================================================
                 COMMENTS
                ===================================================== */}
 
             <section className="comments-section">
-
 
                 <div className="comments-heading">
 
@@ -859,7 +926,6 @@ function Post() {
                     </h2>
 
                 </div>
-
 
                 <form
                     className="comment-form"
@@ -875,7 +941,6 @@ function Post() {
                         }
                     />
 
-
                     <textarea
                         placeholder="Share your thoughts..."
                         value={comment}
@@ -884,26 +949,20 @@ function Post() {
                         }
                     />
 
-
                     <button type="submit">
                         Post Comment →
                     </button>
 
                 </form>
 
-
                 <div className="comments-list">
 
                     {comments.length === 0 ? (
 
-                        <div className="empty-comments">
-
-                            <p>
-                                Be the first to share your
-                                thoughts on this story.
-                            </p>
-
-                        </div>
+                        <EmptyState
+                            title="No approved comments yet"
+                            message="Be the first to share your thoughts on this story."
+                        />
 
                     ) : (
 
@@ -921,7 +980,6 @@ function Post() {
                                         .toUpperCase()}
 
                                 </div>
-
 
                                 <div className="comment-content">
 
@@ -945,7 +1003,6 @@ function Post() {
 
             </section>
 
-
             <Toast
                 show={toast.show}
                 message={toast.message}
@@ -954,6 +1011,5 @@ function Post() {
         </main>
     );
 }
-
 
 export default Post;

@@ -5,11 +5,12 @@ import "./AdminDashboard.css";
 import apiFetch from "../services/api";
 import useAuth from "../hooks/useAuth";
 
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
 import AdminStoryList from "../components/AdminStoryList";
 import AdminCommentList from "../components/AdminCommentList";
 import Pagination from "../components/Pagination";
 import AdminStatCard from "../components/AdminStatCard";
-
 
 function AdminDashboard() {
     const navigate = useNavigate();
@@ -32,6 +33,7 @@ function AdminDashboard() {
     });
 
     const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
     const [category, setCategory] = useState("");
     const [sort, setSort] = useState("latest");
     const [page, setPage] = useState(1);
@@ -39,46 +41,90 @@ function AdminDashboard() {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [retryCount, setRetryCount] = useState(0);
 
+    /*
+    ============================================================
+    LOAD DASHBOARD
+    ============================================================
+    */
+   useEffect(() => {
+    const timer = setTimeout(() => {
+        setDebouncedSearchTerm(searchTerm);
+    }, 400);
+
+    return () => {
+        clearTimeout(timer);
+    };
+}, [searchTerm]);
 
     useEffect(() => {
         const getDashboard = async () => {
+            if (!isAuthenticated) {
+                navigate("/admin/login");
+                return;
+            }
 
-        if (!isAuthenticated) {
-            navigate("/admin/login");
-            return;
-        }
+            setLoading(true);
+            setError("");
 
-        try {
-                // Check whether the admin token is valid
+            try {
+                /*
+                ------------------------------------------------
+                CHECK ADMIN AUTHENTICATION
+                ------------------------------------------------
+                */
+
                 const dashboardData =
-                    await apiFetch("/api/admin/dashboard");
+                    await apiFetch(
+                        "/api/admin/dashboard"
+                    );
 
-                setMessage(dashboardData.message);
-                setAdmin(dashboardData.admin);
+                setMessage(
+                    dashboardData.message
+                );
 
+                setAdmin(
+                    dashboardData.admin
+                );
 
-                // Get dashboard summary
+                /*
+                ------------------------------------------------
+                DASHBOARD SUMMARY
+                ------------------------------------------------
+                */
+
                 const summaryData =
-                    await apiFetch("/api/admin/summary");
+                    await apiFetch(
+                        "/api/admin/summary"
+                    );
 
                 setSummary(summaryData);
 
+                /*
+                ------------------------------------------------
+                ADMIN STORIES
+                ------------------------------------------------
+                */
 
-                // Get admin stories with search,
-                // category filtering, sorting and pagination
                 const params = new URLSearchParams({
                     page: page,
                     limit: 10,
                     sort: sort,
                 });
 
-                if (searchTerm) {
-                    params.set("search", searchTerm);
-                }
+                if (debouncedSearchTerm) {
+    params.set(
+        "search",
+        debouncedSearchTerm
+    );
+}
 
                 if (category) {
-                    params.set("category", category);
+                    params.set(
+                        "category",
+                        category
+                    );
                 }
 
                 const postsData =
@@ -95,8 +141,12 @@ function AdminDashboard() {
                     postsData.total_pages || 1
                 );
 
+                /*
+                ------------------------------------------------
+                COMMENT MODERATION
+                ------------------------------------------------
+                */
 
-                // Get all comments for admin moderation
                 const commentsData =
                     await apiFetch(
                         "/api/admin/comments"
@@ -105,53 +155,95 @@ function AdminDashboard() {
                 setComments(
                     commentsData.comments || []
                 );
+
             } catch (error) {
 
-    if (
-        error.status === 401 ||
-        error.status === 422
-    ) {
-        logout();
-        navigate("/admin/login");
-        return;
-    }
+                /*
+                ------------------------------------------------
+                AUTH FAILURE
+                ------------------------------------------------
+                */
 
-    setError(
-        "Unable to connect to the server"
-    );
+                if (
+                    error.status === 401 ||
+                    error.status === 422 ||
+                    error.status === 403
+                ) {
+                    logout();
+                    navigate("/admin/login");
+                    return;
+                }
 
-} finally {
+                setError(
+                    "Unable to connect to the server. Please try again."
+                );
+
+            } finally {
                 setLoading(false);
             }
         };
 
         getDashboard();
+
     }, [
         navigate,
         isAuthenticated,
         logout,
         page,
-        searchTerm,
+        debouncedSearchTerm,
         category,
         sort,
+        retryCount,
     ]);
 
+    /*
+    ============================================================
+    RETRY
+    ============================================================
+    */
+
+    const handleRetry = () => {
+        setRetryCount(
+            (current) => current + 1
+        );
+    };
+
+    /*
+    ============================================================
+    LOGOUT
+    ============================================================
+    */
 
     const handleLogout = () => {
-    logout();
-    navigate("/admin/login");
-};
+        logout();
+        navigate("/admin/login");
+    };
 
+    /*
+    ============================================================
+    CREATE STORY
+    ============================================================
+    */
 
     const handleCreateStory = () => {
         navigate("/admin/create-story");
     };
 
+    /*
+    ============================================================
+    VIEW STORY
+    ============================================================
+    */
 
     const handleViewStory = (id) => {
         navigate(`/post/${id}`);
     };
 
+    /*
+    ============================================================
+    ADDITIONAL STORY
+    ============================================================
+    */
 
     const handleAddStory = (id) => {
         navigate(
@@ -159,11 +251,23 @@ function AdminDashboard() {
         );
     };
 
+    /*
+    ============================================================
+    EDIT STORY
+    ============================================================
+    */
 
     const handleEditStory = (id) => {
-        navigate(`/admin/posts/${id}/edit`);
+        navigate(
+            `/admin/posts/${id}/edit`
+        );
     };
 
+    /*
+    ============================================================
+    DELETE STORY
+    ============================================================
+    */
 
     const handleDeleteStory = async (id) => {
         const confirmed = window.confirm(
@@ -175,26 +279,36 @@ function AdminDashboard() {
         }
 
         if (!isAuthenticated) {
-    navigate("/admin/login");
-    return;
-}
+            navigate("/admin/login");
+            return;
+        }
 
         try {
             await apiFetch(
-    `/api/admin/posts/${id}`,
-    {
-        method: "DELETE",
-    }
-);
+                `/api/admin/posts/${id}`,
+                {
+                    method: "DELETE",
+                }
+            );
 
-            // Remove deleted story from the screen
+            /*
+            ------------------------------------------------
+            REMOVE STORY FROM SCREEN
+            ------------------------------------------------
+            */
+
             setPosts((currentPosts) =>
                 currentPosts.filter(
                     (post) => post.id !== id
                 )
             );
 
-            // Update summary count
+            /*
+            ------------------------------------------------
+            UPDATE STORY COUNT
+            ------------------------------------------------
+            */
+
             setSummary((currentSummary) => ({
                 ...currentSummary,
                 total_stories:
@@ -203,13 +317,87 @@ function AdminDashboard() {
                         currentSummary.total_stories - 1
                     ),
             }));
-        } catch {
+
+        } catch (error) {
+
+            if (
+                error.status === 401 ||
+                error.status === 422 ||
+                error.status === 403
+            ) {
+                logout();
+                navigate("/admin/login");
+                return;
+            }
+
             setError(
-                "Unable to connect to the server"
+                "Unable to delete the story."
             );
         }
     };
 
+    /*
+    ============================================================
+    CHANGE COMMENT STATUS
+    ============================================================
+    */
+
+    const handleChangeCommentStatus = async (
+        commentId,
+        status
+    ) => {
+        if (!isAuthenticated) {
+            navigate("/admin/login");
+            return;
+        }
+
+        try {
+            const data = await apiFetch(
+    `/api/admin/comments/${commentId}/status`,
+    {
+        method: "PATCH",
+        body: {
+            status,
+        },
+    }
+);
+
+            setComments((currentComments) =>
+                currentComments.map((comment) => {
+                    if (comment.id === commentId) {
+                        return {
+                            ...comment,
+                            status: data.status,
+                        };
+                    }
+
+                    return comment;
+                })
+            );
+
+        } catch (error) {
+
+            if (
+                error.status === 401 ||
+                error.status === 422 ||
+                error.status === 403
+            ) {
+                logout();
+                navigate("/admin/login");
+                return;
+            }
+
+            setError(
+                "Unable to update comment status."
+            );
+        }
+    };
+
+    /*
+    ============================================================
+    DELETE COMMENT
+    ============================================================
+    */
 
     const handleDeleteComment = async (commentId) => {
         const confirmed = window.confirm(
@@ -221,19 +409,24 @@ function AdminDashboard() {
         }
 
         if (!isAuthenticated) {
-    navigate("/admin/login");
-    return;
-}
+            navigate("/admin/login");
+            return;
+        }
 
         try {
             await apiFetch(
-    `/api/admin/comments/${commentId}`,
-    {
-        method: "DELETE",
-    }
-);
+                `/api/admin/comments/${commentId}`,
+                {
+                    method: "DELETE",
+                }
+            );
 
-            // Remove deleted comment from the screen
+            /*
+            ------------------------------------------------
+            REMOVE COMMENT FROM SCREEN
+            ------------------------------------------------
+            */
+
             setComments((currentComments) =>
                 currentComments.filter(
                     (comment) =>
@@ -241,7 +434,12 @@ function AdminDashboard() {
                 )
             );
 
-            // Update summary count
+            /*
+            ------------------------------------------------
+            UPDATE COMMENT COUNT
+            ------------------------------------------------
+            */
+
             setSummary((currentSummary) => ({
                 ...currentSummary,
                 total_comments:
@@ -250,54 +448,95 @@ function AdminDashboard() {
                         currentSummary.total_comments - 1
                     ),
             }));
-        } catch {
+
+        } catch (error) {
+
+            if (
+                error.status === 401 ||
+                error.status === 422 ||
+                error.status === 403
+            ) {
+                logout();
+                navigate("/admin/login");
+                return;
+            }
+
             setError(
-                "Unable to connect to the server"
+                "Unable to delete the comment."
             );
         }
     };
 
+    /*
+    ============================================================
+    LOADING STATE
+    ============================================================
+    */
 
     if (loading) {
         return (
             <main className="admin-page">
-                <div className="admin-message">
-                    <h2>Loading dashboard...</h2>
-                </div>
+                <LoadingState
+                    message="Loading dashboard..."
+                />
             </main>
         );
     }
 
+    /*
+    ============================================================
+    ERROR STATE
+    ============================================================
+    */
 
     if (error) {
         return (
             <main className="admin-page">
-                <div className="admin-message">
-                    <h2>Something went wrong</h2>
-                    <p>{error}</p>
-                </div>
+                <ErrorState
+                    title="Something went wrong"
+                    message={error}
+                    onRetry={handleRetry}
+                />
             </main>
         );
     }
 
+    /*
+    ============================================================
+    DASHBOARD
+    ============================================================
+    */
 
     return (
         <main className="admin-page">
 
-            {/* Dashboard header */}
-            <section className="admin-header">
-                <div>
-                    <h1>Admin Dashboard</h1>
+            {/* =================================================
+                DASHBOARD HEADER
+               ================================================= */}
 
-                    <p>{message}</p>
+            <section className="admin-header">
+
+                <div>
+
+                    <h1>
+                        Admin Dashboard
+                    </h1>
+
+                    <p>
+                        {message}
+                    </p>
 
                     <p>
                         Logged in as:{" "}
-                        <strong>{admin}</strong>
+                        <strong>
+                            {admin}
+                        </strong>
                     </p>
+
                 </div>
 
                 <div className="admin-header-actions">
+
                     <button
                         type="button"
                         onClick={handleCreateStory}
@@ -313,11 +552,15 @@ function AdminDashboard() {
                     >
                         Logout
                     </button>
+
                 </div>
+
             </section>
 
+            {/* =================================================
+                DASHBOARD SUMMARY
+               ================================================= */}
 
-            {/* Dashboard summary */}
             <section className="admin-stats-grid">
 
                 <AdminStatCard
@@ -346,12 +589,17 @@ function AdminDashboard() {
 
             </section>
 
+            {/* =================================================
+                STORIES
+               ================================================= */}
 
-            {/* Stories section */}
             <section className="admin-section">
 
                 <div className="admin-section-header">
-                    <h2>All Stories</h2>
+
+                    <h2>
+                        All Stories
+                    </h2>
 
                     <span>
                         {posts.length}{" "}
@@ -359,34 +607,41 @@ function AdminDashboard() {
                             ? "Story"
                             : "Stories"}
                     </span>
+
                 </div>
 
+                {/* =================================================
+                    FILTERS
+                   ================================================= */}
 
-                {/* Search, category and sort filters */}
                 <div className="admin-filters">
 
                     <input
                         type="text"
                         placeholder="Search stories..."
+                        aria-label="Search stories"
                         value={searchTerm}
                         onChange={(event) => {
                             setSearchTerm(
                                 event.target.value
                             );
+
                             setPage(1);
                         }}
                     />
 
-
                     <select
+                    aria-label="Filter by category"
                         value={category}
                         onChange={(event) => {
                             setCategory(
                                 event.target.value
                             );
+
                             setPage(1);
                         }}
                     >
+
                         <option value="">
                             All Categories
                         </option>
@@ -406,16 +661,21 @@ function AdminDashboard() {
                         <option value="Other">
                             Other
                         </option>
-                    </select>
 
+                    </select>
 
                     <select
                         value={sort}
+                        aria-label="Sort stories"
                         onChange={(event) => {
-                            setSort(event.target.value);
+                            setSort(
+                                event.target.value
+                            );
+
                             setPage(1);
                         }}
                     >
+
                         <option value="latest">
                             Latest
                         </option>
@@ -427,10 +687,10 @@ function AdminDashboard() {
                         <option value="popular">
                             Popular
                         </option>
+
                     </select>
 
                 </div>
-
 
                 <AdminStoryList
                     posts={posts}
@@ -439,7 +699,6 @@ function AdminDashboard() {
                     onEditStory={handleEditStory}
                     onDeleteStory={handleDeleteStory}
                 />
-
 
                 <Pagination
                     page={page}
@@ -454,12 +713,17 @@ function AdminDashboard() {
 
             </section>
 
+            {/* =================================================
+                COMMENT MODERATION
+               ================================================= */}
 
-            {/* Comment moderation section */}
             <section className="admin-section">
 
                 <div className="admin-section-header">
-                    <h2>Comment Moderation</h2>
+
+                    <h2>
+                        Comment Moderation
+                    </h2>
 
                     <span>
                         {comments.length}{" "}
@@ -467,13 +731,16 @@ function AdminDashboard() {
                             ? "Comment"
                             : "Comments"}
                     </span>
-                </div>
 
+                </div>
 
                 <AdminCommentList
                     comments={comments}
                     onDeleteComment={
                         handleDeleteComment
+                    }
+                    onChangeStatus={
+                        handleChangeCommentStatus
                     }
                 />
 
@@ -482,6 +749,5 @@ function AdminDashboard() {
         </main>
     );
 }
-
 
 export default AdminDashboard;

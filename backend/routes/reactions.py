@@ -1,8 +1,7 @@
 from flask import Blueprint
 
-from database import db
-from models import Post
 from services.reaction_service import (
+    get_post,
     like_post as like_post_service,
     dislike_post as dislike_post_service,
     record_view
@@ -25,17 +24,13 @@ reactions_bp = Blueprint(
 )
 def like_post(post_id):
 
-    post = db.session.get(
-        Post,
-        post_id
-    )
+    post = get_post(post_id)
 
     if not post:
         return {
             "message": "Post not found"
         }, 404
 
-    # Protect against old NULL database values
     likes = like_post_service(post)
 
     return {
@@ -54,17 +49,13 @@ def like_post(post_id):
 )
 def dislike_post(post_id):
 
-    post = db.session.get(
-        Post,
-        post_id
-    )
+    post = get_post(post_id)
 
     if not post:
         return {
             "message": "Post not found"
         }, 404
 
-    # Protect against old NULL database values
     dislikes = dislike_post_service(post)
 
     return {
@@ -83,20 +74,16 @@ def dislike_post(post_id):
 )
 def view_post(post_id):
 
-    post = db.session.get(
-        Post,
-        post_id
-    )
+    post = get_post(post_id)
 
     if not post:
         return {
             "message": "Post not found"
         }, 404
 
-    # Protect against old NULL database values
     views = record_view(post)
 
     return {
         "message": "Post view recorded successfully",
         "views": views
-    }, 200 
+    }, 200

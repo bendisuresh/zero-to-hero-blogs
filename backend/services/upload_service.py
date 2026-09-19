@@ -27,6 +27,9 @@ def upload_image(image):
         image.filename
     )
 
+    if not allowed_file(original_filename):
+        raise ValueError("Invalid image type")
+
     file_extension = os.path.splitext(
         original_filename
     )[1].lower()

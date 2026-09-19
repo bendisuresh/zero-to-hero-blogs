@@ -30,6 +30,22 @@ def create_test_post(client, admin_token):
     return response.get_json()["post_id"]
 
 
+def create_test_comment(client, admin_token):
+    post_id = create_test_post(client, admin_token)
+
+    response = client.post(
+        f"/api/posts/{post_id}/comments",
+        json={
+            "name": "Test User",
+            "content": "Comment to be moderated"
+        }
+    )
+
+    assert response.status_code == 201
+
+    return post_id, response.get_json()["comment_id"]
+
+
 def test_create_comment(client, admin_token):
     post_id = create_test_post(client, admin_token)
 
@@ -45,20 +61,53 @@ def test_create_comment(client, admin_token):
 
     data = response.get_json()
 
-    assert data["message"] == "Comment added successfully"
+    assert data["message"] == "Comment submitted for moderation"
     assert "comment_id" in data
+    assert data["status"] == "pending"
 
 
-def test_get_comments(client, admin_token):
-    post_id = create_test_post(client, admin_token)
+def test_pending_comment_is_not_publicly_visible(
+    client,
+    admin_token
+):
+    post_id, comment_id = create_test_comment(
+        client,
+        admin_token
+    )
 
-    client.post(
-        f"/api/posts/{post_id}/comments",
+    assert comment_id is not None
+
+    response = client.get(
+        f"/api/posts/{post_id}/comments"
+    )
+
+    assert response.status_code == 200
+
+    comments = response.get_json()
+
+    assert comments == []
+
+
+def test_approved_comment_is_publicly_visible(
+    client,
+    admin_token
+):
+    post_id, comment_id = create_test_comment(
+        client,
+        admin_token
+    )
+
+    approve_response = client.patch(
+        f"/api/admin/comments/{comment_id}/status",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        },
         json={
-            "name": "Test User",
-            "content": "This is a test comment"
+            "status": "approved"
         }
     )
+
+    assert approve_response.status_code == 200
 
     response = client.get(
         f"/api/posts/{post_id}/comments"
@@ -70,16 +119,152 @@ def test_get_comments(client, admin_token):
 
     assert len(comments) == 1
     assert comments[0]["name"] == "Test User"
-    assert comments[0]["content"] == "This is a test comment"
+    assert comments[0]["content"] == "Comment to be moderated"
 
 
-def test_create_comment_without_name(client, admin_token):
-    post_id = create_test_post(client, admin_token)
+def test_rejected_comment_is_not_publicly_visible(
+    client,
+    admin_token
+):
+    post_id, comment_id = create_test_comment(
+        client,
+        admin_token
+    )
 
-    response = client.post(
-        f"/api/posts/{post_id}/comments",
+    reject_response = client.patch(
+        f"/api/admin/comments/{comment_id}/status",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        },
         json={
-            "content": "Comment without a name"
+            "status": "rejected"
+        }
+    )
+
+    assert reject_response.status_code == 200
+
+    response = client.get(
+        f"/api/posts/{post_id}/comments"
+    )
+
+    assert response.status_code == 200
+
+    comments = response.get_json()
+
+    assert comments == []
+
+
+def test_admin_can_approve_comment(
+    client,
+    admin_token
+):
+    post_id, comment_id = create_test_comment(
+        client,
+        admin_token
+    )
+
+    response = client.patch(
+        f"/api/admin/comments/{comment_id}/status",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        },
+        json={
+            "status": "approved"
+        }
+    )
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert data["message"] == (
+        "Comment status updated successfully"
+    )
+    assert data["comment_id"] == comment_id
+    assert data["status"] == "approved"
+
+
+def test_admin_can_reject_comment(
+    client,
+    admin_token
+):
+    post_id, comment_id = create_test_comment(
+        client,
+        admin_token
+    )
+
+    response = client.patch(
+        f"/api/admin/comments/{comment_id}/status",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        },
+        json={
+            "status": "rejected"
+        }
+    )
+
+    assert response.status_code == 200
+
+    data = response.get_json()
+
+    assert data["comment_id"] == comment_id
+    assert data["status"] == "rejected"
+
+
+def test_admin_can_reset_comment_to_pending(
+    client,
+    admin_token
+):
+    post_id, comment_id = create_test_comment(
+        client,
+        admin_token
+    )
+
+    approve_response = client.patch(
+        f"/api/admin/comments/{comment_id}/status",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        },
+        json={
+            "status": "approved"
+        }
+    )
+
+    assert approve_response.status_code == 200
+
+    pending_response = client.patch(
+        f"/api/admin/comments/{comment_id}/status",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        },
+        json={
+            "status": "pending"
+        }
+    )
+
+    assert pending_response.status_code == 200
+
+    data = pending_response.get_json()
+
+    assert data["status"] == "pending"
+
+
+def test_admin_cannot_set_invalid_comment_status(
+    client,
+    admin_token
+):
+    post_id, comment_id = create_test_comment(
+        client,
+        admin_token
+    )
+
+    response = client.patch(
+        f"/api/admin/comments/{comment_id}/status",
+        headers={
+            "Authorization": f"Bearer {admin_token}"
+        },
+        json={
+            "status": "invalid"
         }
     )
 
@@ -87,43 +272,72 @@ def test_create_comment_without_name(client, admin_token):
 
     data = response.get_json()
 
-    assert data["message"] == "Name and content are required"
+    assert data["message"] == (
+        "Status must be pending, approved, "
+        "or rejected"
+    )
 
 
-def test_create_comment_for_missing_post(client):
-    response = client.post(
-        "/api/posts/9999/comments",
+def test_anonymous_cannot_change_comment_status(
+    client,
+    admin_token
+):
+    post_id, comment_id = create_test_comment(
+        client,
+        admin_token
+    )
+
+    response = client.patch(
+        f"/api/admin/comments/{comment_id}/status",
         json={
-            "name": "Test User",
-            "content": "Comment for missing post"
+            "status": "approved"
         }
     )
 
-    assert response.status_code == 404
-
-    data = response.get_json()
-
-    assert data["message"] == "Post not found"
+    assert response.status_code == 401
 
 
-def create_test_comment(client, admin_token):
-    post_id = create_test_post(client, admin_token)
+def test_non_admin_cannot_change_comment_status(
+    client,
+    app,
+    admin_token
+):
+    post_id, comment_id = create_test_comment(
+        client,
+        admin_token
+    )
 
-    response = client.post(
-        f"/api/posts/{post_id}/comments",
+    from flask_jwt_extended import create_access_token
+
+    with app.app_context():
+        user_token = create_access_token(
+            identity="user@test.com",
+            additional_claims={
+                "role": "user"
+            }
+        )
+
+    response = client.patch(
+        f"/api/admin/comments/{comment_id}/status",
+        headers={
+            "Authorization": f"Bearer {user_token}"
+        },
         json={
-            "name": "Test User",
-            "content": "Comment to be deleted"
+            "status": "approved"
         }
     )
 
-    assert response.status_code == 201
-
-    return response.get_json()["comment_id"]
+    assert response.status_code == 403
 
 
-def test_admin_can_get_all_comments(client, admin_token):
-    comment_id = create_test_comment(client, admin_token)
+def test_admin_can_get_all_comments(
+    client,
+    admin_token
+):
+    comment_id = create_test_comment(
+        client,
+        admin_token
+    )[1]
 
     response = client.get(
         "/api/admin/comments",
@@ -141,13 +355,24 @@ def test_admin_can_get_all_comments(client, admin_token):
     assert data["total"] == 1
     assert len(data["comments"]) == 1
     assert data["comments"][0]["id"] == comment_id
-    assert data["comments"][0]["post_title"] == "Comment Test Post"
+    assert data["comments"][0]["post_title"] == (
+        "Comment Test Post"
+    )
     assert data["comments"][0]["name"] == "Test User"
-    assert data["comments"][0]["content"] == "Comment to be deleted"
+    assert data["comments"][0]["content"] == (
+        "Comment to be moderated"
+    )
+    assert data["comments"][0]["status"] == "pending"
 
 
-def test_anonymous_cannot_get_all_comments(client, admin_token):
-    create_test_comment(client, admin_token)
+def test_anonymous_cannot_get_all_comments(
+    client,
+    admin_token
+):
+    create_test_comment(
+        client,
+        admin_token
+    )
 
     response = client.get(
         "/api/admin/comments"
@@ -156,8 +381,15 @@ def test_anonymous_cannot_get_all_comments(client, admin_token):
     assert response.status_code == 401
 
 
-def test_non_admin_cannot_get_all_comments(client, app, admin_token):
-    create_test_comment(client, admin_token)
+def test_non_admin_cannot_get_all_comments(
+    client,
+    app,
+    admin_token
+):
+    create_test_comment(
+        client,
+        admin_token
+    )
 
     from flask_jwt_extended import create_access_token
 
@@ -179,8 +411,14 @@ def test_non_admin_cannot_get_all_comments(client, app, admin_token):
     assert response.status_code == 403
 
 
-def test_anonymous_cannot_delete_comment(client, admin_token):
-    comment_id = create_test_comment(client, admin_token)
+def test_anonymous_cannot_delete_comment(
+    client,
+    admin_token
+):
+    comment_id = create_test_comment(
+        client,
+        admin_token
+    )[1]
 
     response = client.delete(
         f"/api/admin/comments/{comment_id}"
@@ -189,8 +427,15 @@ def test_anonymous_cannot_delete_comment(client, admin_token):
     assert response.status_code == 401
 
 
-def test_non_admin_cannot_delete_comment(client, app, admin_token):
-    comment_id = create_test_comment(client, admin_token)
+def test_non_admin_cannot_delete_comment(
+    client,
+    app,
+    admin_token
+):
+    comment_id = create_test_comment(
+        client,
+        admin_token
+    )[1]
 
     from flask_jwt_extended import create_access_token
 
@@ -212,8 +457,14 @@ def test_non_admin_cannot_delete_comment(client, app, admin_token):
     assert response.status_code == 403
 
 
-def test_admin_can_delete_comment(client, admin_token):
-    comment_id = create_test_comment(client, admin_token)
+def test_admin_can_delete_comment(
+    client,
+    admin_token
+):
+    comment_id = create_test_comment(
+        client,
+        admin_token
+    )[1]
 
     response = client.delete(
         f"/api/admin/comments/{comment_id}",
@@ -233,7 +484,10 @@ def test_deleted_comment_no_longer_appears_in_admin_moderation(
     client,
     admin_token
 ):
-    comment_id = create_test_comment(client, admin_token)
+    comment_id = create_test_comment(
+        client,
+        admin_token
+    )[1]
 
     delete_response = client.delete(
         f"/api/admin/comments/{comment_id}",
@@ -263,7 +517,10 @@ def test_admin_comment_count_matches_comments_returned(
     client,
     admin_token
 ):
-    post_id = create_test_post(client, admin_token)
+    post_id = create_test_post(
+        client,
+        admin_token
+    )
 
     first_response = client.post(
         f"/api/posts/{post_id}/comments",

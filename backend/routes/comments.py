@@ -5,7 +5,9 @@ from models import Post, Comment
 from routes.auth import admin_required
 from services.comment_service import (
     create_comment as create_comment_service,
-    delete_comment as delete_comment_service
+    delete_comment as delete_comment_service,
+
+    update_comment_status as update_comment_status_service
 )
 
 
@@ -56,19 +58,20 @@ def create_comment(post_id):
         }, 404
 
     comment = create_comment_service(
-    post_id,
-    name,
-    content
-)
+        post_id,
+        name,
+        content
+    )
 
     return {
-        "message": "Comment added successfully",
-        "comment_id": comment.id
+        "message": "Comment submitted for moderation",
+        "comment_id": comment.id,
+        "status": comment.status
     }, 201
 
 
 # ============================================================
-# GET COMMENTS
+# GET APPROVED COMMENTS - PUBLIC
 # ============================================================
 
 @comments_bp.route(
@@ -89,7 +92,10 @@ def get_comments(post_id):
 
     comments = (
         Comment.query
-        .filter_by(post_id=post_id)
+        .filter_by(
+            post_id=post_id,
+            status="approved"
+        )
         .order_by(
             Comment.created_at.asc()
         )
@@ -107,6 +113,7 @@ def get_comments(post_id):
         })
 
     return comments_data, 200
+
 
 # ============================================================
 # GET ALL COMMENTS - ADMIN
@@ -143,6 +150,7 @@ def get_all_comments():
             "post_title": post_title,
             "name": comment.name,
             "content": comment.content,
+            "status": comment.status,
             "created_at": comment.created_at
         })
 
@@ -152,6 +160,60 @@ def get_all_comments():
     }, 200
 
 
+# ============================================================
+# UPDATE COMMENT STATUS - ADMIN
+# ============================================================
+
+@comments_bp.route(
+    "/api/admin/comments/<int:comment_id>/status",
+    methods=["PATCH"]
+)
+@admin_required()
+def change_comment_status(comment_id):
+
+    comment = db.session.get(
+        Comment,
+        comment_id
+    )
+
+    if not comment:
+        return {
+            "message": "Comment not found"
+        }, 404
+
+    data = request.get_json()
+
+    if not data:
+        return {
+            "message": "Request body is required"
+        }, 400
+
+    status = data.get("status")
+
+    allowed_statuses = [
+        "pending",
+        "approved",
+        "rejected"
+    ]
+
+    if status not in allowed_statuses:
+        return {
+            "message": (
+                "Status must be pending, approved, "
+                "or rejected"
+            )
+        }, 400
+
+    update_comment_status_service(
+        comment,
+        status
+    )
+
+    return {
+        "message": "Comment status updated successfully",
+        "comment_id": comment.id,
+        "status": comment.status
+    }, 200
 # ============================================================
 # DELETE COMMENT - ADMIN
 # ============================================================
@@ -173,8 +235,11 @@ def delete_comment(comment_id):
             "message": "Comment not found"
         }, 404
 
-    delete_comment_service(comment)
+    delete_comment_service(
+        comment
+    )
 
     return {
-        "message": "Comment deleted successfully"
+        "message": "Comment deleted successfully",
+        "comment_id": comment_id
     }, 200

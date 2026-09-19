@@ -3,10 +3,10 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, get_jwt_identity
+from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from database import db
-from routes.auth import auth_bp, admin_required
+from routes.auth import auth_bp
 from routes.dashboard import dashboard_bp
 from routes.posts import posts_bp
 from routes.comments import comments_bp
@@ -97,18 +97,6 @@ def home():
     }
 
 
-@app.route(
-    "/api/admin/dashboard",
-    methods=["GET"]
-)
-@admin_required()
-def admin_dashboard():
-    current_admin = get_jwt_identity()
-
-    return {
-        "message": "Welcome to the admin dashboard",
-        "admin": current_admin
-    }, 200
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ function AdminStoryList({
         return (
             <div className="admin-empty">
                 <h3>No stories found</h3>
+
                 <p>
                     Try changing your search or category filter.
                 </p>
@@ -21,13 +22,13 @@ function AdminStoryList({
             <table className="admin-story-table">
                 <thead>
                     <tr>
-                        <th>Story</th>
-                        <th>Category</th>
-                        <th>Storyteller</th>
-                        <th>Views</th>
-                        <th>Likes</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th scope="col">Story</th>
+<th scope="col">Category</th>
+<th scope="col">Storyteller</th>
+<th scope="col">Views</th>
+<th scope="col">Likes</th>
+<th scope="col">Status</th>
+<th scope="col">Actions</th>
                     </tr>
                 </thead>
 
@@ -36,7 +37,10 @@ function AdminStoryList({
                         <tr key={post.id}>
                             <td>
                                 <div className="admin-table-story">
-                                    <strong>{post.title}</strong>
+                                    <strong>
+                                        {post.title}
+                                    </strong>
+
                                     <span>
                                         {post.description}
                                     </span>
@@ -77,16 +81,14 @@ function AdminStoryList({
 
                             <td>
                                 <div className="admin-table-actions">
-                                    {post.status !== "draft" && (
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                onViewStory(post.id)
-                                            }
-                                        >
-                                            View
-                                        </button>
-                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            onViewStory(post.id)
+                                        }
+                                    >
+                                        View
+                                    </button>
 
                                     <button
                                         type="button"
