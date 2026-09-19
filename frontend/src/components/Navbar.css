@@ -3,11 +3,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 15px 30px;
-    background-color: #222;
+    background-color:var(--color-dark);
 }
 
 .navbar-logo a {
-    color: white;
+    color: var(--color-surface);
     text-decoration: none;
     font-size: 22px;
     font-weight: bold;
@@ -20,13 +20,19 @@
 
 .navbar-links a,
 .navbar-admin a {
-    color: white;
+    color: var(--color-surface);
     text-decoration: none;
 }
 
 .navbar-links a:hover,
 .navbar-admin a:hover {
     text-decoration: underline;
+}
+.navbar a:focus-visible,
+.navbar button:focus-visible {
+    outline: 2px solid var(--color-surface);
+    outline-offset: 4px;
+    border-radius: var(--radius-sm);
 }
 
 /* Hide mobile menu button on desktop */
@@ -55,7 +61,7 @@
         display: block;
         background: none;
         border: none;
-        color: white;
+        color: var(--color-surface);
         font-size: 28px;
         cursor: pointer;
     }

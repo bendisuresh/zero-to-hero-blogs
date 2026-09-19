@@ -19,7 +19,7 @@
 
     border-radius: 16px;
 
-    background: #ffffff;
+    background: var(--color-surface);
 
     box-shadow:
         0 6px 22px rgba(28, 28, 42, 0.05);
@@ -54,7 +54,7 @@
 
     overflow: hidden;
 
-    background: #ececf1;
+    background: var(--color-background);
 
     text-decoration: none;
 }
@@ -94,7 +94,7 @@
 
     padding: 7px 11px;
 
-    border-radius: 999px;
+    border-radius:var(--radius-pill);
 
     background: rgba(20, 20, 25, 0.78);
 
@@ -137,7 +137,7 @@
 
     padding: 20px 20px 18px;
 
-    background: #ffffff;
+    background: var(--color-surface);
 }
 
 
@@ -166,7 +166,7 @@
 
     padding: 5px 9px;
 
-    border-radius: 999px;
+    border-radius:var(--radius-pill);
 
     background: #f0ecff;
 
@@ -192,7 +192,7 @@
 .post-card-date {
     flex-shrink: 0;
 
-    color: #8a8d97;
+    color: var(--color-muted);
 
     font-size: 11px;
 
@@ -217,7 +217,7 @@
 
     overflow: hidden;
 
-    color: #1b1c22;
+    color: var(--color-text);
 
     font-size: 20px;
 
@@ -248,7 +248,7 @@
 
     overflow: hidden;
 
-    color: #666a75;
+    color: var(--color-secondary-text);
 
     font-size: 14px;
 
@@ -315,7 +315,7 @@
 
     overflow: hidden;
 
-    color: #444750;
+    color:var(--color-secondary-text);
 
     font-size: 12px;
 
@@ -329,7 +329,7 @@
 .post-card-reading-time {
     flex-shrink: 0;
 
-    color: #8a8d97;
+    color: var(--color-muted);
 
     font-size: 11px;
 }
@@ -362,7 +362,7 @@
 
     gap: 12px;
 
-    color: #858892;
+    color: var(--color-muted);
 
     font-size: 11px;
 
@@ -389,11 +389,9 @@
 
     border-radius: 8px;
 
-    background: #6c3fd5;
-
-    color: white;
-
-    text-decoration: none;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: var(--color-surface);
 
     font-size: 11px;
 
@@ -414,7 +412,7 @@
 }
 
 .post-card-button:hover {
-    background: #5930bd;
+    background: var(--color-primary-hover);
 
     transform: translateY(-1px);
 }
@@ -436,7 +434,7 @@
 
     overflow: hidden;
 
-    background: #ececf1;
+    background: var(--color-background);
 }
 
 .featured-story-image img {

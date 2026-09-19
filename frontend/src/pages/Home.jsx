@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PostCard from "../components/PostCard";
-import LoadingState from "../components/LoadingState";
+import StoryCardSkeleton from "../components/StoryCardSkeleton";
 import ErrorState from "../components/ErrorState";
 import EmptyState from "../components/EmptyState";
 import getStoryImage from "../utils/storyImage";
@@ -69,6 +69,7 @@ const journeySteps = [
             "Learn what changed, what worked, and what the journey taught them.",
     },
 ];
+
 function getReadingTime(post) {
     const content = [
         post.description,
@@ -78,7 +79,7 @@ function getReadingTime(post) {
         post.life_changed,
         post.failures,
         post.financial_info,
-        post.lessons
+        post.lessons,
     ]
         .filter(Boolean)
         .join(" ");
@@ -89,10 +90,7 @@ function getReadingTime(post) {
         .filter(Boolean)
         .length;
 
-    return Math.max(
-        1,
-        Math.ceil(wordCount / 200)
-    );
+    return Math.max(1, Math.ceil(wordCount / 200));
 }
 
 function Home() {
@@ -129,9 +127,7 @@ function Home() {
     const latestPosts = posts.slice(3, 6);
 
     const handleRetry = () => {
-        setRetryCount(
-            (current) => current + 1
-        );
+        setRetryCount((current) => current + 1);
     };
 
     return (
@@ -342,11 +338,26 @@ function Home() {
 
                 </div>
 
+                {/* =========================================
+                    LOADING STATE
+                ========================================= */}
+
                 {loading && (
-                    <LoadingState
-                        message="Discovering stories..."
-                    />
+                    <div
+                        className="home-latest-posts"
+                        aria-label="Loading stories"
+                        aria-busy="true"
+                    >
+                        <StoryCardSkeleton />
+                        <StoryCardSkeleton />
+                        <StoryCardSkeleton />
+                        <StoryCardSkeleton />
+                    </div>
                 )}
+
+                {/* =========================================
+                    ERROR STATE
+                ========================================= */}
 
                 {!loading && error && (
                     <ErrorState
@@ -355,6 +366,10 @@ function Home() {
                         onRetry={handleRetry}
                     />
                 )}
+
+                {/* =========================================
+                    SUCCESS STATE
+                ========================================= */}
 
                 {!loading && !error && (
 
@@ -396,40 +411,40 @@ function Home() {
 
                                             <div className="featured-story-meta">
 
-    <span>
-        {post.storyteller}
-    </span>
+                                                <span>
+                                                    {post.storyteller}
+                                                </span>
 
-    {post.created_at && (
-        <>
-            <span>
-                •
-            </span>
+                                                {post.created_at && (
+                                                    <>
+                                                        <span>
+                                                            •
+                                                        </span>
 
-            <span>
-                {new Date(
-                    post.created_at
-                ).toLocaleDateString(
-                    "en-IN",
-                    {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                    }
-                )}
-            </span>
-        </>
-    )}
+                                                        <span>
+                                                            {new Date(
+                                                                post.created_at
+                                                            ).toLocaleDateString(
+                                                                "en-IN",
+                                                                {
+                                                                    day: "numeric",
+                                                                    month: "short",
+                                                                    year: "numeric",
+                                                                }
+                                                            )}
+                                                        </span>
+                                                    </>
+                                                )}
 
-    <span>
-        •
-    </span>
+                                                <span>
+                                                    •
+                                                </span>
 
-    <span>
-        {getReadingTime(post)} min read
-    </span>
+                                                <span>
+                                                    {getReadingTime(post)} min read
+                                                </span>
 
-</div>
+                                            </div>
 
                                             <Link
                                                 to={`/post/${post.id}`}

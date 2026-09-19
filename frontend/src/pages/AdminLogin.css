@@ -25,7 +25,7 @@
             rgba(117, 79, 205, 0.08),
             transparent 30%
         ),
-        #f7f8fc;
+        var(--color-background);
 }
 
 
@@ -69,9 +69,9 @@
 
     margin-bottom: 25px;
 
-    border-radius: 13px;
+    border-radius: var(--radius-md);
 
-    background: #6c3fd5;
+    background: var(--color-primary);
 
     color: white;
 
@@ -90,7 +90,7 @@
 
     margin-bottom: 13px;
 
-    color: #7352d4;
+    color: var(--color-primary);
 
     font-size: 11px;
 
@@ -104,7 +104,7 @@
 .admin-login-intro h1 {
     margin: 0 0 18px;
 
-    color: #17171c;
+    color: var(--color-text);
 
     font-size: clamp(42px, 5vw, 62px);
 
@@ -120,7 +120,7 @@
 
     margin: 0;
 
-    color: #666a76;
+    color: var(--color-secondary-text);
 
     font-size: 18px;
 
@@ -153,7 +153,7 @@
 .admin-login-points span {
     flex-shrink: 0;
 
-    color: #9b9da6;
+    color: var(--color-muted);
 
     font-size: 11px;
 
@@ -165,7 +165,7 @@
 .admin-login-points p {
     margin: 0;
 
-    color: #464951;
+    color: var(--color-text);
 
     font-size: 13px;
 
@@ -184,14 +184,13 @@
 
     padding: 34px;
 
-    border: 1px solid #e1e1e7;
+    border: 1px solid var(--color-border);
 
-    border-radius: 18px;
+    border-radius: var(--radius-xl);
 
-    background: white;
+    background: var(--color-surface);
 
-    box-shadow:
-        0 18px 55px rgba(30, 30, 45, 0.09);
+    box-shadow: var(--shadow-lg);
 }
 
 
@@ -208,7 +207,7 @@
 
     margin-bottom: 8px;
 
-    color: #7352d4;
+    color: var(--color-primary);
 
     font-size: 10px;
 
@@ -222,7 +221,7 @@
 .login-card-heading h2 {
     margin: 0 0 8px;
 
-    color: #1c1d23;
+    color: var(--color-text);
 
     font-size: 30px;
 
@@ -234,7 +233,7 @@
 .login-card-heading p {
     margin: 0;
 
-    color: #777b86;
+    color: var(--color-muted);
 
     font-size: 13px;
 
@@ -268,7 +267,7 @@
 }
 
 .login-field label {
-    color: #35373f;
+    color: var(--color-text);
 
     font-size: 13px;
 
@@ -284,15 +283,15 @@
 
     padding: 0 14px;
 
-    border: 1px solid #dedfe5;
+    border: 1px solid var(--color-border);
 
-    border-radius: 9px;
+    border-radius: var(--radius-sm);
 
     outline: none;
 
     background: #fafafd;
 
-    color: #282a31;
+    color: var(--color-text);
 
     font-family: inherit;
 
@@ -305,16 +304,16 @@
 }
 
 .login-field input::placeholder {
-    color: #a0a2aa;
+    color: var(--color-muted);
 }
 
 .login-field input:focus {
-    border-color: #7653d3;
+    border-color: var(--color-primary);
 
-    background: white;
+    background: var(--color-surface);
 
     box-shadow:
-        0 0 0 3px rgba(118, 83, 211, 0.10);
+        0 0 0 3px rgba(108, 63, 213, 0.10);
 }
 
 
@@ -333,7 +332,7 @@
 
     border: 1px solid #f1caca;
 
-    border-radius: 9px;
+    border-radius: var(--radius-sm);
 
     background: #fff5f5;
 }
@@ -349,7 +348,7 @@
     align-items: center;
     justify-content: center;
 
-    border-radius: 50%;
+    border-radius: var(--radius-pill);
 
     background: #b43b3b;
 
@@ -391,9 +390,9 @@
 
     border: none;
 
-    border-radius: 9px;
+    border-radius: var(--radius-sm);
 
-    background: #6c3fd5;
+    background: var(--color-primary);
 
     color: white;
 
@@ -412,7 +411,7 @@
 }
 
 .login-submit:hover:not(:disabled) {
-    background: #5930bd;
+    background: var(--color-primary-hover);
 
     transform: translateY(-1px);
 }
@@ -447,7 +446,7 @@
 
     border-top-color: white;
 
-    border-radius: 50%;
+    border-radius: var(--radius-pill);
 
     animation: login-spin 0.7s linear infinite;
 }
@@ -474,7 +473,7 @@
 
     padding-top: 20px;
 
-    border-top: 1px solid #eeeeF2;
+    border-top: 1px solid var(--color-light-border);
 }
 
 .login-security-note > span {
@@ -486,7 +485,7 @@
 .login-security-note p {
     margin: 0;
 
-    color: #898c96;
+    color: var(--color-muted);
 
     font-size: 11px;
 
@@ -566,7 +565,7 @@
     .login-card {
         padding: 25px 20px;
 
-        border-radius: 15px;
+        border-radius: var(--radius-lg);
     }
 
     .login-card-heading h2 {
@@ -589,6 +588,25 @@
 
     .login-card {
         padding: 22px 17px;
+    }
+
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .login-submit,
+    .login-submit > span:not(.login-spinner),
+    .login-field input {
+        transition: none;
+    }
+
+    .login-spinner {
+        animation: none;
     }
 
 }

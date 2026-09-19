@@ -40,12 +40,13 @@ function Navbar() {
             {/* Mobile menu button */}
 
             <button
-                className="menu-button"
-                onClick={() =>
-                    setMenuOpen(!menuOpen)
-                }
-                aria-label="Toggle navigation menu"
-            >
+    type="button"
+    className="menu-button"
+    onClick={() => setMenuOpen(!menuOpen)}
+    aria-label="Toggle navigation menu"
+    aria-expanded={menuOpen}
+    aria-controls="main-navigation"
+>
                 ☰
             </button>
 
@@ -53,12 +54,13 @@ function Navbar() {
             {/* Main navigation links */}
 
             <div
-                className={`navbar-links ${
-                    menuOpen
-                        ? "navbar-links-open"
-                        : ""
-                }`}
-            >
+    id="main-navigation"
+    className={`navbar-links ${
+        menuOpen
+            ? "navbar-links-open"
+            : ""
+    }`}
+>
 
                 <Link
                     to="/"

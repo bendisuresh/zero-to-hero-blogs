@@ -9,6 +9,8 @@ import {
 } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import Navbar from "./components/Navbar";
+import "./components/RouteLoading.css";
+import "./components/StateComponents.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const Home = lazy(() => import("./pages/Home"));

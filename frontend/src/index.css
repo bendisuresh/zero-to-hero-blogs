@@ -1,29 +1,164 @@
-/* Remove the browser's default spacing */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ============================================================
+   GLOBAL DESIGN SYSTEM
+   Zero to Hero Blogs
+   ============================================================ */
+
+:root {
+    /* Colors */
+    --color-background: #f7f8fc;
+    --color-surface: #ffffff;
+    --color-surface-soft: #f4f1f6;
+
+    --color-text: #17171c;
+    --color-text-secondary: #555862;
+    --color-text-muted: #777b86;
+
+    --color-border: #e1e1e7;
+    --color-border-light: #e7e4ea;
+
+    --color-primary: #6c3fd5;
+    --color-primary-hover: #5930bd;
+    --color-primary-soft: #f1edff;
+
+    --color-dark: #17171c;
+    --color-dark-soft: #25262d;
+
+    --color-success: #166534;
+    --color-success-background: #f0fdf4;
+
+    --color-danger: #b42323;
+    --color-danger-background: #fef2f2;
+
+    /* Border radius */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 10px;
+    --radius-xl: 12px;
+    --radius-2xl: 16px;
+    --radius-pill: 999px;
+
+    /* Shadows */
+    --shadow-sm:
+        0 4px 14px rgba(28, 28, 42, 0.04);
+
+    --shadow-md:
+        0 8px 25px rgba(28, 28, 42, 0.06);
+
+    --shadow-lg:
+        0 15px 38px rgba(28, 28, 42, 0.1);
+
+    /* Layout */
+    --content-max-width: 1200px;
+
+    /* Motion */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.25s ease;
+    --transition-slow: 0.4s ease;
 }
 
-/* Basic page settings */
+/* ============================================================
+   RESET
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ============================================================
+   DOCUMENT
+   ============================================================ */
+
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f7fb;
-    color: #222;
-}
-/* Main content area */
-main {
-  padding: 60px 40px;
-  text-align: center;
+    min-width: 320px;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: var(--color-background);
+    color: var(--color-text);
+
+    line-height: 1.5;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
-main h1 {
-  margin-bottom: 15px;
-  font-size: 40px;
+/* ============================================================
+   MEDIA
+   ============================================================ */
+
+img,
+svg,
+video {
+    max-width: 100%;
 }
 
-main p {
-  font-size: 18px;
-  line-height: 1.6;
+img {
+    display: block;
+}
+
+/* ============================================================
+   LINKS
+   ============================================================ */
+
+a {
+    color: inherit;
+}
+
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+/* ============================================================
+   BUTTON
+   ============================================================ */
+
+button {
+    color: inherit;
+}
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+
+:focus-visible {
+    outline: 3px solid rgba(108, 63, 213, 0.35);
+    outline-offset: 3px;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

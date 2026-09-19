@@ -4,15 +4,16 @@
 
 .post-page {
     width: 100%;
+
     min-height: 100vh;
 
     box-sizing: border-box;
 
     padding: 32px 24px 90px;
 
-    background: #f7f8fc;
+    background: var(--color-background);
 
-    color: #17171c;
+    color: var(--color-text);
 }
 
 
@@ -22,6 +23,7 @@
 
 .post-navigation {
     width: 100%;
+
     max-width: 1180px;
 
     margin: 0 auto 28px;
@@ -37,6 +39,7 @@
     text-decoration: none;
 
     font-size: 14px;
+
     font-weight: 700;
 
     transition:
@@ -57,6 +60,7 @@
 
 .post-header {
     width: 100%;
+
     max-width: 1000px;
 
     margin: 0 auto;
@@ -68,17 +72,19 @@
     display: inline-flex;
 
     align-items: center;
+
     justify-content: center;
 
     padding: 7px 14px;
 
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
 
     background: #eee8ff;
 
     color: #6941c6;
 
     font-size: 12px;
+
     font-weight: 800;
 
     letter-spacing: 0.8px;
@@ -118,6 +124,7 @@
     display: flex;
 
     justify-content: center;
+
     align-items: center;
 
     flex-wrap: wrap;
@@ -126,7 +133,7 @@
 
     margin-top: 24px;
 
-    color: #777b86;
+    color: var(--color-muted);
 
     font-size: 13px;
 }
@@ -156,6 +163,7 @@
 
 .post-hero-image {
     width: 100%;
+
     max-width: 1180px;
 
     margin: 42px auto 64px;
@@ -174,6 +182,7 @@
     display: block;
 
     width: 100%;
+
     height: 460px;
 
     object-fit: cover;
@@ -186,6 +195,7 @@
 
 .post-content-layout {
     width: 100%;
+
     max-width: 1180px;
 
     margin: 0 auto;
@@ -210,6 +220,7 @@
 
 .main-story {
     width: 100%;
+
     max-width: 760px;
 
     min-width: 0;
@@ -244,6 +255,7 @@
     color: #7352d4;
 
     font-size: 11px;
+
     font-weight: 800;
 
     letter-spacing: 1.2px;
@@ -281,7 +293,7 @@
 .story-section h2 {
     margin: 0 0 14px;
 
-    color: #17171c;
+    color: var(--color-text);
 
     font-size: 29px;
 
@@ -336,7 +348,7 @@
 
     border: 1px solid #f0dfb5;
 
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
 
     background: #fffaf0;
 }
@@ -454,6 +466,7 @@
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
     width: 100%;
@@ -462,15 +475,16 @@
 
     padding: 11px 15px;
 
-    border-radius: 9px;
+    border-radius: var(--radius-sm);
 
-    background: #6c3fd5;
+    background: var(--color-primary);
 
     color: white;
 
     text-decoration: none;
 
     font-size: 13px;
+
     font-weight: 700;
 
     transition:
@@ -479,7 +493,7 @@
 }
 
 .contact-storyteller-btn:hover {
-    background: #5930bd;
+    background: var(--color-primary-hover);
 
     transform: translateY(-1px);
 }
@@ -493,6 +507,7 @@
     display: flex;
 
     align-items: center;
+
     justify-content: space-between;
 
     gap: 15px;
@@ -542,7 +557,7 @@
 
     padding: 6px 10px;
 
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
 
     background: #f0edff;
 
@@ -574,6 +589,7 @@
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
     gap: 8px;
@@ -584,9 +600,9 @@
 
     border: 1px solid #dedfe6;
 
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
 
-    background: white;
+    background: var(--color-surface);
 
     color: #30323a;
 
@@ -638,7 +654,7 @@
 .section-heading h2 {
     margin: 0;
 
-    color: #17171c;
+    color: var(--color-text);
 
     font-size: 30px;
 
@@ -698,6 +714,7 @@
 
 .comments-section {
     width: 100%;
+
     max-width: 900px;
 
     margin: 88px auto 0;
@@ -714,7 +731,7 @@
 .comments-heading h2 {
     margin: 0 0 28px;
 
-    color: #17171c;
+    color: var(--color-text);
 
     font-size: 31px;
 
@@ -748,9 +765,9 @@
 
     border: 1px solid #dfe0e6;
 
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
 
-    background: white;
+    background: var(--color-surface);
 
     color: #25262d;
 
@@ -767,10 +784,10 @@
 
 .comment-form input:focus,
 .comment-form textarea:focus {
-    border-color: #7653d3;
+    border-color: var(--color-primary);
 
     box-shadow:
-        0 0 0 3px rgba(118, 83, 211, 0.10);
+        0 0 0 3px rgba(108, 63, 213, 0.10);
 }
 
 .comment-form textarea {
@@ -786,9 +803,9 @@
 
     border: none;
 
-    border-radius: 9px;
+    border-radius: var(--radius-sm);
 
-    background: #6c3fd5;
+    background: var(--color-primary);
 
     color: white;
 
@@ -806,7 +823,7 @@
 }
 
 .comment-form button:hover {
-    background: #5930bd;
+    background: var(--color-primary-hover);
 
     transform: translateY(-1px);
 }
@@ -835,23 +852,25 @@
 
     border: 1px solid #e5e5ea;
 
-    border-radius: 13px;
+    border-radius: var(--radius-md);
 
-    background: white;
+    background: var(--color-surface);
 }
 
 .comment-avatar {
     flex-shrink: 0;
 
     width: 38px;
+
     height: 38px;
 
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
-    border-radius: 50%;
+    border-radius: var(--radius-pill);
 
     background: #eee8ff;
 
@@ -893,89 +912,17 @@
 .empty-comments {
     padding: 25px;
 
-    border-radius: 12px;
+    border-radius: var(--radius-md);
 
-    background: white;
+    background: var(--color-surface);
 
-    color: #777b85;
+    color: var(--color-muted);
 
     text-align: center;
 }
 
 .empty-comments p {
     margin: 0;
-}
-
-
-/* ============================================================
-   LOADING / ERROR
-   ============================================================ */
-
-.post-status-card {
-    width: 100%;
-    max-width: 600px;
-
-    margin: 120px auto;
-
-    padding: 50px 30px;
-
-    box-sizing: border-box;
-
-    border-radius: 18px;
-
-    background: white;
-
-    text-align: center;
-
-    box-shadow:
-        0 12px 40px rgba(30, 30, 40, 0.08);
-}
-
-.post-status-card h2 {
-    margin: 0 0 10px;
-
-    color: #202128;
-
-    font-size: 25px;
-}
-
-.post-status-card p {
-    margin: 0 0 20px;
-
-    color: #71747e;
-
-    line-height: 1.6;
-}
-
-.post-status-card .post-back-link {
-    display: inline-flex;
-}
-
-.post-error-card h2 {
-    color: #a33b3b;
-}
-
-.status-spinner {
-    display: block;
-
-    width: 30px;
-    height: 30px;
-
-    margin: 0 auto 18px;
-
-    border: 3px solid #e5e0f6;
-
-    border-top-color: #6c3fd5;
-
-    border-radius: 50%;
-
-    animation: post-spinner 0.8s linear infinite;
-}
-
-@keyframes post-spinner {
-    to {
-        transform: rotate(360deg);
-    }
 }
 
 
@@ -1179,6 +1126,7 @@
 
     .post-page {
         padding-left: 12px;
+
         padding-right: 12px;
     }
 
@@ -1195,9 +1143,6 @@
     }
 
 }
-/* ============================================================
-   HERO IMAGE
-   ============================================================ */
 
 
 /* ============================================================
@@ -1206,12 +1151,19 @@
 
 .story-rich-content img {
     display: block;
+
     width: auto;
+
     max-width: 100%;
+
     height: auto;
+
     max-height: 500px;
+
     margin: 30px auto;
-    border-radius: 14px;
+
+    border-radius: var(--radius-md);
+
     object-fit: contain;
 }
 
@@ -1224,27 +1176,42 @@
 
     .post-hero-image {
         width: 100%;
+
         height: 320px;
+
         margin-bottom: 35px;
+
         border-radius: 12px;
     }
 
     .post-hero-image img {
         width: 100%;
+
         height: 100%;
+
         object-fit: cover;
     }
 
     .story-rich-content img {
         max-width: 100%;
+
         max-height: 320px;
+
         margin: 24px auto;
     }
+
 }
+
+
+/* ============================================================
+   POST CARD IMAGE
+   ============================================================ */
+
 .post-card-image {
     display: block;
 
     width: 100%;
+
     height: 220px;
 
     object-fit: cover;
@@ -1254,12 +1221,23 @@
     transition:
         transform 0.45s ease;
 }
+
+
+/* ============================================================
+   BREADCRUMBS
+   ============================================================ */
+
 .post-breadcrumbs {
     display: flex;
+
     align-items: center;
+
     flex-wrap: wrap;
+
     gap: 0.5rem;
+
     margin-bottom: 1rem;
+
     font-size: 0.9rem;
 }
 
@@ -1271,23 +1249,40 @@
     opacity: 0.7;
 }
 
+
+/* ============================================================
+   SHARE ACTIONS
+   ============================================================ */
+
 .post-share-actions {
     display: flex;
+
     flex-wrap: wrap;
+
     gap: 0.5rem;
+
     margin-top: 0.75rem;
 }
 
 .post-share-actions button,
 .post-share-actions a {
     display: inline-flex;
+
     align-items: center;
+
     justify-content: center;
+
     padding: 0.55rem 0.8rem;
+
     border: 1px solid currentColor;
+
     border-radius: 6px;
+
     background: transparent;
+
     font: inherit;
+
     text-decoration: none;
+
     cursor: pointer;
 }
