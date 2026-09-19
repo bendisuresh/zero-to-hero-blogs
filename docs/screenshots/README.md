@@ -18,7 +18,6 @@ use mock or placeholder screenshots.
 | 5 | `create-story.png` | Create story | Demonstrates story creation and rich-text editing |
 | 6 | `edit-story.png` | Edit story | Demonstrates editing and draft/publish workflow |
 | 7 | `comment-moderation.png` | Comment moderation | Demonstrates the moderation workflow |
-| 8 | `mobile-responsive.png` | Mobile view | Demonstrates responsive design |
 
 ---
 
@@ -211,112 +210,8 @@ admin UI.
 
 ---
 
-# 8. Mobile Responsive View
 
-### Filename
 
-```text
-mobile-responsive.png
-```
-
-### Capture
-
-Use browser developer tools or a real mobile device.
-
-Capture a representative public page showing:
-
-- Responsive navigation
-- Story cards/content
-- Proper spacing
-- No horizontal overflow
-- Mobile-friendly layout
-
-### Why it matters
-
-This demonstrates responsive frontend implementation.
-
----
-
-# Screenshot Quality Checklist
-
-Before adding a screenshot to the repository:
-
-- [ ] Use the real application
-- [ ] Use realistic sample content
-- [ ] No passwords visible
-- [ ] No JWT tokens visible
-- [ ] No API keys visible
-- [ ] No database credentials visible
-- [ ] No private user information visible
-- [ ] Browser zoom is approximately 100%
-- [ ] Important UI is clearly visible
-- [ ] No unrelated windows are visible
-- [ ] Screenshot has a useful filename
-- [ ] Image is cropped cleanly
-
----
-
-# Suggested README Placement
-
-The root `README.md` can reference the screenshots like this:
-
-```markdown
-## Screenshots
-
-### Home Page
-
-![Home Page](docs/screenshots/home.png)
-
-### Story Reading
-
-![Story Reading](docs/screenshots/story-reading.png)
-
-### Admin Dashboard
-
-![Admin Dashboard](docs/screenshots/admin-dashboard.png)
-
-### Create Story
-
-![Create Story](docs/screenshots/create-story.png)
-
-### Comment Moderation
-
-![Comment Moderation](docs/screenshots/comment-moderation.png)
-
-### Mobile Responsive
-
-![Mobile Responsive](docs/screenshots/mobile-responsive.png)
-```
-
----
-
-# Recommended Capture Order
-
-Capture screenshots in this order:
-
-```text
-1. Home
-      ↓
-2. Published Story
-      ↓
-3. Admin Login
-      ↓
-4. Admin Dashboard
-      ↓
-5. Create Story
-      ↓
-6. Edit Story
-      ↓
-7. Comment Moderation
-      ↓
-8. Mobile Responsive
-```
-
-This follows the natural user journey through the application.
-
----
-
-# Screenshot Directory
 
 Final directory:
 
@@ -335,7 +230,6 @@ docs/
     ├── create-story.png
     ├── edit-story.png
     ├── comment-moderation.png
-    └── mobile-responsive.png
 ```
 
 The PNG files should only be added after the corresponding real screens have
